@@ -17,6 +17,7 @@ venv/
 
 # Vendored agent skills (installed via `databricks aitools install`)
 .claude/skills/
+.claude/settings.local.json
 .databricks/
 
 # Local scratch
