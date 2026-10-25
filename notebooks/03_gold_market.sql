@@ -27,6 +27,35 @@ CREATE SCHEMA IF NOT EXISTS workspace.gold;
 
 -- COMMAND ----------
 
+-- Notices with the latest LLM extraction. effective_regions = TED NUTS regions, or the LLM-inferred region when
+-- TED only says "Finland" (typical for state road maintenance contracts, where the place is only in the title).
+CREATE OR REPLACE TABLE workspace.gold.notices_enriched
+COMMENT 'Silver notices + latest LLM extraction; effective_regions falls back to the LLM region'
+AS WITH llm AS (
+  SELECT * FROM workspace.silver.llm_extractions
+  QUALIFY row_number() OVER (PARTITION BY publication_number ORDER BY _extracted_at DESC) = 1
+)
+SELECT
+  n.*,
+  CASE WHEN size(n.regions) > 0 THEN n.regions
+       WHEN l.region IS NOT NULL THEN array(l.region)
+       ELSE n.regions END                              AS effective_regions,
+  size(n.regions) = 0 AND l.region IS NOT NULL        AS region_from_llm,
+  l.municipalities,
+  l.contract_start_year,
+  l.contract_end_year,
+  l.option_years,
+  l.work_types,
+  l.scope_summary,
+  l.key_requirements,
+  l.risks,
+  l.has_price_index_clause,
+  l.prompt_version                                    AS llm_prompt_version
+FROM workspace.silver.notices n
+LEFT JOIN llm l USING (publication_number);
+
+-- COMMAND ----------
+
 CREATE OR REPLACE TABLE workspace.gold.award_facts
 COMMENT 'One row per infrastructure contract award notice'
 AS SELECT
@@ -37,7 +66,7 @@ AS SELECT
   n.title,
   n.buyer_id,
   b.buyer_name,
-  n.regions,
+  n.effective_regions             AS regions,
   n.is_framework,
   size(n.winner_ids)              AS winner_count,
   n.total_value_eur               AS contract_value_eur,
@@ -46,7 +75,7 @@ AS SELECT
   n.tenders_received_max <= 2     AS is_low_competition,
   n.lowest_tender_eur,
   n.highest_tender_eur
-FROM workspace.silver.notices n
+FROM workspace.gold.notices_enriched n
 LEFT JOIN workspace.silver.buyers b USING (buyer_id)
 WHERE n.notice_category = 'award';
 
@@ -161,8 +190,8 @@ FROM stats s LEFT JOIN top_winners t USING (buyer_name);
 CREATE OR REPLACE TABLE workspace.gold.open_tenders
 COMMENT 'Competitions open today with history: same buyer + category, and same category + region'
 AS WITH open AS (
-  SELECT n.*, b.buyer_name
-  FROM workspace.silver.notices n LEFT JOIN workspace.silver.buyers b USING (buyer_id)
+  SELECT n.* EXCEPT (regions), n.effective_regions AS regions, b.buyer_name
+  FROM workspace.gold.notices_enriched n LEFT JOIN workspace.silver.buyers b USING (buyer_id)
   WHERE n.notice_category = 'competition' AND n.tender_deadline >= current_date()
 ),
 -- Past awards comparable to each open tender, tagged by how they match. Regional history matters for
@@ -199,11 +228,21 @@ SELECT
   o.buyer_name,
   o.infra_category,
   o.regions,
+  o.region_from_llm,
+  o.municipalities,
   o.procedure_type,
   o.lot_count,
   o.tender_deadline,
   datediff(o.tender_deadline, current_date())            AS days_left,
   coalesce(o.total_value_eur, o.estimated_lot_value_eur) AS estimated_value_eur,
+  o.contract_start_year,
+  o.contract_end_year,
+  o.option_years,
+  o.work_types,
+  o.scope_summary,
+  o.key_requirements,
+  o.risks,
+  o.has_price_index_clause,
   o.description,
   coalesce(hb.past_awards, 0)                            AS buyer_past_awards,
   hb.past_avg_bids                                       AS buyer_past_avg_bids,
