@@ -53,11 +53,21 @@ $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Env
 - ~30 % of hits are building projects listing earthworks as a *secondary* CPV. Bronze keeps everything raw;
   Silver filters on `main-classification-proc`.
 - TED covers only above-EU-threshold tenders (works ≈ €5.5M). State this limitation in docs and the demo.
-- Same company appears under several names (e.g. business-unit suffixes); buyer agencies were renamed in 2026
-  (ELY → Elinvoimakeskus). Entity resolution belongs in Silver.
+- Entity resolution is by Y-tunnus, never by name. Winners come as Y-tunnus or Finnish VAT number
+  (`FI21630263` = `2163026-3`); `normalize_business_id` merges them. Official names, company form and industry
+  come from the PRH YTJ open data API (cached in `bronze.prh_companies`).
+- `winner-name` and `winner-identifier` arrays are NOT aligned in multi-winner (framework) notices; only
+  single-winner notices may link a name to an ID.
+- Privacy: winner names are shown only when `is_registered_company` (found in PRH open data and not a sole
+  trader). IDs missing from PRH open data are typically private persons.
+- ELY centres, Elinvoimakeskus agencies (2026 rename) and KEHA share one buyer Y-tunnus (`BUYER_NAME_OVERRIDES`).
+- Bid counts: `tenders` statistic, falling back to `t-esubm` (e-submission is mandatory above EU thresholds).
 - In Databricks SQL read hyphenated JSON keys with `raw_json:['winner-name']`, not `$.winner-name`.
 
 ## Environment quirks
 
 - `.env` files are hidden from Claude by permission rules — ask the user to edit them.
+- A Ruflo hook in the parent folder creates stray empty files named after code fragments (e.g. `CompanyRecord`,
+  `tuple[str`). Before committing run `find . -maxdepth 1 -type f -empty -delete` and check `git status`.
+- Write JSON request files for the Databricks CLI without a BOM (PowerShell `Out-File -Encoding utf8` adds one).
 - `.claude/skills/` and `.databricks/` hold vendored Databricks + HashiCorp skills and are gitignored.
