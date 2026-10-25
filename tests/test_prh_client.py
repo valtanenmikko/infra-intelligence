@@ -1,7 +1,13 @@
 import unittest
 from unittest.mock import MagicMock
 
-from infra_intelligence.ingest.prh_client import PRH_COMPANIES_URL, PrhApiError, PrhClient, is_business_id
+from infra_intelligence.ingest.prh_client import (
+    PRH_COMPANIES_URL,
+    PrhApiError,
+    PrhClient,
+    is_business_id,
+    normalize_business_id,
+)
 
 
 def _resp(status: int, payload: dict | None = None) -> MagicMock:
@@ -15,6 +21,16 @@ class IsBusinessIdTest(unittest.TestCase):
         self.assertTrue(is_business_id("1007822-3"))
         for value in ["FI10078223", "923 609 016", "1007822", "1007822-3; DROP", "", None]:
             self.assertFalse(is_business_id(value), value)
+
+
+class NormalizeBusinessIdTest(unittest.TestCase):
+    def test_vat_number_becomes_business_id(self):
+        self.assertEqual(normalize_business_id("FI21630263"), "2163026-3")
+        self.assertEqual(normalize_business_id(" FI 2163 0263 "), "2163026-3")
+
+    def test_other_values_unchanged(self):
+        for value in ["2163026-3", "923 609 016", "SE5560000000"]:
+            self.assertEqual(normalize_business_id(value), value)
 
 
 class PrhClientTest(unittest.TestCase):

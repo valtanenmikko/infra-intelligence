@@ -21,7 +21,7 @@ import json
 import requests
 
 from infra_intelligence.config import BRONZE_PRH_TABLE, BRONZE_TED_TABLE
-from infra_intelligence.ingest.prh_client import PrhClient, is_business_id
+from infra_intelligence.ingest.prh_client import PrhClient, is_business_id, normalize_business_id
 
 REFRESH_AFTER_DAYS = 90
 
@@ -39,17 +39,21 @@ spark.sql(f"""
 
 # COMMAND ----------
 
-candidates = spark.sql(f"""
-    WITH ids AS (
-        SELECT DISTINCT explode(from_json(raw_json:['winner-identifier'], 'array<string>')) AS business_id
-        FROM {BRONZE_TED_TABLE}
-    )
-    SELECT ids.business_id
-    FROM ids LEFT JOIN {BRONZE_PRH_TABLE} p USING (business_id)
-    WHERE p.business_id IS NULL OR p._fetched_at < current_timestamp() - INTERVAL {REFRESH_AFTER_DAYS} DAYS
+raw_ids = spark.sql(f"""
+    SELECT DISTINCT explode(from_json(raw_json:['winner-identifier'], 'array<string>')) AS id
+    FROM {BRONZE_TED_TABLE}
 """).collect()
-to_fetch = sorted(r.business_id for r in candidates if is_business_id(r.business_id))
-print(f"IDs to fetch: {len(to_fetch)} (skipped {len(candidates) - len(to_fetch)} non-Finnish IDs)")
+fresh = {
+    r.business_id
+    for r in spark.sql(f"""
+        SELECT business_id FROM {BRONZE_PRH_TABLE}
+        WHERE _fetched_at >= current_timestamp() - INTERVAL {REFRESH_AFTER_DAYS} DAYS
+    """).collect()
+}
+# Winners are reported as Y-tunnus or Finnish VAT number; both map to one business ID
+ids = {normalize_business_id(r.id) for r in raw_ids if r.id}
+to_fetch = sorted(i for i in ids if is_business_id(i) and i not in fresh)
+print(f"Distinct winner IDs: {len(ids)} | to fetch: {len(to_fetch)} | non-Finnish: {sum(1 for i in ids if not is_business_id(i))}")
 
 # COMMAND ----------
 

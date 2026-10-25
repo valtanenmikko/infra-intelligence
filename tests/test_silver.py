@@ -112,8 +112,12 @@ class WinnersTest(unittest.TestCase):
         rows = parse_winners(FRAMEWORK, {}, {"1111111-1": _company("1111111-1", "Mikko Pörsti", sole_trader=True)})
         self.assertFalse(rows[0].is_registered_company)
 
+    def test_vat_and_business_id_formats_merge(self):
+        raw = {**FRAMEWORK, "winner-identifier": ["FI21630263", "2163026-3"]}
+        self.assertEqual([r.winner_id for r in parse_winners(raw, {}, {})], ["2163026-3"])
+
     def test_foreign_id_uses_legal_form(self):
-        raw = {**AWARD, "winner-identifier": ["FI07551649"], "winner-name": {"fin": ["Nordic Rail AS"]}}
+        raw = {**AWARD, "winner-identifier": ["923 609 016"], "winner-name": {"fin": ["Nordic Rail AS"]}}
         [row] = parse_winners(raw, {}, {})
         self.assertTrue(row.is_registered_company)
 

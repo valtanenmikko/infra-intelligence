@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
-from infra_intelligence.ingest.prh_client import is_business_id
+from infra_intelligence.ingest.prh_client import is_business_id, normalize_business_id
 from infra_intelligence.reference import NUTS3_REGIONS, cpv_category, notice_category
 from infra_intelligence.transform.companies import CompanyRecord
 from infra_intelligence.transform.names import clean_company_name, has_legal_form
@@ -96,7 +96,7 @@ def _submission_counts(raw: dict[str, Any], code: str) -> list[int]:
 
 
 def winner_ids(raw: dict[str, Any]) -> list[str]:
-    return _unique(raw.get("winner-identifier"))
+    return _unique([normalize_business_id(i) for i in raw.get("winner-identifier") or []])
 
 
 def single_winner_pair(raw: dict[str, Any]) -> tuple[str, str] | None:
@@ -130,7 +130,7 @@ def parse_notice(raw: dict[str, Any]) -> NoticeRecord:
         notice_category=notice_category(raw.get("notice-type")),
         title=_first(_localized(raw.get("notice-title"))),
         description="\n\n".join(_localized(raw.get("description-lot"))) or None,
-        buyer_id=_first(raw.get("buyer-identifier") or []),
+        buyer_id=_first([normalize_business_id(i) for i in raw.get("buyer-identifier") or []]),
         buyer_unit=_first(_localized(raw.get("buyer-name"))),
         main_cpv=main_cpv,
         infra_category=cpv_category(main_cpv),

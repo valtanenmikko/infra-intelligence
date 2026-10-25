@@ -9,6 +9,17 @@ from infra_intelligence.ingest.ted_client import RETRYABLE_STATUS, HttpSession
 PRH_COMPANIES_URL = "https://avoindata.prh.fi/opendata-ytj-api/v3/companies"
 
 _BUSINESS_ID_RE = re.compile(r"^\d{7}-\d$")
+_FI_VAT_RE = re.compile(r"^FI(\d{7})(\d)$")
+
+
+def normalize_business_id(value: str) -> str:
+    """Convert a Finnish VAT number to the Y-tunnus it contains ("FI21630263" -> "2163026-3").
+
+    Buyers report winners with either format; other values are returned trimmed but unchanged.
+    """
+    value = value.strip()
+    m = _FI_VAT_RE.match(value.replace(" ", ""))
+    return f"{m.group(1)}-{m.group(2)}" if m else value
 
 
 class PrhApiError(RuntimeError):
