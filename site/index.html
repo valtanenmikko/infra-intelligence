@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Infra Intelligence</title>
+  <meta name="description" content="Suomen infrahankintojen tilannekuva: markkinaosuudet, kilpailun intensiteetti ja tekoälyn go/no-go-arviot avoimiin kilpailutuksiin.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap masthead-inner">
+      <div>
+        <p class="kicker">Infra Intelligence · tilannekuva</p>
+        <h1>Suomen infrahankinnat</h1>
+        <p class="lede">Julkiset tie-, rata-, silta- ja kunnossapitohankinnat yhdessä näkymässä: kuka voittaa, missä kilpailu on ohutta ja mihin avoimiin kilpailutuksiin kannattaa tarttua.</p>
+      </div>
+      <button class="theme-toggle" type="button" aria-label="Vaihda väriteema" data-action="theme">◐</button>
+    </div>
+    <div class="lane" aria-hidden="true"></div>
+  </header>
+
+  <div id="sample-banner" class="banner" hidden>
+    <div class="wrap"><strong>Esimerkkidata.</strong> Luvut perustuvat kehitysvaiheen ajoon, ja avoimien kilpailutusten arviot ovat havainnollistavia. Sivu päivittyy, kun putken vienti on käytössä.</div>
+  </div>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="hero-title">
+      <h2 id="hero-title" class="visually-hidden">Avainluvut</h2>
+      <div class="hero-figure">
+        <span class="hero-value" data-kpi="single_winner_value_eur"></span>
+        <span class="hero-label">yhden voittajan infrasopimuksia <span data-meta="period"></span></span>
+      </div>
+      <dl class="tiles">
+        <div class="tile"><dt>Ilmoituksia</dt><dd data-kpi="notices"></dd></div>
+        <div class="tile"><dt>Ratkaistuja hankintoja</dt><dd data-kpi="awards"></dd></div>
+        <div class="tile"><dt>Tarjouksia keskimäärin</dt><dd data-kpi="avg_bids"></dd></div>
+        <div class="tile"><dt>Vähäinen kilpailu (≤ 2 tarjousta)</dt><dd data-kpi="share_low_competition"></dd></div>
+      </dl>
+    </section>
+
+    <section id="tenders" aria-labelledby="tenders-title">
+      <div class="section-head">
+        <p class="eyebrow">01 · Tarjousäly</p>
+        <h2 id="tenders-title">Avoimet kilpailutukset</h2>
+        <p class="section-note">Tekoäly arvioi soveltuvuuden ja riskit esimerkkiprofiilille. Kilpailutekijä lasketaan historiasta ja kokonaispisteet kiinteällä kaavalla.</p>
+      </div>
+      <div class="filters" role="group" aria-label="Suodata kilpailutuksia">
+        <label>Luokka <select id="tender-category"></select></label>
+        <label>Suositus <select id="tender-rec"></select></label>
+      </div>
+      <ol id="tender-list" class="tender-list"></ol>
+    </section>
+
+    <section id="market" aria-labelledby="market-title">
+      <div class="section-head">
+        <p class="eyebrow">02 · Markkina</p>
+        <h2 id="market-title">Kuka voittaa</h2>
+        <p class="section-note">Voitot jälki-ilmoituksista. Euromäärä vain yhden voittajan sopimuksista, koska puitejärjestelyjen arvoa ei voi jakaa.</p>
+      </div>
+      <div class="filters" role="group" aria-label="Markkinaosuuden mittari">
+        <div class="segmented" role="radiogroup" aria-label="Mittari">
+          <button type="button" role="radio" aria-checked="true" data-measure="wins">Voitot</button>
+          <button type="button" role="radio" aria-checked="false" data-measure="won_value_eur">Sopimusarvo</button>
+        </div>
+      </div>
+      <figure class="chart-card">
+        <figcaption id="market-caption">Voitetut hankinnat, 13 suurinta</figcaption>
+        <div id="market-chart" class="hbar" role="img" aria-labelledby="market-caption"></div>
+        <details class="table-view"><summary>Näytä taulukkona</summary><div id="market-table"></div></details>
+      </figure>
+    </section>
+
+    <section id="competition" aria-labelledby="competition-title">
+      <div class="section-head">
+        <p class="eyebrow">03 · Kilpailu</p>
+        <h2 id="competition-title">Missä kilpailu on ohutta</h2>
+        <p class="section-note">Osuus hankinnoista, joissa yksikään osa ei saanut yli kahta tarjousta.</p>
+      </div>
+      <div class="grid-2">
+        <figure class="chart-card">
+          <figcaption id="comp-caption">Vähäisen kilpailun osuus, hankintaluokittain</figcaption>
+          <div id="competition-chart" class="hbar" role="img" aria-labelledby="comp-caption"></div>
+          <details class="table-view"><summary>Näytä taulukkona</summary><div id="competition-table"></div></details>
+        </figure>
+        <figure class="chart-card">
+          <figcaption id="region-caption">Vähäisen kilpailun osuus, maakunnittain</figcaption>
+          <div id="region-chart" class="hbar" role="img" aria-labelledby="region-caption"></div>
+          <details class="table-view"><summary>Näytä taulukkona</summary><div id="region-table"></div></details>
+        </figure>
+      </div>
+      <p class="callout" id="spread-callout"></p>
+    </section>
+
+    <section id="buyers" aria-labelledby="buyers-title">
+      <div class="section-head">
+        <p class="eyebrow">04 · Tilaajat</p>
+        <h2 id="buyers-title">Suurimmat tilaajat</h2>
+      </div>
+      <div class="table-scroll"><table id="buyer-table" class="data-table"></table></div>
+    </section>
+
+    <section id="method" aria-labelledby="method-title">
+      <div class="section-head">
+        <p class="eyebrow">05 · Menetelmä</p>
+        <h2 id="method-title">Näin tämä on rakennettu</h2>
+      </div>
+      <ol class="pipeline">
+        <li><span class="stage">Bronze</span>EU TED -rajapinta ja PRH:n yritysrekisteri raakana Delta-tauluihin</li>
+        <li><span class="stage">Silver</span>Tyypitys, infrarajaus pääluokalla, yritykset Y-tunnuksella, yksityishenkilöt piilotettu</li>
+        <li><span class="stage">LLM</span>Gemini poimii kuvauksista sijainnin, kauden, vaatimukset ja riskit JSON-skeemaan</li>
+        <li><span class="stage">Gold</span>Markkinaosuudet, kilpailu, tilaajaprofiilit ja avoimet kilpailutukset SQL:llä</li>
+        <li><span class="stage">Arvio</span>Go/no-go: LLM arvioi soveltuvuuden ja riskin, koodi laskee pisteet</li>
+      </ol>
+      <h3>Tekoälyn tarkkuus</h3>
+      <p class="section-note">LLM ei näe TEDin rakenteista maakunta- eikä arvotietoa, joten niitä käytetään vertailukohtana.</p>
+      <dl id="eval-tiles" class="tiles"></dl>
+      <h3>Rajoitteet</h3>
+      <ul class="limits">
+        <li>Mukana vain EU-kynnysarvon ylittävät hankinnat (rakennusurakat noin 5,5 M€), eivät kansalliset pienhankinnat.</li>
+        <li>Puitejärjestelyjen arvoa ei kohdisteta yksittäisille voittajille.</li>
+        <li>Yksityisten elinkeinonharjoittajien nimiä ei näytetä; he sisältyvät ryhmään “Muut toimijat”.</li>
+        <li>Go/no-go-arvio on tehty kuvitteelliselle esimerkkiprofiilille, ei millekään todelliselle yritykselle.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p>Lähteet: <span data-meta="sources"></span>. Päivitetty <span data-meta="generated_at"></span>.</p>
+      <p>Itsenäinen portfolioprojekti. Ei yhteyttä mainittuihin yrityksiin tai tilaajiin.</p>
+    </div>
+  </footer>
+
+  <div id="tooltip" class="tooltip" role="status" hidden></div>
+  <script src="app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "sample": true,
+    "generated_at": "2026-10-25",
+    "period": "1/2024–10/2026",
+    "sources": ["EU TED Search API v3", "PRH YTJ avoin data"]
+  },
+  "kpis": {
+    "notices": 811,
+    "awards": 283,
+    "competitions": 460,
+    "open_tenders": 23,
+    "single_winner_value_eur": 1552000000,
+    "avg_bids": 4.1,
+    "share_low_competition": 0.29
+  },
+  "market_share": [
+    {"category": "Kaikki", "company": "Destia Oy", "wins": 42, "won_value_eur": 289188598, "share_of_wins": 0.073},
+    {"category": "Kaikki", "company": "Muut toimijat", "wins": 41, "won_value_eur": 46676131, "share_of_wins": 0.072},
+    {"category": "Kaikki", "company": "Eltel Networks Oy", "wins": 14, "won_value_eur": 33396227, "share_of_wins": 0.024},
+    {"category": "Kaikki", "company": "YIT Road Oy", "wins": 11, "won_value_eur": 147930088, "share_of_wins": 0.019},
+    {"category": "Kaikki", "company": "Asfalttikallio Oy", "wins": 9, "won_value_eur": 41604800, "share_of_wins": 0.016},
+    {"category": "Kaikki", "company": "GRK Suomi Oy", "wins": 8, "won_value_eur": 21933760, "share_of_wins": 0.014},
+    {"category": "Kaikki", "company": "Peab Industri Oy", "wins": 8, "won_value_eur": 12700000, "share_of_wins": 0.014},
+    {"category": "Kaikki", "company": "NRC Group Finland Oy", "wins": 7, "won_value_eur": 300585074, "share_of_wins": 0.012},
+    {"category": "Kaikki", "company": "Pimara Väyläpalvelut Oy", "wins": 6, "won_value_eur": 82050582, "share_of_wins": 0.010},
+    {"category": "Kaikki", "company": "VRJ Suomi Oy", "wins": 6, "won_value_eur": null, "share_of_wins": 0.010},
+    {"category": "Kaikki", "company": "Terranor Oy", "wins": 5, "won_value_eur": 52035658, "share_of_wins": 0.009},
+    {"category": "Kaikki", "company": "Oteran Oy", "wins": 4, "won_value_eur": 81390000, "share_of_wins": 0.007},
+    {"category": "Kaikki", "company": "Kreate Oy", "wins": 4, "won_value_eur": 77818520, "share_of_wins": 0.007}
+  ],
+  "competition": [
+    {"category": "Teiden kunnossapito", "awards": 116, "avg_bids": 3.9, "share_single_bid": 0.07, "share_low_competition": 0.16},
+    {"category": "Talvihoito", "awards": 56, "avg_bids": 4.2, "share_single_bid": 0.18, "share_low_competition": 0.34},
+    {"category": "Tiet ja kadut", "awards": 29, "avg_bids": 2.6, "share_single_bid": 0.08, "share_low_competition": 0.48},
+    {"category": "Putki- ja kaapelilinjat", "awards": 24, "avg_bids": 4.3, "share_single_bid": 0.17, "share_low_competition": 0.17},
+    {"category": "Rautatiet", "awards": 14, "avg_bids": 2.7, "share_single_bid": 0.18, "share_low_competition": 0.64},
+    {"category": "Maanrakennus", "awards": 14, "avg_bids": 14.6, "share_single_bid": 0.11, "share_low_competition": 0.11},
+    {"category": "Vesirakentaminen", "awards": 12, "avg_bids": 1.8, "share_single_bid": 0.25, "share_low_competition": 0.88},
+    {"category": "Sillat ja tunnelit", "awards": 9, "avg_bids": 2.6, "share_single_bid": 0.0, "share_low_competition": 0.6}
+  ],
+  "regions": [
+    {"region": "Helsinki-Uusimaa", "awards": 66, "avg_bids": 4.4, "share_low_competition": 0.41},
+    {"region": "Varsinais-Suomi", "awards": 20, "avg_bids": 4.6, "share_low_competition": 0.31},
+    {"region": "Pirkanmaa", "awards": 17, "avg_bids": 5.8, "share_low_competition": 0.58},
+    {"region": "Pohjois-Savo", "awards": 16, "avg_bids": 5.8, "share_low_competition": 0.13},
+    {"region": "Pohjois-Pohjanmaa", "awards": 15, "avg_bids": 10.3, "share_low_competition": 0.14},
+    {"region": "Satakunta", "awards": 14, "avg_bids": 6.1, "share_low_competition": 0.42},
+    {"region": "Kymenlaakso", "awards": 12, "avg_bids": 3.7, "share_low_competition": 0.55}
+  ],
+  "buyers": [
+    {"buyer": "ELY-keskukset / elinvoimakeskukset", "notices": 178, "awards": 75, "awarded_value_eur": 638000000, "main_category": "Teiden kunnossapito", "avg_bids": 3.4, "top_winner": "Destia Oy", "top_winner_share": 0.40},
+    {"buyer": "Helsingin kaupunki", "notices": 66, "awards": 22, "awarded_value_eur": 299000000, "main_category": "Tiet ja kadut", "avg_bids": 3.9, "top_winner": "Peab Industri Oy", "top_winner_share": 0.27},
+    {"buyer": "Väylävirasto", "notices": 58, "awards": 17, "awarded_value_eur": 63000000, "main_category": "Rautatiet", "avg_bids": 2.8, "top_winner": "NRC Group Finland Oy", "top_winner_share": 0.24},
+    {"buyer": "Senaatti-kiinteistöt", "notices": 18, "awards": 6, "awarded_value_eur": null, "main_category": "Maanrakennus", "avg_bids": 23.3, "top_winner": "VRJ Suomi Oy", "top_winner_share": 0.67},
+    {"buyer": "Lahden kaupunki", "notices": 17, "awards": 8, "awarded_value_eur": 25000000, "main_category": "Teiden kunnossapito", "avg_bids": 2.5, "top_winner": null, "top_winner_share": 0.13},
+    {"buyer": "Sansia Oy", "notices": 16, "awards": 7, "awarded_value_eur": 22000000, "main_category": "Talvihoito", "avg_bids": 5.5, "top_winner": "EP-Urakointi Oy", "top_winner_share": 0.29}
+  ],
+  "open_tenders": [
+    {
+      "id": "sample-1", "title": "Maanteiden hoitourakka (esimerkki A) 2027–2032", "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito", "region": "Pohjois-Karjala", "region_from_llm": true, "deadline": "2026-12-01", "days_left": 37,
+      "period": "2027–2032", "option_years": 2, "estimated_value_eur": null,
+      "recommendation": "Tarjoa", "score": 70, "fit": 5, "competition": 3, "risk": 3, "expected_bids": 3.5,
+      "summary": "Esimerkkiteksti: ydinliiketoimintaa vastaava hoitourakka, jossa kilpailu on historiallisesti kohtuullista.",
+      "fit_reason": "Esimerkkiteksti: maanteiden hoito ja talvihoito ovat profiilin vahvuuksia.",
+      "risk_reason": "Esimerkkiteksti: pitkä sopimuskausi ja ympärivuorokautinen päivystys; indeksiehto lieventää kustannusriskiä.",
+      "questions": ["Esimerkki: riittääkö alueen kalusto talvikaudelle?", "Esimerkki: mitkä aliurakat kilpailutetaan?"],
+      "past_winners": [{"company": "Destia Oy", "wins": 30}, {"company": "YIT Road Oy", "wins": 9}],
+      "url": "https://ted.europa.eu/"
+    },
+    {
+      "id": "sample-2", "title": "Kuiturakentaminen ja verkon ylläpito (esimerkki B) 2027–2030", "buyer": "Esimerkkitilaaja",
+      "category": "Putki- ja kaapelilinjat", "region": null, "region_from_llm": false, "deadline": "2026-11-18", "days_left": 24,
+      "period": "2027–2030", "option_years": null, "estimated_value_eur": null,
+      "recommendation": "Ei tarjota", "score": 33, "fit": 2, "competition": 2, "risk": 3, "expected_bids": 4.3,
+      "summary": "Esimerkkiteksti: erikoistunut tietoliikennerakentaminen on profiilin ulkopuolella.",
+      "fit_reason": "Esimerkkiteksti: vaatisi aliurakoitsijan, oma osaaminen rajallista.",
+      "risk_reason": "Esimerkkiteksti: puitejärjestely, työmäärä epävarma.",
+      "questions": [],
+      "past_winners": [],
+      "url": "https://ted.europa.eu/"
+    },
+    {
+      "id": "sample-3", "title": "Katuvalaistuksen palvelusopimus (esimerkki C) 2027–2028", "buyer": "Esimerkkikaupunki",
+      "category": "Teiden kunnossapito", "region": "Varsinais-Suomi", "region_from_llm": false, "deadline": "2026-11-27", "days_left": 33,
+      "period": "2027–2028", "option_years": 1, "estimated_value_eur": null,
+      "recommendation": "Harkitse", "score": 55, "fit": 3, "competition": 3, "risk": 4, "expected_bids": 3.8,
+      "summary": "Esimerkkiteksti: lyhyt sopimus, sopii osittain profiiliin.",
+      "fit_reason": "Esimerkkiteksti: valaistuksen huolto on sivuliiketoimintaa.",
+      "risk_reason": "Esimerkkiteksti: lyhyt kausi, selkeä laajuus.",
+      "questions": ["Esimerkki: onko sähköurakointikumppani saatavilla?"],
+      "past_winners": [{"company": "Destia Oy", "wins": 3}],
+      "url": "https://ted.europa.eu/"
+    }
+  ],
+  "price_spread": {"n": 17, "median_spread": 0.35},
+  "llm_eval": [
+    {"metric": "region_accuracy", "label": "Maakunta oikein", "value": null, "n": null},
+    {"metric": "region_coverage", "label": "Maakunta pääteltiin", "value": null, "n": null},
+    {"metric": "value_match", "label": "Arvo täsmää (±5 %)", "value": null, "n": null}
+  ]
+}
