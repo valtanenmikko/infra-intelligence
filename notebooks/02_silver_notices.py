@@ -7,7 +7,8 @@
 # MAGIC | Table | Grain | Notes |
 # MAGIC |---|---|---|
 # MAGIC | `silver.notices` | one notice | infra scope only (main CPV); values, bids, deadlines, regions |
-# MAGIC | `silver.notice_winners` | notice × winner Y-tunnus | names resolved by business ID |
+# MAGIC | `silver.notice_winners` | notice × winner Y-tunnus | names resolved by business ID; private persons flagged |
+# MAGIC | `silver.companies` | winner Y-tunnus | official name, company form and industry from PRH |
 # MAGIC | `silver.buyers` | buyer Y-tunnus | one display name per buyer (ELY/Elinvoimakeskus renames merged) |
 # MAGIC
 # MAGIC Parsing logic lives in `src/infra_intelligence/transform` and is unit tested locally.
@@ -24,8 +25,17 @@ sys.path.append(os.path.abspath("../src"))
 import json
 from dataclasses import asdict
 
-from infra_intelligence.config import BRONZE_TED_TABLE, CATALOG, SILVER_BUYERS_TABLE, SILVER_NOTICES_TABLE, SILVER_WINNERS_TABLE
+from infra_intelligence.config import (
+    BRONZE_PRH_TABLE,
+    BRONZE_TED_TABLE,
+    CATALOG,
+    SILVER_BUYERS_TABLE,
+    SILVER_COMPANIES_TABLE,
+    SILVER_NOTICES_TABLE,
+    SILVER_WINNERS_TABLE,
+)
 from infra_intelligence.reference import BUYER_NAME_OVERRIDES
+from infra_intelligence.transform.companies import parse_company
 from infra_intelligence.transform.names import canonical_names
 from infra_intelligence.transform.silver import parse_notice, parse_winners, single_winner_pair
 
@@ -38,15 +48,21 @@ print(f"Bronze: {len(raw)} | infra scope by main CPV: {len(in_scope)} | dropped:
 
 # COMMAND ----------
 
-# Entity resolution by Y-tunnus. Names are linked to IDs only from single-winner notices (see single_winner_pair).
-company_names = canonical_names(p for r, _ in in_scope if (p := single_winner_pair(r)))
-winners = [w for r, _ in in_scope for w in parse_winners(r, company_names)]
+# Entity resolution by Y-tunnus: PRH register first, then names learned from single-winner notices
+# (multi-winner name/ID arrays are not reliably aligned, see single_winner_pair).
+companies = {
+    c.business_id: c
+    for c in (parse_company(json.loads(r.raw_json)) for r in spark.table(BRONZE_PRH_TABLE).where("found").collect())
+}
+learned_names = canonical_names(p for r, _ in in_scope if (p := single_winner_pair(r)))
+winners = [w for r, _ in in_scope for w in parse_winners(r, learned_names, companies)]
 
 buyer_names = {**canonical_names((n.buyer_id, n.buyer_unit) for _, n in in_scope), **BUYER_NAME_OVERRIDES}
 buyers = sorted({n.buyer_id for _, n in in_scope if n.buyer_id})
 
 print(f"Winner rows: {len(winners)} | distinct winners: {len({w.winner_id for w in winners})} "
-      f"| without resolved name: {sum(1 for w in winners if not w.winner_name)}")
+      f"| without resolved name: {sum(1 for w in winners if not w.winner_name)} "
+      f"| not publishable (private person / unknown): {sum(1 for w in winners if not w.is_registered_company)}")
 print(f"Buyers: {len(buyers)}")
 
 # COMMAND ----------
@@ -59,7 +75,11 @@ NOTICES_SCHEMA = """
     tenders_received_min INT, tenders_received_max INT, lowest_tender_eur DOUBLE, highest_tender_eur DOUBLE,
     is_framework BOOLEAN, winner_ids ARRAY<STRING>, winner_names_raw ARRAY<STRING>, winner_size STRING
 """
-WINNERS_SCHEMA = "publication_number STRING, winner_id STRING, winner_name STRING, has_legal_form BOOLEAN, is_single_winner BOOLEAN"
+WINNERS_SCHEMA = "publication_number STRING, winner_id STRING, winner_name STRING, is_registered_company BOOLEAN, is_single_winner BOOLEAN"
+COMPANIES_SCHEMA = """
+    business_id STRING, name STRING, company_form STRING, is_sole_trader BOOLEAN,
+    industry_code STRING, industry STRING, registered_on DATE
+"""
 BUYERS_SCHEMA = "buyer_id STRING, buyer_name STRING"
 
 
@@ -72,7 +92,9 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {CATALOG}.silver")
 write([asdict(n) for _, n in in_scope], NOTICES_SCHEMA, SILVER_NOTICES_TABLE,
       "Finnish infrastructure procurement notices from EU TED, filtered by main CPV")
 write([asdict(w) for w in winners], WINNERS_SCHEMA, SILVER_WINNERS_TABLE,
-      "Contract award winners by Y-tunnus; names resolved from single-winner notices")
+      "Contract award winners by Y-tunnus; is_registered_company = false hides likely private persons")
+write([asdict(c) for c in companies.values() if not c.is_sole_trader], COMPANIES_SCHEMA, SILVER_COMPANIES_TABLE,
+      "Winner companies from the PRH register (sole traders excluded)")
 write([(b, buyer_names.get(b)) for b in buyers], BUYERS_SCHEMA, SILVER_BUYERS_TABLE,
       "Contracting authorities by Y-tunnus with one display name")
 

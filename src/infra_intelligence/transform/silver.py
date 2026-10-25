@@ -4,7 +4,9 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
+from infra_intelligence.ingest.prh_client import is_business_id
 from infra_intelligence.reference import NUTS3_REGIONS, cpv_category, notice_category
+from infra_intelligence.transform.companies import CompanyRecord
 from infra_intelligence.transform.names import clean_company_name, has_legal_form
 
 _LANG_PREFERENCE = ("fin", "eng", "swe")
@@ -44,7 +46,9 @@ class WinnerRecord:
     publication_number: str
     winner_id: str
     winner_name: str | None
-    has_legal_form: bool
+    # False hides the name in published views: sole traders and IDs missing from PRH open data are likely
+    # private persons. Foreign IDs fall back to the legal-form check.
+    is_registered_company: bool
     is_single_winner: bool
 
 
@@ -81,6 +85,16 @@ def _unique(values: list[str] | None) -> list[str]:
     return list(dict.fromkeys(values or []))
 
 
+def _submission_counts(raw: dict[str, Any], code: str) -> list[int]:
+    """Per-lot submission counts of one statistic type.
+
+    "tenders" is the total. Many notices only report "t-esubm" (electronically submitted tenders); electronic
+    submission is mandatory for above-threshold procurements in Finland, so it is used as the fallback total.
+    """
+    pairs = zip(raw.get("received-submissions-type-code") or [], raw.get("received-submissions-type-val") or [])
+    return [int(v) for c, v in pairs if c == code and str(v).isdigit()]
+
+
 def winner_ids(raw: dict[str, Any]) -> list[str]:
     return _unique(raw.get("winner-identifier"))
 
@@ -101,10 +115,7 @@ def single_winner_pair(raw: dict[str, Any]) -> tuple[str, str] | None:
 def parse_notice(raw: dict[str, Any]) -> NoticeRecord:
     main_cpv = _first(raw.get("main-classification-proc") or [])
     currencies = set(raw.get("total-value-cur") or [])
-    tenders = [
-        int(v) for code, v in zip(raw.get("received-submissions-type-code") or [], raw.get("received-submissions-type-val") or [])
-        if code == "tenders" and str(v).isdigit()
-    ]
+    tenders = _submission_counts(raw, "tenders") or _submission_counts(raw, "t-esubm")
     deadlines = [d for d in map(_to_date, raw.get("deadline-receipt-tender-date-lot") or []) if d]
     lowest = _floats(raw.get("tender-value-lowest"))
     highest = _floats(raw.get("tender-value-highest"))
@@ -141,17 +152,28 @@ def parse_notice(raw: dict[str, Any]) -> NoticeRecord:
     )
 
 
-def parse_winners(raw: dict[str, Any], names_by_id: dict[str, str]) -> list[WinnerRecord]:
+def parse_winners(
+    raw: dict[str, Any],
+    names_by_id: dict[str, str],
+    companies: dict[str, CompanyRecord],
+) -> list[WinnerRecord]:
+    """One row per winner ID. Name priority: PRH official name > name learned from single-winner notices >
+    this notice's own name (single winner only)."""
     ids = winner_ids(raw)
     pair = single_winner_pair(raw)
     rows = []
     for winner_id in ids:
-        name = names_by_id.get(winner_id) or (clean_company_name(pair[1]) if pair else None)
+        company = companies.get(winner_id)
+        name = (company and company.name) or names_by_id.get(winner_id) or (clean_company_name(pair[1]) if pair else None)
+        if is_business_id(winner_id):
+            registered = company is not None and not company.is_sole_trader
+        else:
+            registered = has_legal_form(name)
         rows.append(WinnerRecord(
             publication_number=raw["publication-number"],
             winner_id=winner_id,
             winner_name=name,
-            has_legal_form=has_legal_form(name),
+            is_registered_company=registered,
             is_single_winner=len(ids) == 1,
         ))
     return rows

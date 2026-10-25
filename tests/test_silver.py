@@ -2,6 +2,7 @@ import unittest
 from datetime import date
 
 from infra_intelligence.reference import cpv_category, notice_category
+from infra_intelligence.transform.companies import CompanyRecord
 from infra_intelligence.transform.silver import parse_notice, parse_winners, single_winner_pair
 
 AWARD = {
@@ -34,7 +35,7 @@ FRAMEWORK = {
     "notice-type": "can-standard",
     "framework-agreement-lot": ["fa-wo-rc"],
     "winner-name": {"fin": ["A Oy", "B Oy", "Mikko Pörsti"]},
-    "winner-identifier": ["111-1", "222-2"],
+    "winner-identifier": ["1111111-1", "2222222-2"],
     "winner-size": ["small", "micro"],
 }
 
@@ -65,6 +66,11 @@ class ParseNoticeTest(unittest.TestCase):
         self.assertEqual(self.n.winner_size, "sme")
         self.assertFalse(self.n.is_framework)
 
+    def test_electronic_submissions_used_when_total_missing(self):
+        n = parse_notice({**AWARD, "received-submissions-type-code": ["t-esubm", "t-sme"],
+                          "received-submissions-type-val": ["4", "3"]})
+        self.assertEqual((n.tenders_received_min, n.tenders_received_max), (4, 4))
+
     def test_non_eur_value_is_dropped(self):
         n = parse_notice({**AWARD, "total-value-cur": ["NOK"]})
         self.assertIsNone(n.total_value_eur)
@@ -82,6 +88,10 @@ class ParseNoticeTest(unittest.TestCase):
         self.assertIsNone(n.winner_size)
 
 
+def _company(business_id: str, name: str, sole_trader: bool = False) -> CompanyRecord:
+    return CompanyRecord(business_id, name, "Osakeyhtiö", sole_trader, None, None, None)
+
+
 class WinnersTest(unittest.TestCase):
     def test_single_winner_pair_is_trusted(self):
         self.assertEqual(single_winner_pair(AWARD), ("2412066-4", "Rautatieto oy"))
@@ -89,13 +99,26 @@ class WinnersTest(unittest.TestCase):
     def test_multi_winner_names_are_not_paired_by_position(self):
         self.assertIsNone(single_winner_pair(FRAMEWORK))
 
-    def test_winner_names_come_from_id_lookup(self):
-        rows = parse_winners(FRAMEWORK, {"111-1": "A Oy"})
-        self.assertEqual([(r.winner_id, r.winner_name, r.has_legal_form, r.is_single_winner) for r in rows],
-                         [("111-1", "A Oy", True, False), ("222-2", None, False, False)])
+    def test_prh_name_wins_over_learned_name(self):
+        rows = parse_winners(FRAMEWORK, {"1111111-1": "Old Name Oy"}, {"1111111-1": _company("1111111-1", "A Oy")})
+        self.assertEqual((rows[0].winner_name, rows[0].is_registered_company), ("A Oy", True))
+
+    def test_id_missing_from_prh_is_not_publishable(self):
+        rows = parse_winners(FRAMEWORK, {"2222222-2": "B Oy"}, {})
+        self.assertEqual((rows[1].winner_id, rows[1].winner_name, rows[1].is_registered_company), ("2222222-2", "B Oy", False))
+        self.assertFalse(rows[1].is_single_winner)
+
+    def test_sole_trader_is_not_publishable(self):
+        rows = parse_winners(FRAMEWORK, {}, {"1111111-1": _company("1111111-1", "Mikko Pörsti", sole_trader=True)})
+        self.assertFalse(rows[0].is_registered_company)
+
+    def test_foreign_id_uses_legal_form(self):
+        raw = {**AWARD, "winner-identifier": ["FI07551649"], "winner-name": {"fin": ["Nordic Rail AS"]}}
+        [row] = parse_winners(raw, {}, {})
+        self.assertTrue(row.is_registered_company)
 
     def test_single_winner_falls_back_to_own_cleaned_name(self):
-        [row] = parse_winners(AWARD, {})
+        [row] = parse_winners(AWARD, {}, {})
         self.assertEqual((row.winner_name, row.is_single_winner), ("Rautatieto Oy", True))
 
 

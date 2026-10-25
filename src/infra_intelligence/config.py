@@ -55,6 +55,8 @@ TED_FIELDS: list[str] = [
 
 CATALOG = "workspace"
 BRONZE_TED_TABLE = f"{CATALOG}.bronze.ted_notices"
+BRONZE_PRH_TABLE = f"{CATALOG}.bronze.prh_companies"
+SILVER_COMPANIES_TABLE = f"{CATALOG}.silver.companies"
 SILVER_NOTICES_TABLE = f"{CATALOG}.silver.notices"
 SILVER_WINNERS_TABLE = f"{CATALOG}.silver.notice_winners"
 SILVER_BUYERS_TABLE = f"{CATALOG}.silver.buyers"
