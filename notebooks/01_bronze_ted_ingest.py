@@ -6,7 +6,8 @@
 # MAGIC
 # MAGIC - **First run:** backfill from `BACKFILL_FROM`
 # MAGIC - **Later runs:** incremental from the latest stored publication date minus an overlap window
-# MAGIC - **Idempotent:** `MERGE` on `publication_number`, so re-runs never create duplicates
+# MAGIC - **Idempotent:** `MERGE` on `publication_number`, so re-runs never create duplicates; changed notices are updated
+# MAGIC - **`full_refresh` widget:** re-read everything, e.g. after adding fields to `TED_FIELDS`
 
 # COMMAND ----------
 
@@ -50,8 +51,12 @@ spark.sql(f"""
 
 # COMMAND ----------
 
+# full_refresh=true re-reads everything since BACKFILL_FROM, e.g. after adding fields to TED_FIELDS
+dbutils.widgets.dropdown("full_refresh", "false", ["false", "true"])
+full_refresh = dbutils.widgets.get("full_refresh") == "true"
+
 latest = spark.sql(f"SELECT max(publication_date) AS d FROM {BRONZE_TED_TABLE}").first()["d"]
-published_from = latest - timedelta(days=INCREMENTAL_OVERLAP_DAYS) if latest else BACKFILL_FROM
+published_from = latest - timedelta(days=INCREMENTAL_OVERLAP_DAYS) if latest and not full_refresh else BACKFILL_FROM
 query = build_query(INFRA_CPV_CODES.keys(), BUYER_COUNTRY, published_from)
 print(f"Fetching notices published since {published_from}\n{query}")
 
@@ -63,7 +68,7 @@ rows = [
         n["publication-number"],
         n.get("publication-date", "")[:10],  # e.g. "2024-01-03Z" -> "2024-01-03"
         n.get("notice-type"),
-        json.dumps(n, ensure_ascii=False),
+        json.dumps(n, ensure_ascii=False, sort_keys=True),  # stable text so MERGE detects real changes
     )
     for n in client.search(query, TED_FIELDS)
 ]
@@ -82,6 +87,7 @@ if rows:
     result = spark.sql(f"""
         MERGE INTO {BRONZE_TED_TABLE} t
         USING ted_batch s ON t.publication_number = s.publication_number
+        WHEN MATCHED AND t.raw_json <> s.raw_json THEN UPDATE SET *
         WHEN NOT MATCHED THEN INSERT *
     """)
     display(result)

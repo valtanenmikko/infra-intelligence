@@ -28,6 +28,7 @@ TED_FIELDS: list[str] = [
     "notice-type",
     "notice-title",
     "buyer-name",
+    "buyer-identifier",
     "classification-cpv",
     # Main CPV of the procedure. The broad query above also returns building projects that list
     # earthworks as a secondary CPV (~30 %); Silver filters on this field.
@@ -39,10 +40,21 @@ TED_FIELDS: list[str] = [
     "total-value",
     "total-value-cur",
     "estimated-value-lot",
-    "result-value-lot",
+    "result-lot-identifier",
+    "framework-agreement-lot",
+    "tender-value-lowest",
+    "tender-value-highest",
+    # Winner names and IDs are separate arrays, not reliably aligned for multi-winner notices.
     "winner-name",
+    "winner-identifier",
+    "winner-size",
+    # Parallel arrays: code "tenders" = total tenders received per lot.
+    "received-submissions-type-code",
     "received-submissions-type-val",
 ]
 
 CATALOG = "workspace"
 BRONZE_TED_TABLE = f"{CATALOG}.bronze.ted_notices"
+SILVER_NOTICES_TABLE = f"{CATALOG}.silver.notices"
+SILVER_WINNERS_TABLE = f"{CATALOG}.silver.notice_winners"
+SILVER_BUYERS_TABLE = f"{CATALOG}.silver.buyers"
