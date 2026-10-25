@@ -34,7 +34,7 @@ NUTS3_REGIONS: dict[str, str] = {
     "FI1D7": "Lappi",
     "FI1D8": "Kainuu",
     "FI1D9": "Pohjois-Pohjanmaa",
-    "FI200": "Åland",
+    "FI200": "Ahvenanmaa",
 }
 
 # Business categories by CPV prefix. Longest matching prefix wins.

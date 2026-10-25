@@ -60,3 +60,11 @@ SILVER_COMPANIES_TABLE = f"{CATALOG}.silver.companies"
 SILVER_NOTICES_TABLE = f"{CATALOG}.silver.notices"
 SILVER_WINNERS_TABLE = f"{CATALOG}.silver.notice_winners"
 SILVER_BUYERS_TABLE = f"{CATALOG}.silver.buyers"
+SILVER_LLM_EXTRACTIONS_TABLE = f"{CATALOG}.silver.llm_extractions"
+GOLD_LLM_EVAL_TABLE = f"{CATALOG}.gold.llm_eval_metrics"
+GOLD_LLM_REGION_ERRORS_TABLE = f"{CATALOG}.gold.llm_eval_region_errors"
+
+# LLM: Gemini free tier. The key lives in a Databricks secret scope, never in code or notebooks.
+GEMINI_MODEL = "gemini-2.5-flash"
+SECRET_SCOPE = "infra-intelligence"
+GEMINI_SECRET_KEY = "gemini-api-key"
