@@ -1,0 +1,153 @@
+"""Go/no-go assessment for open tenders.
+
+Split of responsibilities, so the result is reproducible and auditable:
+- the LLM rates qualitative factors it can read from text (fit to the bidder profile, delivery/commercial risk)
+  and explains them;
+- the competition factor is computed from historical bid counts, not by the LLM;
+- the overall score and recommendation come from a fixed formula in code.
+"""
+
+from dataclasses import dataclass
+from typing import Any
+
+PROMPT_VERSION = "bid-v1"
+
+# Example bidder used in the demo. A real deployment would load the company's own profile.
+BIDDER_PROFILE = """Esimerkkiprofiili: keskisuuri suomalainen infraurakoitsija.
+Vahvuudet: maanteiden ja katujen hoito- ja kunnossapitourakat, talvihoito, päällystys, pienet ja keskisuuret
+maarakennus- ja siltakorjaustyöt. Oma kalusto ja päivystysorganisaatio koko Manner-Suomessa.
+Rajoitteet: ei omaa ratateknistä (sähkörata, turvalaitteet) eikä vesirakentamisen kalustoa; erikoistunut
+kaapeli- ja tietoliikennerakentaminen vaatii aliurakoitsijan. Sopiva urakkakoko noin 0,5–50 M€."""
+
+SYSTEM_PROMPT = """You assess open public infrastructure tenders for a Finnish contractor's bid team.
+Rate only what the given text and data support. Write all text in Finnish, short and concrete.
+
+fit (1-5): how well the work matches the bidder profile. 5 = core business, 1 = outside capabilities.
+risk (1-5): delivery and commercial risk for the bidder. 5 = low risk, 1 = high risk
+  (very long term, heavy penalties or on-call duty, unclear scope, no price index clause on a multi-year contract).
+Mention the incumbent or frequent past winners if the history shows them. Do not estimate prices."""
+
+ASSESSMENT_SCHEMA: dict[str, Any] = {
+    "type": "OBJECT",
+    "properties": {
+        "fit": {"type": "INTEGER"},
+        "fit_reason": {"type": "STRING"},
+        "risk": {"type": "INTEGER"},
+        "risk_reason": {"type": "STRING"},
+        "summary": {"type": "STRING"},
+        "questions_for_bid_team": {"type": "ARRAY", "items": {"type": "STRING"}},
+    },
+    "required": ["fit", "fit_reason", "risk", "risk_reason", "summary", "questions_for_bid_team"],
+}
+
+WEIGHTS = {"fit": 0.4, "competition": 0.3, "risk": 0.3}
+BID_THRESHOLD = 65
+CONSIDER_THRESHOLD = 45
+
+
+@dataclass(frozen=True)
+class BidAssessment:
+    publication_number: str
+    fit: int
+    fit_reason: str
+    risk: int
+    risk_reason: str
+    competition: int
+    expected_bids: float | None
+    score: int
+    recommendation: str
+    summary: str
+    questions_for_bid_team: list[str]
+
+
+def expected_bids(tender: dict[str, Any]) -> float | None:
+    """Most specific history available: same region and category, then same buyer, then category average."""
+    for key in ("region_past_avg_bids", "buyer_past_avg_bids", "category_avg_bids"):
+        if tender.get(key) is not None:
+            return float(tender[key])
+    return None
+
+
+def competition_score(bids: float | None) -> int:
+    """5 = little competition expected, 1 = crowded. Unknown history is neutral."""
+    if bids is None:
+        return 3
+    for limit, score in ((1.5, 5), (2.5, 4), (3.5, 3), (5.0, 2)):
+        if bids <= limit:
+            return score
+    return 1
+
+
+def overall_score(fit: int, competition: int, risk: int) -> int:
+    """Weighted 1-5 factors mapped to 0-100."""
+    weighted = WEIGHTS["fit"] * fit + WEIGHTS["competition"] * competition + WEIGHTS["risk"] * risk
+    return round((weighted - 1) / 4 * 100)
+
+
+def recommendation(score: int, fit: int) -> str:
+    if fit <= 1:
+        return "Ei tarjota"  # outside capabilities, whatever the competition
+    if score >= BID_THRESHOLD:
+        return "Tarjoa"
+    if score >= CONSIDER_THRESHOLD:
+        return "Harkitse"
+    return "Ei tarjota"
+
+
+def _winners(winners: Any) -> str:
+    if not winners:
+        return "ei tietoa"
+    return ", ".join(f"{w['company']} ({w['wins']})" for w in winners)
+
+
+def build_prompt(tender: dict[str, Any]) -> str:
+    """tender: a Gold open_tenders row joined with LLM extraction fields."""
+    period = "–".join(str(y) for y in (tender.get("contract_start_year"), tender.get("contract_end_year")) if y) or "ei tietoa"
+    lines = [
+        f"Tarjoajan profiili:\n{BIDDER_PROFILE}",
+        "\nAvoin kilpailutus:",
+        f"Otsikko: {tender.get('title')}",
+        f"Tilaaja: {tender.get('buyer_name')}",
+        f"Luokka: {tender.get('infra_category')}",
+        f"Alue: {tender.get('region') or ', '.join(tender.get('regions') or []) or 'ei tietoa'}",
+        f"Sopimuskausi: {period}, optiot {tender.get('option_years') or 'ei tietoa'} v",
+        f"Arvioitu arvo: {tender.get('estimated_value_eur') or 'ei ilmoitettu'} €",
+        f"Indeksiehto: {tender.get('has_price_index_clause')}",
+        f"Laajuus: {tender.get('scope_summary') or ''}",
+        f"Vaatimukset: {'; '.join(tender.get('key_requirements') or [])}",
+        f"Tunnistetut riskit: {'; '.join(tender.get('risks') or [])}",
+        "\nHistoria (EU-kynnysarvon ylittävät hankinnat 2024–):",
+        f"Saman tilaajan ja luokan aiemmat voittajat: {_winners(tender.get('buyer_past_top_winners'))}",
+        f"Saman alueen ja luokan aiemmat voittajat: {_winners(tender.get('region_past_top_winners'))}",
+        f"Odotettu tarjousmäärä historian perusteella: {expected_bids(tender) or 'ei tietoa'}",
+    ]
+    return "\n".join(lines)
+
+
+def _rating(value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 5:
+        raise ValueError(f"Rating must be an integer 1-5, got {value!r}")
+    return value
+
+
+def parse_assessment(data: Any, tender: dict[str, Any]) -> BidAssessment:
+    if not isinstance(data, dict):
+        raise ValueError("Assessment is not an object")
+    fit, risk = _rating(data.get("fit")), _rating(data.get("risk"))
+    bids = expected_bids(tender)
+    competition = competition_score(bids)
+    score = overall_score(fit, competition, risk)
+    questions = [str(q).strip() for q in data.get("questions_for_bid_team") or [] if str(q).strip()][:3]
+    return BidAssessment(
+        publication_number=tender["publication_number"],
+        fit=fit,
+        fit_reason=str(data.get("fit_reason") or "").strip(),
+        risk=risk,
+        risk_reason=str(data.get("risk_reason") or "").strip(),
+        competition=competition,
+        expected_bids=bids,
+        score=score,
+        recommendation=recommendation(score, fit),
+        summary=str(data.get("summary") or "").strip(),
+        questions_for_bid_team=questions,
+    )
