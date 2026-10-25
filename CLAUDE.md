@@ -69,5 +69,8 @@ $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Env
 - `.env` files are hidden from Claude by permission rules — ask the user to edit them.
 - A Ruflo hook in the parent folder creates stray empty files named after code fragments (e.g. `CompanyRecord`,
   `tuple[str`). Before committing run `find . -maxdepth 1 -type f -empty -delete` and check `git status`.
+- Databricks Free Edition has a daily serverless quota; when exceeded, all compute (jobs and SQL warehouse) is
+  refused for the rest of the day ("RESOURCE_EXHAUSTED"). Put quality checks inside notebooks, avoid ad-hoc
+  warehouse queries, run only the notebooks a change affects, and stop the warehouse if it loops on start.
 - Write JSON request files for the Databricks CLI without a BOM (PowerShell `Out-File -Encoding utf8` adds one).
 - `.claude/skills/` and `.databricks/` hold vendored Databricks + HashiCorp skills and are gitignored.
