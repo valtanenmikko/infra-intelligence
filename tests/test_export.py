@@ -3,7 +3,16 @@ from datetime import date
 from unittest.mock import MagicMock
 
 from infra_intelligence.export.databricks_sql import DatabricksSql, SqlError
-from infra_intelligence.export.site_data import QUERIES, build_site_data
+from infra_intelligence.export.site_data import QUERIES, build_site_data, clean_title
+
+
+class CleanTitleTest(unittest.TestCase):
+    def test_strips_country_and_cpv_prefix(self):
+        self.assertEqual(clean_title("Suomi – Rakennustyöt – FINAVIA OYJ: Päällystys – vaihe 2"), "FINAVIA OYJ: Päällystys – vaihe 2")
+
+    def test_leaves_other_titles(self):
+        for title in ("Maanteiden hoitourakka", "Sverige – X – Y", None, ""):
+            self.assertEqual(clean_title(title), title)
 
 
 def _resp(payload: dict, status: int = 200) -> MagicMock:
@@ -56,7 +65,7 @@ class FakeSql:
                   "period": "1/2024–10/2026"}],
         "market_share": [{"category": "Kaikki", "company": "A Oy", "wins": "3", "won_value_eur": None, "share_of_wins": "0.5"}],
         "competition": [], "regions": [], "buyers": [],
-        "open_tenders": [{"id": "1", "region": "", "period": "", "region_from_llm": "true", "score": "70",
+        "open_tenders": [{"id": "1", "title": "Suomi – Teiden korjaus – Maanteiden hoitourakka Oulu 2027-2032", "region": "", "period": "", "region_from_llm": "true", "score": "70",
                           "questions": '["Q?"]', "past_winners": None, "option_years": "2.0"}],
         "price_spread": [{"n": "17", "median_spread": "0.35"}],
         "llm_eval": [{"metric": "region_accuracy", "value": "0.9", "n": "400"}, {"metric": "value_without_ted_value", "value": "0.1", "n": "5"}],
@@ -87,6 +96,9 @@ class BuildSiteDataTest(unittest.TestCase):
 
     def test_eval_keeps_labelled_metrics_only(self):
         self.assertEqual(self.data["llm_eval"], [{"metric": "region_accuracy", "value": 0.9, "n": 400, "label": "Maakunta oikein"}])
+
+    def test_open_tender_title_is_cleaned(self):
+        self.assertEqual(self.data["open_tenders"][0]["title"], "Maanteiden hoitourakka Oulu 2027-2032")
 
     def test_descriptions_are_not_exported(self):
         self.assertNotIn("description", QUERIES["open_tenders"].split("FROM")[0])

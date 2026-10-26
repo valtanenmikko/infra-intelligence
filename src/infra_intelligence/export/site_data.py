@@ -84,6 +84,14 @@ EVAL_LABELS = {
 }
 
 
+def clean_title(title: str | None) -> str | None:
+    """TED titles repeat country and CPV label: "Suomi – <CPV label> – <actual title>". Keep the actual title."""
+    if not title:
+        return title
+    parts = title.split(" – ", 2)
+    return parts[2] if len(parts) == 3 and parts[0] in ("Suomi", "Finland") else title
+
+
 def _convert(row: dict[str, Any]) -> dict[str, Any]:
     """The Statement API returns every value as a string; cast by field name."""
     out: dict[str, Any] = {}
@@ -107,6 +115,7 @@ def build_site_data(sql: SqlRunner, today: date) -> dict[str, Any]:
     data = {name: [_convert(r) for r in sql.query(q)] for name, q in QUERIES.items()}
     kpis = data["kpis"][0]
     for t in data["open_tenders"]:
+        t["title"] = clean_title(t.get("title"))
         t["region"] = t["region"] or None
         t["period"] = t["period"] or None
     return {
