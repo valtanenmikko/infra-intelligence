@@ -36,7 +36,8 @@ class GeminiClient:
         requests_per_minute: float = 8,
         max_retries: int = 5,
         backoff_s: float = 15.0,
-        timeout_s: float = 180,
+        timeout_s: float = 300,
+        thinking_level: str | None = "low",
         sleep=time.sleep,
         clock=time.monotonic,
     ) -> None:
@@ -49,6 +50,9 @@ class GeminiClient:
         self._max_retries = max_retries
         self._backoff_s = backoff_s
         self._timeout_s = timeout_s
+        # Gemini 3 models reason before answering by default; extraction needs little of it, and long
+        # reasoning over a batch of notices can exceed the request timeout.
+        self._thinking_level = thinking_level
         self._sleep = sleep
         self._clock = clock
         self._last_call: float | None = None
@@ -64,6 +68,8 @@ class GeminiClient:
         }
         if system:
             body["systemInstruction"] = {"parts": [{"text": system}]}
+        if self._thinking_level:
+            body["generationConfig"]["thinkingConfig"] = {"thinkingLevel": self._thinking_level}
 
         payload = self._post(body)
         try:

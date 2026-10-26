@@ -41,6 +41,13 @@ class GeminiClientTest(unittest.TestCase):
         self.assertEqual(kwargs["json"]["generationConfig"]["responseMimeType"], "application/json")
         self.assertEqual(kwargs["json"]["generationConfig"]["temperature"], 0)
         self.assertEqual(kwargs["json"]["systemInstruction"]["parts"][0]["text"], "sys")
+        self.assertEqual(kwargs["json"]["generationConfig"]["thinkingConfig"], {"thinkingLevel": "low"})
+
+    def test_thinking_config_can_be_disabled(self):
+        client = GeminiClient(self.session, "key", "m", thinking_level=None, sleep=self.sleep)
+        self.session.post.return_value = _ok({})
+        client.generate_json("p", {})
+        self.assertNotIn("thinkingConfig", self.session.post.call_args.kwargs["json"]["generationConfig"])
 
     def test_throttles_to_requests_per_minute(self):
         self.session.post.return_value = _ok({})

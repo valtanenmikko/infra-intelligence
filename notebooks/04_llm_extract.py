@@ -6,7 +6,7 @@
 # MAGIC price-index terms.
 # MAGIC
 # MAGIC - **Cached:** each notice is processed once per `PROMPT_VERSION`; changing the prompt re-processes everything.
-# MAGIC - **Free-tier friendly:** 10 notices per request, throttled, `max_notices` per run. Open competitions go first.
+# MAGIC - **Free-tier friendly:** 5 notices per request, throttled, `max_notices` per run. Open competitions go first.
 # MAGIC - **Resumable:** every batch is written immediately, so a quota stop loses nothing.
 # MAGIC - **Evaluable:** TED regions and values are withheld from the model (see `05_llm_eval`).
 
@@ -36,7 +36,7 @@ from infra_intelligence.llm.extraction import EXTRACTION_SCHEMA, PROMPT_VERSION,
 from infra_intelligence.llm.gemini_client import GeminiClient, LlmError
 
 dbutils.widgets.text("max_notices", "400")
-dbutils.widgets.text("batch_size", "10")
+dbutils.widgets.text("batch_size", "5")
 dbutils.widgets.text("model", GEMINI_MODEL)
 max_notices = int(dbutils.widgets.get("max_notices"))
 batch_size = int(dbutils.widgets.get("batch_size"))
