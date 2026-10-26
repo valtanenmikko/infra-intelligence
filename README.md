@@ -43,14 +43,18 @@ flowchart LR
   G -- SQL Statement API --> SITE[site.json → static site]
 ```
 
+An **ELT pipeline following the medallion architecture**: raw data lands unchanged in Bronze, Silver cleans and
+conforms it, and Gold holds business-ready tables. Because raw data is kept, data quality fixes only require
+re-running the transform layers, not re-fetching from the sources.
+
 All compute runs on **Databricks Free Edition** (serverless, Unity Catalog, Delta). Notebooks import a tested Python
 package from `src/`, so business logic is unit tested locally and the notebooks stay thin.
 
 | Layer | Tables | Notes |
 |---|---|---|
-| Bronze | `ted_notices`, `prh_companies` | Raw JSON, incremental and idempotent `MERGE`; PRH lookups cached and refreshed every 90 days |
-| Silver | `notices`, `notice_winners`, `companies`, `buyers`, `llm_extractions` | Typed records, infra scope by main CPV, entity resolution by business ID |
-| Gold | `market_share`, `competition`, `competition_by_region`, `buyer_profiles`, `open_tenders`, `price_spread`, `bid_assessments`, `llm_eval_metrics` | SQL with `GROUPING SETS` rollups and in-notebook quality assertions |
+| Bronze (raw) | `ted_notices`, `prh_companies` | Raw JSON, incremental and idempotent `MERGE`; PRH lookups cached and refreshed every 90 days |
+| Silver (cleaned, conformed) | `notices`, `notice_winners`, `companies`, `buyers`, `llm_extractions` | Typed records, infra scope by main CPV, entity resolution by business ID |
+| Gold (business-ready) | `market_share`, `competition`, `competition_by_region`, `buyer_profiles`, `open_tenders`, `price_spread`, `bid_assessments`, `llm_eval_metrics` | SQL with `GROUPING SETS` rollups and in-notebook quality assertions |
 
 ## Design decisions
 
