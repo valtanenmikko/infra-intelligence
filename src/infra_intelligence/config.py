@@ -65,6 +65,6 @@ GOLD_LLM_EVAL_TABLE = f"{CATALOG}.gold.llm_eval_metrics"
 GOLD_LLM_REGION_ERRORS_TABLE = f"{CATALOG}.gold.llm_eval_region_errors"
 
 # LLM: Gemini free tier. The key lives in a Databricks secret scope, never in code or notebooks.
-GEMINI_MODEL = "gemini-2.5-flash"
+GEMINI_MODEL = "gemini-3.8-flash"  # 2.5-flash was withdrawn for new users (Oct 2026)
 SECRET_SCOPE = "infra-intelligence"
 GEMINI_SECRET_KEY = "gemini-api-key"

@@ -113,10 +113,16 @@ def save(records, result):
 api_key = dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY)
 session = requests.Session()
 
-# Preflight: fail fast with a clear message if the key or model name is wrong
-check = session.get(f"{GEMINI_BASE_URL}/models/{model}", headers={"x-goog-api-key": api_key}, timeout=30)
+# Preflight: a tiny real generation call. Model metadata can exist even when generation is refused
+# (e.g. a model withdrawn for new users), so only a generate call proves the key and model work.
+check = session.post(
+    f"{GEMINI_BASE_URL}/models/{model}:generateContent",
+    json={"contents": [{"parts": [{"text": "Reply with OK."}]}], "generationConfig": {"maxOutputTokens": 5}},
+    headers={"x-goog-api-key": api_key},
+    timeout=60,
+)
 if check.status_code != 200:
-    raise RuntimeError(f"Gemini model check failed ({check.status_code}): {check.text[:300]}")
+    raise RuntimeError(f"Gemini preflight failed for {model} ({check.status_code}): {check.text[:300]}")
 
 client = GeminiClient(session, api_key, model)
 saved, failed_batches, tokens_in, tokens_out = 0, 0, 0, 0
