@@ -124,8 +124,16 @@ tests/         unit tests (stdlib unittest, mocks for all external APIs)
 python -m unittest discover -s tests -t .      # 91 tests, no network
 ```
 
-On Databricks: add the repo as a Git folder, store the Gemini key with
-`databricks secrets put-secret infra-intelligence gemini-api-key`, then run notebooks 01 → 06 in order.
+On Databricks the pipeline runs as the scheduled job `infra-intelligence-daily` (10:30 Europe/Helsinki, after
+the Gemini daily quota resets). It checks the notebooks out from this repo on every run:
+
+```
+bronze_ted → bronze_prh → silver → llm_extract → gold → llm_eval
+                                                      └→ bid_assessment
+```
+
+Gold runs even if the LLM step fails (e.g. quota), so market tables stay fresh. The Gemini key is read from a
+secret scope: `databricks secrets put-secret infra-intelligence gemini-api-key`.
 
 Export the site data (needs a Databricks token and SQL warehouse ID):
 
@@ -136,7 +144,7 @@ cd site && python -m http.server 8000
 
 ## Roadmap
 
-- Scheduled pipeline as a Databricks job, defined with Terraform (Databricks provider)
+- Job definition as code with Terraform (Databricks provider); the scheduled job currently exists via the CLI
 - GitHub Actions: nightly export of `site.json` and deploy to GitHub Pages
 - Construction cost index (Statistics Finland) for inflation risk on multi-year contracts
 - Azure variant: Terraform module for ADLS Gen2, Key Vault and Data Factory orchestration

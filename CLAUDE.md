@@ -43,7 +43,10 @@ CLI may need a PATH refresh:
 ```powershell
 $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
 ```
-- Git folder: `/Workspace/Users/valtanenmikko@gmail.com/infra-intelligence` (update with `databricks repos update <id> --branch main` after pushing)
+- Scheduled job `infra-intelligence-daily` (job_id 288507497663040), daily 10:30 Europe/Helsinki, Git source
+  `main` (no repo pull needed). Test single tasks with `databricks jobs run-now --json '{"job_id": ..., "only": ["silver"]}'`.
+  Daily Gemini budget: extraction max 120 notices (~13 requests) + go/no-go (~5) ≤ 20.
+- Git folder (for interactive use): `/Workspace/Users/valtanenmikko@gmail.com/infra-intelligence` (update with `databricks repos update <id> --branch main` after pushing)
 - One-off notebook run: `databricks jobs submit --json @submit.json` with a `notebook_task` (serverless, no cluster spec)
 - Ad-hoc SQL: `databricks api post /api/2.0/sql/statements` with the first warehouse from `databricks warehouses list`
 
