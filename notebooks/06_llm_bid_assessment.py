@@ -5,7 +5,7 @@
 # MAGIC **risk**, with reasons. **Competition** comes from historical bid counts, and the score (0–100) and
 # MAGIC recommendation from a fixed formula in `bid_assessment.py`, so the LLM never does the arithmetic.
 # MAGIC
-# MAGIC Each tender is assessed once per `PROMPT_VERSION`.
+# MAGIC Each tender is assessed once per `PROMPT_VERSION`, five tenders per request (free tier: 20 requests/day).
 
 # COMMAND ----------
 
@@ -22,7 +22,14 @@ import requests
 from pyspark.sql import functions as F
 
 from infra_intelligence.config import GEMINI_MODEL, GEMINI_SECRET_KEY, SECRET_SCOPE
-from infra_intelligence.llm.bid_assessment import ASSESSMENT_SCHEMA, PROMPT_VERSION, SYSTEM_PROMPT, build_prompt, parse_assessment
+from infra_intelligence.llm.bid_assessment import (
+    ASSESSMENT_SCHEMA,
+    BATCH_SIZE,
+    PROMPT_VERSION,
+    SYSTEM_PROMPT,
+    build_prompt,
+    parse_assessments,
+)
 from infra_intelligence.llm.gemini_client import GeminiClient, LlmError
 
 TABLE = "workspace.gold.bid_assessments"
@@ -63,17 +70,24 @@ print(f"Open tenders to assess: {len(tenders)}")
 
 # COMMAND ----------
 
-client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), model)
-rows = []
-for tender in tenders:
+client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), model,
+                      requests_per_minute=4)
+rows, errors = [], []
+for start in range(0, len(tenders), BATCH_SIZE):
+    batch = tenders[start:start + BATCH_SIZE]
     try:
-        result = client.generate_json(build_prompt(tender), ASSESSMENT_SCHEMA, system=SYSTEM_PROMPT)
-        assessment = parse_assessment(result.data, tender)
+        result = client.generate_json(build_prompt(batch), ASSESSMENT_SCHEMA, system=SYSTEM_PROMPT)
+        assessments = parse_assessments(result.data, batch)
     except (LlmError, ValueError) as e:
-        print(f"{tender['publication_number']}: failed: {e}")
+        errors.append(str(e)[:300])
+        print(f"Batch {start // BATCH_SIZE + 1} failed: {e}")
         continue
-    rows.append({**asdict(assessment), "prompt_version": PROMPT_VERSION, "model": result.model, "_assessed_at": None})
-    print(f"{tender['publication_number']}: {assessment.recommendation} ({assessment.score})")
+    for a in assessments:
+        rows.append({**asdict(a), "prompt_version": PROMPT_VERSION, "model": result.model, "_assessed_at": None})
+        print(f"{a.publication_number}: {a.recommendation} ({a.score})")
+
+if tenders and not rows:
+    raise RuntimeError(f"No assessments saved from {len(tenders)} open tenders. Errors: {errors}")
 
 # COMMAND ----------
 

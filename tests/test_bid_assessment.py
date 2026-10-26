@@ -6,6 +6,7 @@ from infra_intelligence.llm.bid_assessment import (
     expected_bids,
     overall_score,
     parse_assessment,
+    parse_assessments,
     recommendation,
 )
 
@@ -65,17 +66,46 @@ class ScoringTest(unittest.TestCase):
 
 class PromptTest(unittest.TestCase):
     def test_prompt_contains_profile_tender_and_history(self):
-        p = build_prompt(TENDER)
-        self.assertIn("Esimerkkiprofiili", p)
+        p = build_prompt([TENDER])
+        self.assertEqual(p.count("Esimerkkiprofiili"), 1)
+        self.assertIn("### id: 700001-2026", p)
         self.assertIn("Viinijärvi", p)
         self.assertIn("2027–2032", p)
         self.assertIn("Destia Oy (30)", p)
         self.assertIn("Odotettu tarjousmäärä historian perusteella: 3.5", p)
 
+    def test_batch_prompt_has_one_block_per_tender(self):
+        p = build_prompt([TENDER, {**TENDER, "publication_number": "700002-2026"}])
+        self.assertIn("Arvioi nämä 2 avointa", p)
+        self.assertEqual(p.count("### id:"), 2)
+
     def test_prompt_handles_missing_fields(self):
-        p = build_prompt({"publication_number": "x"})
+        p = build_prompt([{"publication_number": "x"}])
         self.assertIn("Sopimuskausi: ei tietoa", p)
         self.assertIn("Alue: ei tietoa", p)
+
+
+class ParseAssessmentsTest(unittest.TestCase):
+    def test_batch_keeps_valid_items_in_input_order(self):
+        other = {**TENDER, "publication_number": "700002-2026", "buyer_past_avg_bids": 1.2}
+        items = [
+            {**LLM_OUTPUT, "id": "700002-2026"},
+            {**LLM_OUTPUT, "id": "700001-2026"},
+            {**LLM_OUTPUT, "id": "unknown"},
+            {**LLM_OUTPUT, "id": "700001-2026", "fit": 1},  # duplicate: first wins
+        ]
+        results = parse_assessments({"items": items}, [TENDER, other])
+        self.assertEqual([r.publication_number for r in results], ["700001-2026", "700002-2026"])
+        self.assertEqual(results[0].fit, 5)
+        self.assertEqual(results[1].competition, 5)  # computed from that tender's own history
+
+    def test_invalid_item_is_skipped_not_fatal(self):
+        results = parse_assessments({"items": [{**LLM_OUTPUT, "id": "700001-2026", "risk": 9}]}, [TENDER])
+        self.assertEqual(results, [])
+
+    def test_missing_items_raises(self):
+        with self.assertRaises(ValueError):
+            parse_assessments({}, [TENDER])
 
 
 class ParseAssessmentTest(unittest.TestCase):

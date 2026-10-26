@@ -10,7 +10,8 @@ Split of responsibilities, so the result is reproducible and auditable:
 from dataclasses import dataclass
 from typing import Any
 
-PROMPT_VERSION = "bid-v1"
+PROMPT_VERSION = "bid-v2"
+BATCH_SIZE = 5  # tenders per request (free tier: 20 requests/day)
 
 # Example bidder used in the demo. A real deployment would load the company's own profile.
 BIDDER_PROFILE = """Esimerkkiprofiili: keskisuuri suomalainen infraurakoitsija.
@@ -30,14 +31,24 @@ Mention the incumbent or frequent past winners if the history shows them. Do not
 ASSESSMENT_SCHEMA: dict[str, Any] = {
     "type": "OBJECT",
     "properties": {
-        "fit": {"type": "INTEGER"},
-        "fit_reason": {"type": "STRING"},
-        "risk": {"type": "INTEGER"},
-        "risk_reason": {"type": "STRING"},
-        "summary": {"type": "STRING"},
-        "questions_for_bid_team": {"type": "ARRAY", "items": {"type": "STRING"}},
+        "items": {
+            "type": "ARRAY",
+            "items": {
+                "type": "OBJECT",
+                "properties": {
+                    "id": {"type": "STRING"},
+                    "fit": {"type": "INTEGER"},
+                    "fit_reason": {"type": "STRING"},
+                    "risk": {"type": "INTEGER"},
+                    "risk_reason": {"type": "STRING"},
+                    "summary": {"type": "STRING"},
+                    "questions_for_bid_team": {"type": "ARRAY", "items": {"type": "STRING"}},
+                },
+                "required": ["id", "fit", "fit_reason", "risk", "risk_reason", "summary", "questions_for_bid_team"],
+            },
+        }
     },
-    "required": ["fit", "fit_reason", "risk", "risk_reason", "summary", "questions_for_bid_team"],
+    "required": ["items"],
 }
 
 WEIGHTS = {"fit": 0.4, "competition": 0.3, "risk": 0.3}
@@ -100,12 +111,20 @@ def _winners(winners: Any) -> str:
     return ", ".join(f"{w['company']} ({w['wins']})" for w in winners)
 
 
-def build_prompt(tender: dict[str, Any]) -> str:
-    """tender: a Gold open_tenders row joined with LLM extraction fields."""
+def build_prompt(tenders: list[dict[str, Any]]) -> str:
+    """tenders: Gold open_tenders rows (which include the LLM extraction fields)."""
+    parts = [
+        f"Tarjoajan profiili:\n{BIDDER_PROFILE}",
+        f"\nArvioi nämä {len(tenders)} avointa kilpailutusta. Palauta yksi item kustakin sen id:llä.",
+    ]
+    parts += [_tender_block(t) for t in tenders]
+    return "\n".join(parts)
+
+
+def _tender_block(tender: dict[str, Any]) -> str:
     period = "–".join(str(y) for y in (tender.get("contract_start_year"), tender.get("contract_end_year")) if y) or "ei tietoa"
     lines = [
-        f"Tarjoajan profiili:\n{BIDDER_PROFILE}",
-        "\nAvoin kilpailutus:",
+        f"\n### id: {tender.get('publication_number')}",
         f"Otsikko: {tender.get('title')}",
         f"Tilaaja: {tender.get('buyer_name')}",
         f"Luokka: {tender.get('infra_category')}",
@@ -128,6 +147,23 @@ def _rating(value: Any) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 5:
         raise ValueError(f"Rating must be an integer 1-5, got {value!r}")
     return value
+
+
+def parse_assessments(data: Any, tenders: list[dict[str, Any]]) -> list[BidAssessment]:
+    """Validate a batch response. Items with unknown IDs or invalid ratings are skipped (retried next run)."""
+    items = data.get("items") if isinstance(data, dict) else None
+    if not isinstance(items, list):
+        raise ValueError("LLM output has no 'items' list")
+    by_id = {t["publication_number"]: t for t in tenders}
+    results: dict[str, BidAssessment] = {}
+    for item in items:
+        tender_id = item.get("id") if isinstance(item, dict) else None
+        if tender_id in by_id and tender_id not in results:
+            try:
+                results[tender_id] = parse_assessment(item, by_id[tender_id])
+            except ValueError:
+                continue
+    return [results[t["publication_number"]] for t in tenders if t["publication_number"] in results]
 
 
 def parse_assessment(data: Any, tender: dict[str, Any]) -> BidAssessment:
