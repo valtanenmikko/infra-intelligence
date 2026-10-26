@@ -4,6 +4,11 @@ const fmtInt = new Intl.NumberFormat("fi-FI");
 const fmtDec = new Intl.NumberFormat("fi-FI", { maximumFractionDigits: 1 });
 const fmtPct = new Intl.NumberFormat("fi-FI", { style: "percent", maximumFractionDigits: 0 });
 const fmtDate = new Intl.DateTimeFormat("fi-FI", { day: "numeric", month: "numeric", year: "numeric" });
+const fmtShortDate = new Intl.DateTimeFormat("fi-FI", { day: "numeric", month: "numeric" });
+
+const OTHERS = "Muut toimijat";
+const SMALL_SAMPLE = 15;
+const REC_ORDER = ["Tarjoa", "Harkitse", "Ei tarjota"];
 
 function fmtEur(v) {
   if (v == null) return "–";
@@ -12,7 +17,12 @@ function fmtEur(v) {
   return `${fmtInt.format(Math.round(v))} €`;
 }
 
-// Build DOM with text nodes only: all data is inserted as text, never as HTML.
+/** Whole days until the end of the deadline day (Finnish time); negative when passed. */
+function daysLeft(deadline) {
+  return Math.ceil((new Date(`${deadline}T23:59:59+02:00`) - Date.now()) / 864e5);
+}
+
+// Build DOM with text nodes only: data is always inserted as text, never as HTML.
 function el(tag, attrs = {}, ...children) {
   const node = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -25,16 +35,13 @@ function el(tag, attrs = {}, ...children) {
   return node;
 }
 
-/* ---------- Tooltip ---------- */
+/* ---------- Tooltip (mouse only; every value is also in the row label and the table view) ---------- */
 const tooltip = document.getElementById("tooltip");
 function showTip(evt, text) {
   tooltip.textContent = text;
   tooltip.hidden = false;
-  const r = evt.currentTarget.getBoundingClientRect();
-  const x = evt.clientX ?? r.left + r.width / 2;
-  const y = evt.clientY ?? r.top;
-  tooltip.style.left = `${Math.min(x + 14, window.innerWidth - tooltip.offsetWidth - 8)}px`;
-  tooltip.style.top = `${Math.max(y - tooltip.offsetHeight - 10, 8)}px`;
+  tooltip.style.left = `${Math.min(evt.clientX + 14, window.innerWidth - tooltip.offsetWidth - 8)}px`;
+  tooltip.style.top = `${Math.max(evt.clientY - tooltip.offsetHeight - 10, 8)}px`;
 }
 function hideTip() { tooltip.hidden = true; }
 
@@ -44,37 +51,41 @@ function hbar(container, rows, { value, label, display, tip, muted = () => false
   container.replaceChildren(
     ...rows.map((r) => {
       const v = value(r);
-      const row = el("div", { class: "hbar-row", tabindex: "0", "data-muted": muted(r) ? "true" : null },
-        el("span", { class: "hbar-label", title: label(r), text: label(r) }),
-        el("span", { class: "hbar-track" },
+      const row = el("div", { class: "hbar-row", role: "listitem", "aria-label": `${label(r)}: ${display(r)}`, "data-muted": muted(r) ? "true" : null },
+        el("span", { class: "hbar-label", title: label(r), text: label(r), "aria-hidden": "true" }),
+        el("span", { class: "hbar-track", "aria-hidden": "true" },
           el("span", { class: "hbar-bar", style: `width:${v == null ? 0 : (v / max) * 82}%` }),
           el("span", { class: "hbar-value", text: display(r) })));
       row.addEventListener("mousemove", (e) => showTip(e, tip(r)));
       row.addEventListener("mouseleave", hideTip);
-      row.addEventListener("focus", (e) => showTip(e, tip(r)));
-      row.addEventListener("blur", hideTip);
       return row;
     }),
   );
 }
 
-function table(container, columns, rows) {
-  const t = el("table", { class: "data-table" },
-    el("thead", {}, el("tr", {}, columns.map((c) => el("th", { class: c.num ? "num" : null, scope: "col", text: c.title })))),
-    el("tbody", {}, rows.map((r) => el("tr", {}, columns.map((c) => el("td", { class: c.num ? "num" : null, text: c.get(r) }))))));
-  if (container.tagName === "TABLE") container.replaceWith(Object.assign(t, { id: container.id }));
-  else container.replaceChildren(t);
+function table(container, caption, columns, rows) {
+  container.replaceChildren(el("table", { class: "data-table" },
+    el("caption", { class: "visually-hidden", text: caption }),
+    el("thead", {}, el("tr", {}, columns.map((c) => el("th", { class: c.cls, scope: "col", text: c.title })))),
+    el("tbody", {}, rows.map((r) => el("tr", {}, columns.map((c) => el("td", { class: c.cls, text: c.get(r) })))))));
+}
+
+function options(select, values, allLabel = "Kaikki") {
+  select.replaceChildren(el("option", { value: "", text: allLabel }), ...values.map((v) => el("option", { value: v, text: v })));
 }
 
 /* ---------- Sections ---------- */
-function renderMeta(data) {
+function renderMeta(data, openTenders) {
   document.getElementById("sample-banner").hidden = !data.meta.sample;
   document.querySelectorAll("[data-meta]").forEach((n) => {
     const v = data.meta[n.dataset.meta];
-    n.textContent = Array.isArray(v) ? v.join(", ") : n.dataset.meta === "generated_at" ? fmtDate.format(new Date(v)) : v;
+    n.textContent = n.dataset.meta === "generated_at" ? fmtDate.format(new Date(v)) : v;
   });
   const k = data.kpis;
+  const next = openTenders.map((t) => t.deadline).sort()[0];
   const values = {
+    open_now: fmtInt.format(openTenders.length),
+    next_deadline: next ? ` · seuraava takaraja ${fmtShortDate.format(new Date(next))}` : "",
     single_winner_value_eur: fmtEur(k.single_winner_value_eur),
     notices: fmtInt.format(k.notices),
     awards: fmtInt.format(k.awards),
@@ -84,14 +95,15 @@ function renderMeta(data) {
   document.querySelectorAll("[data-kpi]").forEach((n) => { n.textContent = values[n.dataset.kpi] ?? "–"; });
 }
 
-const REC_ORDER = ["Tarjoa", "Harkitse", "Ei tarjota"];
-
 function tenderCard(t) {
-  const factor = (name, value, hint) => el("div", { class: "factor" },
-    `${name} ${value}/5`, el("div", { class: "meter", title: hint }, el("span", { style: `width:${(value / 5) * 100}%` })));
+  const factor = (name, value, note) => el("div", { class: "factor" },
+    el("span", { class: "factor-name", text: `${name} ${value}/5` }),
+    el("div", { class: "meter", "aria-hidden": "true" }, el("span", { style: `width:${(value / 5) * 100}%` })),
+    note ? el("span", { class: "factor-note", text: note }) : null);
   const winners = t.past_winners?.length
     ? t.past_winners.map((w) => `${w.company} (${w.wins})`).join(", ")
     : "ei aiempia voittoja tiedossa";
+  const days = t.days_left;
   return el("li", { class: "tender" },
     el("div", {},
       el("h3", { text: t.title }),
@@ -99,15 +111,16 @@ function tenderCard(t) {
         el("span", { text: t.buyer }),
         el("span", { text: t.category }),
         t.region ? el("span", {}, t.region, t.region_from_llm ? el("span", { class: "llm", text: " · AI-päätelty" }) : null) : null,
-        el("span", { text: `Jätettävä ${fmtDate.format(new Date(t.deadline))} (${t.days_left} pv)` }),
+        el("span", { class: days <= 14 ? "urgent" : null, text: `Takaraja ${fmtDate.format(new Date(t.deadline))} (${days} pv)` }),
         t.period ? el("span", { text: `Kausi ${t.period}${t.option_years ? ` + ${fmtDec.format(t.option_years)} v optio` : ""}` }) : null)),
     el("div", { class: "verdict" },
       el("span", { class: "badge", "data-rec": t.recommendation, text: t.recommendation }),
       el("div", { class: "score" }, String(t.score), el("small", { text: " / 100" }))),
     el("div", { class: "factors" },
-      factor("Soveltuvuus", t.fit, "Tekoälyn arvio"),
-      factor("Kilpailu", t.competition, `Laskettu historiasta: odotettu ${t.expected_bids ?? "?"} tarjousta`),
-      factor("Riski (5 = matala)", t.risk, "Tekoälyn arvio")),
+      factor("Soveltuvuus", t.fit, "tekoälyn arvio"),
+      factor("Kilpailu (5 = vähäinen)", t.competition,
+        t.expected_bids != null ? `odotettu ${fmtDec.format(t.expected_bids)} tarjousta` : "ei historiaa"),
+      factor("Riski (5 = matala)", t.risk, "tekoälyn arvio")),
     el("details", {},
       el("summary", { text: "Perustelut ja historia" }),
       el("p", { text: t.summary }),
@@ -115,21 +128,20 @@ function tenderCard(t) {
       el("p", {}, el("strong", { text: "Riskit: " }), t.risk_reason),
       el("p", {}, el("strong", { text: "Aiemmat voittajat: " }), winners),
       t.questions?.length ? el("ul", {}, t.questions.map((q) => el("li", { text: q }))) : null,
-      el("p", {}, el("a", { href: t.url, target: "_blank", rel: "noopener", text: "Ilmoitus TEDissä ↗" }))));
+      t.url ? el("p", {}, el("a", { href: t.url, target: "_blank", rel: "noopener", text: "Ilmoitus TEDissä ↗" })) : null));
 }
 
-function renderTenders(data) {
+function renderTenders(openTenders) {
   const catSel = document.getElementById("tender-category");
   const recSel = document.getElementById("tender-rec");
-  const cats = [...new Set(data.open_tenders.map((t) => t.category))].sort();
-  catSel.replaceChildren(el("option", { value: "", text: "Kaikki" }), ...cats.map((c) => el("option", { value: c, text: c })));
-  recSel.replaceChildren(el("option", { value: "", text: "Kaikki" }), ...REC_ORDER.map((r) => el("option", { value: r, text: r })));
+  options(catSel, [...new Set(openTenders.map((t) => t.category))].sort());
+  options(recSel, REC_ORDER);
   const list = document.getElementById("tender-list");
   const draw = () => {
-    const rows = data.open_tenders
+    const rows = openTenders
       .filter((t) => (!catSel.value || t.category === catSel.value) && (!recSel.value || t.recommendation === recSel.value))
       .sort((a, b) => b.score - a.score);
-    list.replaceChildren(...(rows.length ? rows.map(tenderCard) : [el("li", { class: "empty", text: "Ei kilpailutuksia valinnoilla." })]));
+    list.replaceChildren(...(rows.length ? rows.map(tenderCard) : [el("li", { class: "empty", text: "Ei avoimia kilpailutuksia valinnoilla." })]));
   };
   catSel.addEventListener("change", draw);
   recSel.addEventListener("change", draw);
@@ -137,84 +149,108 @@ function renderTenders(data) {
 }
 
 function renderMarket(data) {
-  const rows = data.market_share.filter((r) => r.category === "Kaikki");
-  const chart = document.getElementById("market-chart");
-  const caption = document.getElementById("market-caption");
+  const catSel = document.getElementById("market-category");
+  const categories = [...new Set(data.market_share.map((r) => r.category))].filter((c) => c !== "Kaikki").sort();
+  options(catSel, categories, "Kaikki luokat");
+  document.getElementById("market-category-label").hidden = categories.length === 0;
   const buttons = document.querySelectorAll("[data-measure]");
-  const draw = (measure) => {
-    const sorted = [...rows].sort((a, b) => (b[measure] ?? -1) - (a[measure] ?? -1));
+  let measure = "wins";
+
+  const draw = () => {
+    const category = catSel.value || "Kaikki";
+    const all = data.market_share.filter((r) => r.category === category);
     const isValue = measure === "won_value_eur";
-    caption.textContent = isValue ? "Voitettujen yhden voittajan sopimusten arvo" : "Voitetut hankinnat";
-    hbar(chart, sorted, {
+    const shown = all.filter((r) => !isValue || r.won_value_eur != null);
+    const companies = shown.filter((r) => r.company !== OTHERS).sort((a, b) => b[measure] - a[measure]);
+    const others = shown.filter((r) => r.company === OTHERS);
+    const n = all[0]?.slice_awards;
+    document.getElementById("market-caption").textContent = isValue
+      ? "Voitettujen yhden voittajan sopimusten arvo"
+      : `Voitetut hankinnat${n ? ` (yhteensä ${fmtInt.format(n)} hankintaa)` : ""}`;
+    hbar(document.getElementById("market-chart"), [...companies, ...others], {
       value: (r) => r[measure],
       label: (r) => r.company,
-      display: (r) => (isValue ? fmtEur(r.won_value_eur) : fmtInt.format(r.wins)),
-      tip: (r) => `${r.company}: ${fmtInt.format(r.wins)} voittoa, ${fmtEur(r.won_value_eur)} (${fmtPct.format(r.share_of_wins)} voitoista)`,
-      muted: (r) => r.company === "Muut toimijat",
+      display: (r) => (isValue ? fmtEur(r.won_value_eur) : `${fmtInt.format(r.wins)} · ${fmtPct.format(r.share_of_awards)}`),
+      tip: (r) => `${r.company}: ${fmtInt.format(r.wins)} voittoa (${fmtPct.format(r.share_of_awards)} hankinnoista), ${fmtEur(r.won_value_eur)}`,
+      muted: (r) => r.company === OTHERS,
     });
-    buttons.forEach((b) => b.setAttribute("aria-checked", String(b.dataset.measure === measure)));
+    const missing = all.length - shown.length;
+    document.getElementById("market-note").textContent = [
+      others.length ? `${OTHERS} = yksityiset elinkeinonharjoittajat ja tunnistamattomat voittajat, nimet piilotettu.` : "",
+      missing ? `${missing} yrityksen sopimusarvo ei tiedossa (vain puitejärjestelyjä).` : "",
+    ].join(" ");
+    buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.measure === measure)));
+    table(document.getElementById("market-table"), "Markkinaosuudet", [
+      { title: "Yritys", get: (r) => r.company },
+      { title: "Voitot", cls: "num", get: (r) => fmtInt.format(r.wins) },
+      { title: "Osuus hankinnoista", cls: "num", get: (r) => fmtPct.format(r.share_of_awards) },
+      { title: "Sopimusarvo", cls: "num", get: (r) => fmtEur(r.won_value_eur) },
+    ], [...all.filter((r) => r.company !== OTHERS).sort((a, b) => b.wins - a.wins), ...all.filter((r) => r.company === OTHERS)]);
   };
-  buttons.forEach((b) => b.addEventListener("click", () => draw(b.dataset.measure)));
-  draw("wins");
-  table(document.getElementById("market-table"), [
-    { title: "Yritys", get: (r) => r.company },
-    { title: "Voitot", num: true, get: (r) => fmtInt.format(r.wins) },
-    { title: "Sopimusarvo", num: true, get: (r) => fmtEur(r.won_value_eur) },
-    { title: "Osuus voitoista", num: true, get: (r) => fmtPct.format(r.share_of_wins) },
-  ], rows);
+  buttons.forEach((b) => b.addEventListener("click", () => { measure = b.dataset.measure; draw(); }));
+  catSel.addEventListener("change", draw);
+  draw();
 }
 
 function renderCompetition(data) {
   const byLow = (a, b) => b.share_low_competition - a.share_low_competition;
   const opts = (key) => ({
     value: (r) => r.share_low_competition,
-    label: (r) => r[key],
+    label: (r) => `${r[key]} (${fmtInt.format(r.awards)})`,
     display: (r) => fmtPct.format(r.share_low_competition),
     tip: (r) => `${r[key]}: ${fmtInt.format(r.awards)} hankintaa, keskimäärin ${fmtDec.format(r.avg_bids)} tarjousta`,
+    muted: (r) => r.awards < SMALL_SAMPLE,
   });
   hbar(document.getElementById("competition-chart"), [...data.competition].sort(byLow), opts("category"));
   hbar(document.getElementById("region-chart"), [...data.regions].sort(byLow), opts("region"));
+  const minRegion = Math.min(...data.regions.map((r) => r.awards));
+  document.getElementById("region-caption").textContent =
+    `Maakunnittain (${data.regions.length} maakuntaa, joissa vähintään ${minRegion} hankintaa)`;
   const cols = (key, title) => [
     { title, get: (r) => r[key] },
-    { title: "Hankinnat", num: true, get: (r) => fmtInt.format(r.awards) },
-    { title: "Tarjouksia ka.", num: true, get: (r) => fmtDec.format(r.avg_bids) },
-    { title: "≤ 2 tarjousta", num: true, get: (r) => fmtPct.format(r.share_low_competition) },
+    { title: "Hankinnat", cls: "num", get: (r) => fmtInt.format(r.awards) },
+    { title: "Tarjouksia ka.", cls: "num", get: (r) => fmtDec.format(r.avg_bids) },
+    { title: "≤ 2 tarjousta", cls: "num", get: (r) => fmtPct.format(r.share_low_competition) },
   ];
-  table(document.getElementById("competition-table"), cols("category", "Luokka"), data.competition);
-  table(document.getElementById("region-table"), cols("region", "Maakunta"), data.regions);
+  table(document.getElementById("competition-table"), "Kilpailu hankintaluokittain", cols("category", "Luokka"), data.competition);
+  table(document.getElementById("region-table"), "Kilpailu maakunnittain", cols("region", "Maakunta"), data.regions);
   const s = data.price_spread;
   document.getElementById("spread-callout").textContent =
     `Hintahaarukka: kun sekä alin että ylin tarjous on ilmoitettu (${s.n} hankintaa), ylin tarjous on mediaanina ${fmtPct.format(s.median_spread)} alinta kalliimpi.`;
 }
 
 function renderBuyers(data) {
-  table(document.getElementById("buyer-table"), [
-    { title: "Tilaaja", get: (r) => r.buyer },
-    { title: "Ilmoitukset", num: true, get: (r) => fmtInt.format(r.notices) },
-    { title: "Hankinnat", num: true, get: (r) => fmtInt.format(r.awards) },
-    { title: "Sopimusarvo", num: true, get: (r) => fmtEur(r.awarded_value_eur) },
-    { title: "Pääluokka", get: (r) => r.main_category },
-    { title: "Tarjouksia ka.", num: true, get: (r) => fmtDec.format(r.avg_bids) },
+  table(document.getElementById("buyer-table"), "Suurimmat tilaajat", [
+    { title: "Tilaaja", cls: "sticky", get: (r) => r.buyer },
+    { title: "Ilmoitukset", cls: "num hide-sm", get: (r) => fmtInt.format(r.notices) },
+    { title: "Hankinnat", cls: "num", get: (r) => fmtInt.format(r.awards) },
+    { title: "Sopimusarvo", cls: "num", get: (r) => fmtEur(r.awarded_value_eur) },
+    { title: "Pääluokka", cls: "hide-sm", get: (r) => r.main_category },
+    { title: "Tarjouksia ka.", cls: "num", get: (r) => fmtDec.format(r.avg_bids) },
     { title: "Useimmin voittanut", get: (r) => (r.top_winner ? `${r.top_winner} (${fmtPct.format(r.top_winner_share)})` : "–") },
   ], data.buyers);
 }
 
 function renderEval(data) {
-  document.getElementById("eval-tiles").replaceChildren(...data.llm_eval.map((m) =>
+  const metrics = data.llm_eval.filter((m) => m.value != null);
+  document.getElementById("eval-block").hidden = metrics.length === 0;
+  document.getElementById("eval-tiles").replaceChildren(...metrics.map((m) =>
     el("div", { class: "tile" },
       el("dt", { text: m.label }),
-      el("dd", {}, m.value == null ? "–" : fmtPct.format(m.value),
-        el("small", { text: m.n == null ? "odottaa ajoa" : `n = ${fmtInt.format(m.n)}` })))));
+      el("dd", {}, fmtPct.format(m.value), el("small", { text: `n = ${fmtInt.format(m.n)}` })))));
 }
 
 /* ---------- Theme ---------- */
 function initTheme() {
   const root = document.documentElement;
-  try { const saved = localStorage.getItem("theme"); if (saved) root.dataset.theme = saved; } catch { /* storage unavailable */ }
-  document.querySelector("[data-action=theme]").addEventListener("click", () => {
-    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    root.dataset.theme = dark ? "light" : "dark";
-    try { localStorage.setItem("theme", root.dataset.theme); } catch { /* ignore */ }
+  const button = document.querySelector("[data-action=theme]");
+  const isDark = () => (root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches);
+  const sync = () => button.setAttribute("aria-pressed", String(isDark()));
+  sync();
+  button.addEventListener("click", () => {
+    root.dataset.theme = isDark() ? "light" : "dark";
+    try { localStorage.setItem("theme", root.dataset.theme); } catch { /* storage unavailable */ }
+    sync();
   });
 }
 
@@ -223,8 +259,12 @@ async function main() {
   const res = await fetch("data/site.json", { cache: "no-cache" });
   if (!res.ok) throw new Error(`site.json: ${res.status}`);
   const data = await res.json();
-  renderMeta(data);
-  renderTenders(data);
+  // Deadlines are evaluated in the browser so the static page never shows expired tenders or stale day counts
+  const openTenders = data.open_tenders
+    .map((t) => ({ ...t, days_left: daysLeft(t.deadline) }))
+    .filter((t) => t.days_left >= 0);
+  renderMeta(data, openTenders);
+  renderTenders(openTenders);
   renderMarket(data);
   renderCompetition(data);
   renderBuyers(data);
@@ -232,5 +272,5 @@ async function main() {
 }
 
 main().catch((e) => {
-  document.querySelector("main").prepend(el("p", { class: "callout", text: `Datan lataus epäonnistui: ${e.message}` }));
+  document.querySelector("main").prepend(el("p", { class: "callout", role: "alert", text: `Datan lataus epäonnistui: ${e.message}` }));
 });

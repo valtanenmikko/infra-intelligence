@@ -3,50 +3,77 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Infra Intelligence</title>
-  <meta name="description" content="Suomen infrahankintojen tilannekuva: markkinaosuudet, kilpailun intensiteetti ja tekoälyn go/no-go-arviot avoimiin kilpailutuksiin.">
+  <title>Suomen infrahankinnat – tilannekuva | Mikko Valtanen</title>
+  <meta name="description" content="Suomen julkiset infrahankinnat yhdessä näkymässä: kuka voittaa, missä kilpailu on ohutta ja tekoälyn go/no-go-arviot avoimiin kilpailutuksiin.">
+  <meta name="author" content="Mikko Valtanen">
+  <link rel="canonical" href="https://valtanenmikko.github.io/infra-intelligence/">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="fi_FI">
+  <meta property="og:title" content="Suomen infrahankinnat – tilannekuva">
+  <meta property="og:description" content="Markkinaosuudet, kilpailun intensiteetti ja tekoälyn go/no-go-arviot julkisesta hankintadatasta. Databricks · LLM · ELT.">
+  <meta property="og:url" content="https://valtanenmikko.github.io/infra-intelligence/">
+  <meta property="og:image" content="https://valtanenmikko.github.io/infra-intelligence/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231d1f22'/%3E%3Crect x='5' y='14' width='9' height='4' rx='1' fill='%23f2b705'/%3E%3Crect x='18' y='14' width='9' height='4' rx='1' fill='%23f2b705'/%3E%3C/svg%3E">
+  <script>
+    // Apply a saved theme before first paint to avoid a light-to-dark flash
+    try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#main">Siirry sisältöön</a>
+
   <header class="masthead">
     <div class="wrap masthead-inner">
       <div>
         <p class="kicker">Infra Intelligence · tilannekuva</p>
         <h1>Suomen infrahankinnat</h1>
-        <p class="lede">Julkiset tie-, rata-, silta- ja kunnossapitohankinnat yhdessä näkymässä: kuka voittaa, missä kilpailu on ohutta ja mihin avoimiin kilpailutuksiin kannattaa tarttua.</p>
+        <p class="lede">Kuka voittaa, missä kilpailu on ohutta ja mihin avoimiin kilpailutuksiin kannattaa tarttua – julkisesta hankintadatasta.</p>
       </div>
-      <button class="theme-toggle" type="button" aria-label="Vaihda väriteema" data-action="theme">◐</button>
+      <button class="theme-toggle" type="button" aria-label="Tumma teema" aria-pressed="false" data-action="theme">◐</button>
     </div>
     <div class="lane" aria-hidden="true"></div>
   </header>
+  <nav class="section-nav" aria-label="Osiot">
+    <div class="wrap">
+      <a href="#tenders">Avoimet</a>
+      <a href="#market">Markkina</a>
+      <a href="#competition">Kilpailu</a>
+      <a href="#buyers">Tilaajat</a>
+      <a href="#method">Menetelmä</a>
+    </div>
+  </nav>
 
   <div id="sample-banner" class="banner" hidden>
-    <div class="wrap"><strong>Esimerkkidata.</strong> Luvut perustuvat kehitysvaiheen ajoon, ja avoimien kilpailutusten arviot ovat havainnollistavia. Sivu päivittyy, kun putken vienti on käytössä.</div>
+    <div class="wrap"><strong>Esimerkkidata.</strong> Luvut perustuvat kehitysvaiheen ajoon, ja avoimien kilpailutusten arviot ovat havainnollistavia.</div>
   </div>
 
-  <main class="wrap">
+  <main id="main" class="wrap">
     <section class="hero" aria-labelledby="hero-title">
       <h2 id="hero-title" class="visually-hidden">Avainluvut</h2>
       <div class="hero-figure">
-        <span class="hero-value" data-kpi="single_winner_value_eur"></span>
-        <span class="hero-label">yhden voittajan infrasopimuksia <span data-meta="period"></span></span>
+        <span class="hero-value" data-kpi="open_now">–</span>
+        <span class="hero-label">avointa kilpailutusta juuri nyt<span data-kpi="next_deadline"></span></span>
+        <a class="hero-cta" href="#tenders">Katso arviot ↓</a>
       </div>
       <dl class="tiles">
-        <div class="tile"><dt>Ilmoituksia</dt><dd data-kpi="notices"></dd></div>
-        <div class="tile"><dt>Ratkaistuja hankintoja</dt><dd data-kpi="awards"></dd></div>
-        <div class="tile"><dt>Tarjouksia keskimäärin</dt><dd data-kpi="avg_bids"></dd></div>
-        <div class="tile"><dt>Vähäinen kilpailu (≤ 2 tarjousta)</dt><dd data-kpi="share_low_competition"></dd></div>
+        <div class="tile"><dt>Yhden voittajan sopimukset</dt><dd data-kpi="single_winner_value_eur">–</dd></div>
+        <div class="tile"><dt>Ratkaistuja hankintoja</dt><dd data-kpi="awards">–</dd></div>
+        <div class="tile"><dt>Tarjouksia keskimäärin</dt><dd data-kpi="avg_bids">–</dd></div>
+        <div class="tile"><dt>Vähäinen kilpailu (≤ 2 tarjousta)</dt><dd data-kpi="share_low_competition">–</dd></div>
       </dl>
+      <p class="hero-period">Aineisto: <span data-meta="period"></span>, <span data-kpi="notices">–</span> ilmoitusta.</p>
     </section>
 
     <section id="tenders" aria-labelledby="tenders-title">
       <div class="section-head">
         <p class="eyebrow">01 · Tarjousäly</p>
         <h2 id="tenders-title">Avoimet kilpailutukset</h2>
-        <p class="section-note">Tekoäly arvioi soveltuvuuden ja riskit esimerkkiprofiilille. Kilpailutekijä lasketaan historiasta ja kokonaispisteet kiinteällä kaavalla.</p>
+        <p class="section-note">Tekoäly arvioi soveltuvuuden ja riskit esimerkkiprofiilille. Kilpailutekijä lasketaan historian tarjousmääristä, ja pisteet tulevat kiinteästä kaavasta.</p>
       </div>
       <div class="filters" role="group" aria-label="Suodata kilpailutuksia">
         <label>Luokka <select id="tender-category"></select></label>
@@ -59,17 +86,19 @@
       <div class="section-head">
         <p class="eyebrow">02 · Markkina</p>
         <h2 id="market-title">Kuka voittaa</h2>
-        <p class="section-note">Voitot jälki-ilmoituksista. Euromäärä vain yhden voittajan sopimuksista, koska puitejärjestelyjen arvoa ei voi jakaa.</p>
+        <p class="section-note">Osuus ratkaistuista hankinnoista. Puitejärjestelyssä voi olla useita voittajia, joten osuudet voivat summautua yli 100 %. Sopimusarvo vain yhden voittajan sopimuksista.</p>
       </div>
-      <div class="filters" role="group" aria-label="Markkinaosuuden mittari">
-        <div class="segmented" role="radiogroup" aria-label="Mittari">
-          <button type="button" role="radio" aria-checked="true" data-measure="wins">Voitot</button>
-          <button type="button" role="radio" aria-checked="false" data-measure="won_value_eur">Sopimusarvo</button>
+      <div class="filters" role="group" aria-label="Markkinanäkymä">
+        <label id="market-category-label">Luokka <select id="market-category"></select></label>
+        <div class="segmented" role="group" aria-label="Mittari">
+          <button type="button" aria-pressed="true" data-measure="wins">Voitot</button>
+          <button type="button" aria-pressed="false" data-measure="won_value_eur">Sopimusarvo</button>
         </div>
       </div>
       <figure class="chart-card">
-        <figcaption id="market-caption">Voitetut hankinnat, 13 suurinta</figcaption>
-        <div id="market-chart" class="hbar" role="img" aria-labelledby="market-caption"></div>
+        <figcaption id="market-caption"></figcaption>
+        <div id="market-chart" class="hbar" role="list" aria-labelledby="market-caption"></div>
+        <p id="market-note" class="chart-note"></p>
         <details class="table-view"><summary>Näytä taulukkona</summary><div id="market-table"></div></details>
       </figure>
     </section>
@@ -78,17 +107,17 @@
       <div class="section-head">
         <p class="eyebrow">03 · Kilpailu</p>
         <h2 id="competition-title">Missä kilpailu on ohutta</h2>
-        <p class="section-note">Osuus hankinnoista, joissa yksikään osa ei saanut yli kahta tarjousta.</p>
+        <p class="section-note">Osuus hankinnoista, joissa yksikään osa ei saanut yli kahta tarjousta. Suluissa hankintojen määrä; harmaa pylväs = alle 15 hankintaa, tulkitse varoen.</p>
       </div>
       <div class="grid-2">
         <figure class="chart-card">
-          <figcaption id="comp-caption">Vähäisen kilpailun osuus, hankintaluokittain</figcaption>
-          <div id="competition-chart" class="hbar" role="img" aria-labelledby="comp-caption"></div>
+          <figcaption id="comp-caption">Hankintaluokittain</figcaption>
+          <div id="competition-chart" class="hbar" role="list" aria-labelledby="comp-caption"></div>
           <details class="table-view"><summary>Näytä taulukkona</summary><div id="competition-table"></div></details>
         </figure>
         <figure class="chart-card">
-          <figcaption id="region-caption">Vähäisen kilpailun osuus, maakunnittain</figcaption>
-          <div id="region-chart" class="hbar" role="img" aria-labelledby="region-caption"></div>
+          <figcaption id="region-caption">Maakunnittain</figcaption>
+          <div id="region-chart" class="hbar" role="list" aria-labelledby="region-caption"></div>
           <details class="table-view"><summary>Näytä taulukkona</summary><div id="region-table"></div></details>
         </figure>
       </div>
@@ -99,14 +128,16 @@
       <div class="section-head">
         <p class="eyebrow">04 · Tilaajat</p>
         <h2 id="buyers-title">Suurimmat tilaajat</h2>
+        <p class="section-note">Useimmin voittanut yritys ja sen osuus tilaajan hankinnoista kertovat, onko tilaajalla vakiotoimittaja.</p>
       </div>
-      <div class="table-scroll"><table id="buyer-table" class="data-table"></table></div>
+      <div class="table-scroll" id="buyer-table"></div>
     </section>
 
     <section id="method" aria-labelledby="method-title">
       <div class="section-head">
         <p class="eyebrow">05 · Menetelmä</p>
         <h2 id="method-title">Näin tämä on rakennettu</h2>
+        <p class="section-note">ELT-putki Databricksissä medallion-arkkitehtuurilla. Raakadata säilyy, joten laatukorjaukset vaativat vain muunnoskerrosten uudelleenajon.</p>
       </div>
       <ol class="pipeline">
         <li><span class="stage">Bronze</span>EU TED -rajapinta ja PRH:n yritysrekisteri raakana Delta-tauluihin</li>
@@ -115,27 +146,35 @@
         <li><span class="stage">Gold</span>Markkinaosuudet, kilpailu, tilaajaprofiilit ja avoimet kilpailutukset SQL:llä</li>
         <li><span class="stage">Arvio</span>Go/no-go: LLM arvioi soveltuvuuden ja riskin, koodi laskee pisteet</li>
       </ol>
-      <h3>Tekoälyn tarkkuus</h3>
-      <p class="section-note">LLM ei näe TEDin rakenteista maakunta- eikä arvotietoa, joten niitä käytetään vertailukohtana.</p>
-      <dl id="eval-tiles" class="tiles"></dl>
+      <div id="eval-block" hidden>
+        <h3>Tekoälyn tarkkuus</h3>
+        <p class="section-note">LLM ei näe TEDin rakenteista maakunta- eikä arvotietoa, joten niitä käytetään vertailukohtana.</p>
+        <dl id="eval-tiles" class="tiles"></dl>
+      </div>
       <h3>Rajoitteet</h3>
       <ul class="limits">
         <li>Mukana vain EU-kynnysarvon ylittävät hankinnat (rakennusurakat noin 5,5 M€), eivät kansalliset pienhankinnat.</li>
         <li>Puitejärjestelyjen arvoa ei kohdisteta yksittäisille voittajille.</li>
-        <li>Yksityisten elinkeinonharjoittajien nimiä ei näytetä; he sisältyvät ryhmään “Muut toimijat”.</li>
+        <li>Yksityisten elinkeinonharjoittajien nimiä ei näytetä; he sisältyvät ryhmään ”Muut toimijat”.</li>
         <li>Go/no-go-arvio on tehty kuvitteelliselle esimerkkiprofiilille, ei millekään todelliselle yritykselle.</li>
       </ul>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="wrap">
-      <p>Lähteet: <span data-meta="sources"></span>. Päivitetty <span data-meta="generated_at"></span>.</p>
-      <p>Itsenäinen portfolioprojekti. Ei yhteyttä mainittuihin yrityksiin tai tilaajiin.</p>
+    <div class="wrap footer-inner">
+      <div>
+        <p class="footer-author">Tekijä: <strong>Mikko Valtanen</strong> · Data Engineering &amp; AI</p>
+        <p><a href="https://github.com/valtanenmikko/infra-intelligence">Lähdekoodi GitHubissa</a> · <a href="https://valtanenmikko.github.io/">Portfolio</a></p>
+      </div>
+      <div>
+        <p>Lähteet: <a href="https://ted.europa.eu/">EU TED</a> · <a href="https://avoindata.prh.fi/">PRH avoin data</a>. Päivitetty <span data-meta="generated_at"></span>.</p>
+        <p>Itsenäinen portfolioprojekti. Ei yhteyttä mainittuihin yrityksiin tai tilaajiin.</p>
+      </div>
     </div>
   </footer>
 
-  <div id="tooltip" class="tooltip" role="status" hidden></div>
+  <div id="tooltip" class="tooltip" aria-hidden="true" hidden></div>
   <script src="app.js" defer></script>
 </body>
 </html>
