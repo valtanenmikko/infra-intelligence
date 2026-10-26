@@ -15,14 +15,11 @@
   <meta property="og:image" content="https://valtanenmikko.github.io/infra-intelligence/og.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231d1f22'/%3E%3Crect x='5' y='14' width='9' height='4' rx='1' fill='%23f2b705'/%3E%3Crect x='18' y='14' width='9' height='4' rx='1' fill='%23f2b705'/%3E%3C/svg%3E">
-  <script>
-    // Apply a saved theme before first paint to avoid a light-to-dark flash
-    try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
-  </script>
+  <meta name="theme-color" content="#0b0c0d">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <a class="skip-link" href="#main">Siirry sisältöön</a>
@@ -34,7 +31,6 @@
         <h1>Suomen infrahankinnat</h1>
         <p class="lede">Kuka voittaa, missä kilpailu on ohutta ja mihin avoimiin kilpailutuksiin kannattaa tarttua – julkisesta hankintadatasta.</p>
       </div>
-      <button class="theme-toggle" type="button" aria-label="Tumma teema" aria-pressed="false" data-action="theme">◐</button>
     </div>
     <div class="lane" aria-hidden="true"></div>
   </header>
@@ -175,6 +171,6 @@
   </footer>
 
   <div id="tooltip" class="tooltip" aria-hidden="true" hidden></div>
-  <script src="app.js?v=2" defer></script>
+  <script src="app.js?v=3" defer></script>
 </body>
 </html>

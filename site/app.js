@@ -240,22 +240,7 @@ function renderEval(data) {
       el("dd", {}, fmtPct.format(m.value), el("small", { text: `n = ${fmtInt.format(m.n)}` })))));
 }
 
-/* ---------- Theme ---------- */
-function initTheme() {
-  const root = document.documentElement;
-  const button = document.querySelector("[data-action=theme]");
-  const isDark = () => (root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches);
-  const sync = () => button.setAttribute("aria-pressed", String(isDark()));
-  sync();
-  button.addEventListener("click", () => {
-    root.dataset.theme = isDark() ? "light" : "dark";
-    try { localStorage.setItem("theme", root.dataset.theme); } catch { /* storage unavailable */ }
-    sync();
-  });
-}
-
 async function main() {
-  initTheme();
   const res = await fetch("data/site.json", { cache: "no-cache" });
   if (!res.ok) throw new Error(`site.json: ${res.status}`);
   const data = await res.json();

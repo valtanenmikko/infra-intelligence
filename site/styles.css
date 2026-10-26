@@ -1,41 +1,5 @@
+/* Dark-only theme: the asphalt look is part of the design */
 :root {
-  color-scheme: light;
-  --surface-0: #f4f3ef;
-  --surface-1: #fcfcfb;
-  --surface-2: #eceae4;
-  --grid: #e3e1da;
-  --text-primary: #141413;
-  --text-secondary: #52514e;
-  --text-muted: #6a6863;
-  --asphalt: #1d1f22;
-  --asphalt-text: #f4f3ef;
-  --lane: #f2b705;
-  --series-1: #2a78d6;
-  --series-1-wash: rgba(42, 120, 214, 0.12);
-  --status-good: #0ca30c;
-  --status-warning: #fab219;
-  --status-critical: #d03b3b;
-  --radius: 10px;
-  --font: "Schibsted Grotesk", "Segoe UI", sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, monospace;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --surface-0: #121212;
-    --surface-1: #1a1a19;
-    --surface-2: #262624;
-    --grid: #2e2e2b;
-    --text-primary: #ecebe6;
-    --text-secondary: #c3c2b7;
-    --text-muted: #8f8d85;
-    --asphalt: #0b0c0d;
-    --series-1: #3987e5;
-    --series-1-wash: rgba(57, 135, 229, 0.16);
-  }
-}
-:root[data-theme="dark"] {
   color-scheme: dark;
   --surface-0: #121212;
   --surface-1: #1a1a19;
@@ -45,8 +9,16 @@
   --text-secondary: #c3c2b7;
   --text-muted: #8f8d85;
   --asphalt: #0b0c0d;
+  --asphalt-text: #f4f3ef;
+  --lane: #f2b705;
   --series-1: #3987e5;
   --series-1-wash: rgba(57, 135, 229, 0.16);
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-critical: #d03b3b;
+  --radius: 10px;
+  --font: "Schibsted Grotesk", "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -79,11 +51,6 @@ a { color: inherit; }
   animation: drive 1.4s ease-out both;
 }
 @keyframes drive { from { background-position-x: -400px; opacity: 0; } to { background-position-x: 0; opacity: 1; } }
-.theme-toggle {
-  align-self: flex-start; background: transparent; color: var(--asphalt-text); border: 1px solid #44464a;
-  border-radius: 999px; width: 40px; height: 40px; font-size: 1.1rem; cursor: pointer;
-}
-.theme-toggle:hover { border-color: var(--lane); }
 
 .banner { background: var(--status-warning); color: #1d1f22; font-size: 0.92rem; padding: 10px 0; }
 
