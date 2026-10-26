@@ -6,7 +6,8 @@
 # MAGIC price-index terms.
 # MAGIC
 # MAGIC - **Cached:** each notice is processed once per `PROMPT_VERSION`; changing the prompt re-processes everything.
-# MAGIC - **Free-tier friendly:** 5 notices per request, throttled, `max_notices` per run. Open competitions go first.
+# MAGIC - **Free-tier friendly:** 10 notices per request, 4 requests/min, ~16 requests per run (limit 20/day).
+# MAGIC   `scope=priority` processes only open competitions, awards lacking a region and an evaluation sample.
 # MAGIC - **Resumable:** every batch is written immediately, so a quota stop loses nothing.
 # MAGIC - **Evaluable:** TED regions and values are withheld from the model (see `05_llm_eval`).
 
@@ -35,11 +36,16 @@ from infra_intelligence.config import (
 from infra_intelligence.llm.extraction import EXTRACTION_SCHEMA, PROMPT_VERSION, SYSTEM_PROMPT, build_prompt, parse_extractions
 from infra_intelligence.llm.gemini_client import GeminiClient, LlmError
 
-dbutils.widgets.text("max_notices", "400")
-dbutils.widgets.text("batch_size", "5")
+# Free tier for gemini-3.8-flash: 5 RPM, 250K TPM, 20 requests/day. Defaults use ~16 requests per run.
+dbutils.widgets.text("max_notices", "150")
+dbutils.widgets.text("batch_size", "10")
+dbutils.widgets.text("eval_sample", "50")
+dbutils.widgets.dropdown("scope", "priority", ["priority", "all"])
 dbutils.widgets.text("model", GEMINI_MODEL)
 max_notices = int(dbutils.widgets.get("max_notices"))
 batch_size = int(dbutils.widgets.get("batch_size"))
+eval_sample = int(dbutils.widgets.get("eval_sample"))
+scope = dbutils.widgets.get("scope")
 model = dbutils.widgets.get("model")
 
 # COMMAND ----------
@@ -69,20 +75,41 @@ spark.sql(f"""
 
 # COMMAND ----------
 
+# With scope=priority the LLM is spent only where it adds value:
+#   0 = open competitions (input for go/no-go)
+#   1 = awards without a TED region (LLM region enables regional history)
+#   2 = a fixed random sample of single-region notices (evaluation against the withheld TED region)
+eval_done = spark.sql(f"""
+    SELECT count(*) AS n FROM {SILVER_LLM_EXTRACTIONS_TABLE} e JOIN {SILVER_NOTICES_TABLE} n USING (publication_number)
+    WHERE e.prompt_version = '{PROMPT_VERSION}' AND size(n.regions) = 1
+""").first()["n"]
+eval_remaining = max(eval_sample - eval_done, 0)
+
 pending = spark.sql(f"""
-    SELECT n.publication_number, n.title, b.buyer_name, n.description
-    FROM {SILVER_NOTICES_TABLE} n
-    LEFT JOIN {SILVER_BUYERS_TABLE} b USING (buyer_id)
-    LEFT ANTI JOIN {SILVER_LLM_EXTRACTIONS_TABLE} e
-      ON e.publication_number = n.publication_number AND e.prompt_version = '{PROMPT_VERSION}'
-    ORDER BY
-      CASE WHEN n.notice_category = 'competition' AND n.tender_deadline >= current_date() THEN 0
-           WHEN n.notice_category = 'award' THEN 1 ELSE 2 END,
-      n.publication_date DESC
+    WITH candidates AS (
+      SELECT n.publication_number, n.title, b.buyer_name, n.description,
+             CASE WHEN n.notice_category = 'competition' AND n.tender_deadline >= current_date() THEN 0
+                  WHEN n.notice_category = 'award' AND size(n.regions) = 0 THEN 1
+                  WHEN size(n.regions) = 1 THEN 2
+                  ELSE 3 END AS priority
+      FROM {SILVER_NOTICES_TABLE} n
+      LEFT JOIN {SILVER_BUYERS_TABLE} b USING (buyer_id)
+      LEFT ANTI JOIN {SILVER_LLM_EXTRACTIONS_TABLE} e
+        ON e.publication_number = n.publication_number AND e.prompt_version = '{PROMPT_VERSION}'
+    ),
+    ranked AS (
+      SELECT *, row_number() OVER (PARTITION BY priority ORDER BY xxhash64(publication_number)) AS rn
+      FROM candidates
+    )
+    SELECT publication_number, title, buyer_name, description, priority
+    FROM ranked
+    WHERE '{scope}' = 'all' OR priority IN (0, 1) OR (priority = 2 AND rn <= {eval_remaining})
+    ORDER BY priority, rn
     LIMIT {max_notices}
 """).collect()
 notices = [r.asDict() for r in pending]
-print(f"Pending notices for {PROMPT_VERSION}: {len(notices)} (max {max_notices} per run), model {model}")
+by_priority = {p: sum(1 for n in notices if n["priority"] == p) for p in range(4)}
+print(f"Pending for {PROMPT_VERSION} (scope={scope}, model {model}): {len(notices)} {by_priority}")
 
 # COMMAND ----------
 
@@ -110,7 +137,8 @@ def save(records, result):
     """)
 
 
-client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), model)
+client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), model,
+                      requests_per_minute=4)
 
 # Preflight: a tiny real generation call (with the client's retries for temporary 429/503). Model metadata
 # can exist even when generation is refused, e.g. for a model withdrawn for new users.
