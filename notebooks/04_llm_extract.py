@@ -33,7 +33,7 @@ from infra_intelligence.config import (
     SILVER_NOTICES_TABLE,
 )
 from infra_intelligence.llm.extraction import EXTRACTION_SCHEMA, PROMPT_VERSION, SYSTEM_PROMPT, build_prompt, parse_extractions
-from infra_intelligence.llm.gemini_client import GEMINI_BASE_URL, GeminiClient, LlmError
+from infra_intelligence.llm.gemini_client import GeminiClient, LlmError
 
 dbutils.widgets.text("max_notices", "400")
 dbutils.widgets.text("batch_size", "10")
@@ -110,21 +110,15 @@ def save(records, result):
     """)
 
 
-api_key = dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY)
-session = requests.Session()
+client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), model)
 
-# Preflight: a tiny real generation call. Model metadata can exist even when generation is refused
-# (e.g. a model withdrawn for new users), so only a generate call proves the key and model work.
-check = session.post(
-    f"{GEMINI_BASE_URL}/models/{model}:generateContent",
-    json={"contents": [{"parts": [{"text": "Reply with OK."}]}], "generationConfig": {"maxOutputTokens": 5}},
-    headers={"x-goog-api-key": api_key},
-    timeout=60,
-)
-if check.status_code != 200:
-    raise RuntimeError(f"Gemini preflight failed for {model} ({check.status_code}): {check.text[:300]}")
+# Preflight: a tiny real generation call (with the client's retries for temporary 429/503). Model metadata
+# can exist even when generation is refused, e.g. for a model withdrawn for new users.
+try:
+    client.generate_json("Reply with ok=true.", {"type": "OBJECT", "properties": {"ok": {"type": "BOOLEAN"}}})
+except LlmError as e:
+    raise RuntimeError(f"Gemini preflight failed for {model}: {e}") from e
 
-client = GeminiClient(session, api_key, model)
 saved, failed_batches, tokens_in, tokens_out = 0, 0, 0, 0
 errors = []
 for start in range(0, len(notices), batch_size):
