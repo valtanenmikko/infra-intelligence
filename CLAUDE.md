@@ -22,7 +22,7 @@ This file overrides the generic parent `Projektit/CLAUDE.md` where they conflict
 | Source | EU TED Search API v3 (public, no key). Later: Statistics Finland PxWeb cost indices |
 | Compute/storage | Databricks Free Edition, serverless, Unity Catalog `workspace` catalog, Delta |
 | Medallion | `workspace.bronze` → `workspace.silver` → `workspace.gold` |
-| LLM | Gemini Flash free tier (~15 RPM / ~1,500 RPD) behind a swappable interface; process each notice once |
+| LLM | `gemini-3.8-flash` free tier: **5 RPM, 250K TPM, 20 requests/day** (resets midnight UTC-8). Batch notices, process each once, spend the LLM only where it adds value (`scope=priority`). Swappable interface |
 | IaC | Terraform: Databricks objects (always), Azure + ADF module (documented variant, apply only if free credits) |
 | Demo | Static site built by GitHub Actions from Gold data → GitHub Pages (only when published) |
 
