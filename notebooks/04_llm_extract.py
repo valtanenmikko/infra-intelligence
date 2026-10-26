@@ -33,7 +33,7 @@ from infra_intelligence.config import (
     SILVER_NOTICES_TABLE,
 )
 from infra_intelligence.llm.extraction import EXTRACTION_SCHEMA, PROMPT_VERSION, SYSTEM_PROMPT, build_prompt, parse_extractions
-from infra_intelligence.llm.gemini_client import GeminiClient, LlmError
+from infra_intelligence.llm.gemini_client import GEMINI_BASE_URL, GeminiClient, LlmError
 
 dbutils.widgets.text("max_notices", "400")
 dbutils.widgets.text("batch_size", "10")
@@ -110,8 +110,17 @@ def save(records, result):
     """)
 
 
-client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), model)
+api_key = dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY)
+session = requests.Session()
+
+# Preflight: fail fast with a clear message if the key or model name is wrong
+check = session.get(f"{GEMINI_BASE_URL}/models/{model}", headers={"x-goog-api-key": api_key}, timeout=30)
+if check.status_code != 200:
+    raise RuntimeError(f"Gemini model check failed ({check.status_code}): {check.text[:300]}")
+
+client = GeminiClient(session, api_key, model)
 saved, failed_batches, tokens_in, tokens_out = 0, 0, 0, 0
+errors = []
 for start in range(0, len(notices), batch_size):
     batch = notices[start:start + batch_size]
     ids = [n["publication_number"] for n in batch]
@@ -120,6 +129,7 @@ for start in range(0, len(notices), batch_size):
         records = parse_extractions(result.data, ids)
     except (LlmError, ValueError) as e:
         failed_batches += 1
+        errors.append(str(e)[:300])
         print(f"Batch {start // batch_size + 1} failed: {e}")
         if failed_batches >= 3:
             print("Stopping after 3 failed batches (likely quota); the rest is picked up next run.")
@@ -133,6 +143,8 @@ for start in range(0, len(notices), batch_size):
     print(f"Batch {start // batch_size + 1}: {len(records)}/{len(batch)} saved")
 
 print(f"Saved {saved} | failed batches {failed_batches} | tokens in {tokens_in:,} out {tokens_out:,}")
+if notices and saved == 0:
+    raise RuntimeError(f"No extractions saved from {len(notices)} pending notices. Errors: {errors}")
 
 # COMMAND ----------
 
