@@ -54,6 +54,15 @@ class GeminiClientTest(unittest.TestCase):
         self.assertEqual(self.client.generate_json("p", {}).data, {"ok": True})
         self.sleep.assert_any_call(15.0)
 
+    def test_retries_network_timeouts(self):
+        self.session.post.side_effect = [TimeoutError("read timed out"), _ok({"ok": True})]
+        self.assertEqual(self.client.generate_json("p", {}).data, {"ok": True})
+
+    def test_network_errors_become_llm_error_after_retries(self):
+        self.session.post.side_effect = ConnectionError("down")
+        with self.assertRaisesRegex(LlmError, "after 5 attempts"):
+            self.client.generate_json("p", {})
+
     def test_client_error_not_retried(self):
         self.session.post.return_value = _resp(400)
         with self.assertRaises(LlmError):

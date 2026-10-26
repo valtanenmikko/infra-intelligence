@@ -91,7 +91,13 @@ class GeminiClient:
         url = f"{GEMINI_BASE_URL}/models/{self._model}:generateContent"
         for attempt in range(1, self._max_retries + 1):
             self._throttle()
-            resp = self._session.post(url, json=body, headers={"x-goog-api-key": self._api_key}, timeout=self._timeout_s)
+            try:
+                resp = self._session.post(url, json=body, headers={"x-goog-api-key": self._api_key}, timeout=self._timeout_s)
+            except OSError as e:  # requests' timeouts and connection errors subclass OSError
+                if attempt == self._max_retries:
+                    raise LlmError(f"Gemini request failed after {attempt} attempts: {e}") from e
+                self._sleep(self._backoff_s * 2 ** (attempt - 1))
+                continue
             if resp.status_code == 200:
                 return resp.json()
             if resp.status_code not in RETRYABLE_STATUS or attempt == self._max_retries:
