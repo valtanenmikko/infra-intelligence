@@ -26,9 +26,9 @@ QUERIES: dict[str, str] = {
           (SELECT concat(date_format(min(publication_date), 'M/yyyy'), '–', date_format(max(publication_date), 'M/yyyy')) FROM workspace.silver.notices) AS period
     """,
     "market_share": """
-        SELECT category_label AS category, company, wins, won_value_eur, share_of_wins
+        SELECT category_label AS category, company, wins, won_value_eur, share_of_awards, slice_awards
         FROM workspace.gold.market_share
-        WHERE year_label = 'Kaikki' AND rank <= 12
+        WHERE year_label = 'Kaikki' AND (rank <= 12 OR company = 'Muut toimijat')
         ORDER BY category, rank
     """,
     "competition": """
@@ -70,9 +70,10 @@ QUERIES: dict[str, str] = {
     """,
 }
 
-INT_FIELDS = {"notices", "awards", "competitions", "open_tenders", "wins", "n", "days_left", "score", "fit", "competition", "risk"}
+INT_FIELDS = {"notices", "awards", "competitions", "open_tenders", "wins", "n", "days_left", "score", "fit",
+              "competition", "risk", "slice_awards"}
 FLOAT_FIELDS = {"single_winner_value_eur", "avg_bids", "share_low_competition", "share_single_bid", "won_value_eur",
-                "share_of_wins", "awarded_value_eur", "top_winner_share", "option_years", "estimated_value_eur",
+                "share_of_awards", "awarded_value_eur", "top_winner_share", "option_years", "estimated_value_eur",
                 "expected_bids", "median_spread", "value"}
 BOOL_FIELDS = {"region_from_llm"}
 JSON_FIELDS = {"questions", "past_winners"}

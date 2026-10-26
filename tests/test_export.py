@@ -63,7 +63,7 @@ class FakeSql:
         "kpis": [{"notices": "811", "awards": "283", "competitions": "460", "open_tenders": "23",
                   "single_winner_value_eur": "1.55E9", "avg_bids": "4.1", "share_low_competition": "0.29",
                   "period": "1/2024–10/2026"}],
-        "market_share": [{"category": "Kaikki", "company": "A Oy", "wins": "3", "won_value_eur": None, "share_of_wins": "0.5"}],
+        "market_share": [{"category": "Kaikki", "company": "A Oy", "wins": "3", "won_value_eur": None, "share_of_awards": "0.5", "slice_awards": "6"}],
         "competition": [], "regions": [], "buyers": [],
         "open_tenders": [{"id": "1", "title": "Suomi – Teiden korjaus – Maanteiden hoitourakka Oulu 2027-2032", "region": "", "period": "", "region_from_llm": "true", "score": "70",
                           "questions": '["Q?"]', "past_winners": None, "option_years": "2.0"}],

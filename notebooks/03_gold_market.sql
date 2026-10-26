@@ -94,9 +94,19 @@ LEFT JOIN workspace.silver.companies c ON c.business_id = w.winner_id;
 
 -- COMMAND ----------
 
+-- share_of_awards = awards won / all awards in the slice (the figure a reader expects; can sum above 1 because a
+-- framework has several winners). share_of_wins = share of winner rows (sums to exactly 1; used for the check).
 CREATE OR REPLACE TABLE workspace.gold.market_share
 COMMENT 'Wins and single-winner contract value per company; year_label/category_label = Kaikki for totals'
-AS WITH wins AS (
+AS WITH awards_in_slice AS (
+  SELECT
+    coalesce(CAST(year AS STRING), 'Kaikki') AS year_label,
+    coalesce(infra_category, 'Kaikki')       AS category_label,
+    count(*)                                 AS slice_awards
+  FROM workspace.gold.award_facts
+  GROUP BY GROUPING SETS ((year, infra_category), (year), (infra_category), ())
+),
+wins AS (
   SELECT a.year, a.infra_category, w.company, a.publication_number,
          CASE WHEN w.is_single_winner THEN a.contract_value_eur END AS won_value_eur
   FROM workspace.gold.award_facts a
@@ -113,12 +123,15 @@ agg AS (
   GROUP BY GROUPING SETS ((year, infra_category, company), (year, company), (infra_category, company), (company))
 )
 SELECT
-  *,
-  wins / sum(wins) OVER w                     AS share_of_wins,
-  won_value_eur / sum(won_value_eur) OVER w   AS share_of_value,
-  rank() OVER (PARTITION BY year_label, category_label ORDER BY wins DESC, won_value_eur DESC NULLS LAST) AS rank
+  agg.*,
+  s.slice_awards,
+  agg.wins / s.slice_awards                   AS share_of_awards,
+  agg.wins / sum(agg.wins) OVER w             AS share_of_wins,
+  agg.won_value_eur / sum(agg.won_value_eur) OVER w AS share_of_value,
+  rank() OVER (PARTITION BY agg.year_label, agg.category_label ORDER BY agg.wins DESC, agg.won_value_eur DESC NULLS LAST) AS rank
 FROM agg
-WINDOW w AS (PARTITION BY year_label, category_label);
+JOIN awards_in_slice s USING (year_label, category_label)
+WINDOW w AS (PARTITION BY agg.year_label, agg.category_label);
 
 -- COMMAND ----------
 
