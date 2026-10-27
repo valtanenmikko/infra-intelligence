@@ -134,6 +134,11 @@ select, .segmented button {
 .tender summary { cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; }
 .tender details p, .tender details ul { margin: 8px 0; color: var(--text-secondary); font-size: 0.93rem; }
 .empty { color: var(--text-muted); }
+.show-more {
+  margin-top: 14px; font: inherit; font-weight: 600; color: var(--text-primary); background: var(--surface-1);
+  border: 1px solid var(--grid); border-radius: 8px; padding: 10px 16px; cursor: pointer;
+}
+.show-more:hover { border-color: var(--lane); }
 
 /* Charts */
 .chart-card { margin: 0; background: var(--surface-1); border: 1px solid var(--grid); border-radius: var(--radius); padding: 18px 20px; }

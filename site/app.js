@@ -8,6 +8,7 @@ const fmtShortDate = new Intl.DateTimeFormat("fi-FI", { day: "numeric", month: "
 
 const OTHERS = "Muut toimijat";
 const SMALL_SAMPLE = 15;
+const TENDERS_COLLAPSED = 6;
 const REC_ORDER = ["Tarjoa", "Harkitse", "Ei tarjota"];
 
 function fmtEur(v) {
@@ -137,14 +138,27 @@ function renderTenders(openTenders) {
   options(catSel, [...new Set(openTenders.map((t) => t.category))].sort());
   options(recSel, REC_ORDER);
   const list = document.getElementById("tender-list");
+  const more = el("button", { type: "button", class: "show-more" });
+  list.after(more);
+  let expanded = false;
   const draw = () => {
     const rows = openTenders
       .filter((t) => (!catSel.value || t.category === catSel.value) && (!recSel.value || t.recommendation === recSel.value))
       .sort((a, b) => b.score - a.score);
-    list.replaceChildren(...(rows.length ? rows.map(tenderCard) : [el("li", { class: "empty", text: "Ei avoimia kilpailutuksia valinnoilla." })]));
+    const shown = expanded ? rows : rows.slice(0, TENDERS_COLLAPSED);
+    list.replaceChildren(...(rows.length ? shown.map(tenderCard) : [el("li", { class: "empty", text: "Ei avoimia kilpailutuksia valinnoilla." })]));
+    more.hidden = rows.length <= TENDERS_COLLAPSED;
+    more.textContent = expanded ? "Näytä vähemmän" : `Näytä kaikki ${rows.length}`;
+    more.setAttribute("aria-expanded", String(expanded));
   };
-  catSel.addEventListener("change", draw);
-  recSel.addEventListener("change", draw);
+  more.addEventListener("click", () => {
+    expanded = !expanded;
+    draw();
+    if (!expanded) document.getElementById("tenders").scrollIntoView();
+  });
+  const reset = () => { expanded = false; draw(); };
+  catSel.addEventListener("change", reset);
+  recSel.addEventListener("change", reset);
   draw();
 }
 
