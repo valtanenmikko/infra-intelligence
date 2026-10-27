@@ -6,8 +6,9 @@
 # MAGIC price-index terms.
 # MAGIC
 # MAGIC - **Cached:** each notice is processed once per `PROMPT_VERSION`; changing the prompt re-processes everything.
-# MAGIC - **Free-tier friendly:** 10 notices per request, 4 requests/min, ~16 requests per run (limit 20/day).
-# MAGIC   `scope=priority` processes only open competitions, awards lacking a region and an evaluation sample.
+# MAGIC - **Free-tier friendly:** Gemini Flash Lite (500 requests/day) with an automatic fallback model, 10 notices
+# MAGIC   per request. `scope=priority` limits the run to open competitions, awards lacking a region and an
+# MAGIC   evaluation sample, for when only a small quota is available.
 # MAGIC - **Resumable:** every batch is written immediately, so a quota stop loses nothing.
 # MAGIC - **Evaluable:** TED regions and values are withheld from the model (see `05_llm_eval`).
 
@@ -26,7 +27,8 @@ import requests
 from pyspark.sql import functions as F
 
 from infra_intelligence.config import (
-    GEMINI_MODEL,
+    EXTRACTION_MODELS,
+    EXTRACTION_RPM,
     GEMINI_SECRET_KEY,
     SECRET_SCOPE,
     SILVER_BUYERS_TABLE,
@@ -36,17 +38,18 @@ from infra_intelligence.config import (
 from infra_intelligence.llm.extraction import EXTRACTION_SCHEMA, PROMPT_VERSION, SYSTEM_PROMPT, build_prompt, parse_extractions
 from infra_intelligence.llm.gemini_client import GeminiClient, LlmError
 
-# Free tier for gemini-3.8-flash: 5 RPM, 250K TPM, 20 requests/day. Defaults use ~16 requests per run.
-dbutils.widgets.text("max_notices", "150")
+# Defaults process everything pending (~82 requests on the first run, a few per day after that).
+dbutils.widgets.text("max_notices", "1000")
 dbutils.widgets.text("batch_size", "10")
 dbutils.widgets.text("eval_sample", "50")
-dbutils.widgets.dropdown("scope", "priority", ["priority", "all"])
-dbutils.widgets.text("model", GEMINI_MODEL)
+dbutils.widgets.dropdown("scope", "all", ["priority", "all"])
+dbutils.widgets.text("models", ",".join(EXTRACTION_MODELS))
 max_notices = int(dbutils.widgets.get("max_notices"))
 batch_size = int(dbutils.widgets.get("batch_size"))
 eval_sample = int(dbutils.widgets.get("eval_sample"))
 scope = dbutils.widgets.get("scope")
-model = dbutils.widgets.get("model")
+models = [m.strip() for m in dbutils.widgets.get("models").split(",") if m.strip()]
+model = models[0]
 
 # COMMAND ----------
 
@@ -137,15 +140,16 @@ def save(records, result):
     """)
 
 
-client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), model,
-                      requests_per_minute=4)
+client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), models,
+                      requests_per_minute=EXTRACTION_RPM)
 
 # Preflight: a tiny real generation call (with the client's retries for temporary 429/503). Model metadata
 # can exist even when generation is refused, e.g. for a model withdrawn for new users.
 try:
     client.generate_json("Reply with ok=true.", {"type": "OBJECT", "properties": {"ok": {"type": "BOOLEAN"}}})
 except LlmError as e:
-    raise RuntimeError(f"Gemini preflight failed for {model}: {e}") from e
+    raise RuntimeError(f"Gemini preflight failed for {models}: {e}") from e
+print(f"Using model {client.active_model}")
 
 saved, failed_batches, tokens_in, tokens_out = 0, 0, 0, 0
 errors = []

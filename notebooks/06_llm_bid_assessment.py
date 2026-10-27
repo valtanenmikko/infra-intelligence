@@ -21,7 +21,7 @@ from dataclasses import asdict
 import requests
 from pyspark.sql import functions as F
 
-from infra_intelligence.config import GEMINI_MODEL, GEMINI_SECRET_KEY, SECRET_SCOPE
+from infra_intelligence.config import ASSESSMENT_MODELS, ASSESSMENT_RPM, GEMINI_SECRET_KEY, SECRET_SCOPE
 from infra_intelligence.llm.bid_assessment import (
     ASSESSMENT_SCHEMA,
     BATCH_SIZE,
@@ -33,8 +33,8 @@ from infra_intelligence.llm.bid_assessment import (
 from infra_intelligence.llm.gemini_client import GeminiClient, LlmError
 
 TABLE = "workspace.gold.bid_assessments"
-dbutils.widgets.text("model", GEMINI_MODEL)
-model = dbutils.widgets.get("model")
+dbutils.widgets.text("models", ",".join(ASSESSMENT_MODELS))
+models = [m.strip() for m in dbutils.widgets.get("models").split(",") if m.strip()]
 
 # COMMAND ----------
 
@@ -70,8 +70,8 @@ print(f"Open tenders to assess: {len(tenders)}")
 
 # COMMAND ----------
 
-client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), model,
-                      requests_per_minute=4)
+client = GeminiClient(requests.Session(), dbutils.secrets.get(SECRET_SCOPE, GEMINI_SECRET_KEY), models,
+                      requests_per_minute=ASSESSMENT_RPM)
 rows, errors = [], []
 for start in range(0, len(tenders), BATCH_SIZE):
     batch = tenders[start:start + BATCH_SIZE]
