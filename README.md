@@ -20,7 +20,7 @@ register (PRH), and adds a go/no-go assessment for every open tender.
 | Which open tenders fit us? | Each open competition with history (same buyer, same region) and a go/no-go score |
 | How far apart are bids? | Lowest vs highest bid where both are reported |
 
-First findings from 811 notices (1/2024–10/2026):
+First findings from 814 notices (1/2024–10/2026):
 
 - **Competition is uneven.** In water construction 88 % and in rail 64 % of awards drew at most two bids, versus
   16 % in road maintenance.
@@ -88,9 +88,9 @@ score and the recommendation, so results are reproducible and the model does no 
 open data knows the ID as a company that is not a sole trader; others are grouped as *Muut toimijat*. A Gold
 assertion fails the run if a hidden name leaks, and tender descriptions are not exported to the site.
 
-**Zero cost.** Databricks Free Edition, Gemini free tier (20 requests/day), public APIs and GitHub. The pipeline is
-built for those limits: LLM calls are batched, cached per prompt version, resumable after a quota stop, and limited
-by default to the notices where the LLM adds value.
+**Zero cost.** Databricks Free Edition, Gemini free tier, public APIs and GitHub. The pipeline is built for those
+limits: LLM calls are batched, processed once per prompt version, resumable after a quota stop, and fall back to
+another free model when one is overloaded or out of daily quota.
 
 ## Data quality issues found and handled
 
@@ -131,7 +131,7 @@ tests/         unit tests (stdlib unittest, mocks for all external APIs)
 ## Running
 
 ```bash
-python -m unittest discover -s tests -t .      # 91 tests, no network
+python -m unittest discover -s tests -t .      # 98 tests, no network
 ```
 
 On Databricks the pipeline runs as the scheduled job `infra-intelligence-daily` (10:30 Europe/Helsinki, after
