@@ -7,8 +7,8 @@ A bid team has three recurring questions: *which open tenders are worth our effo
 where is competition thin?* This project answers them from EU procurement data (TED) and the Finnish company
 register (PRH), and adds a go/no-go assessment for every open tender.
 
-> Status: pipeline (Bronze → Silver → Gold) running on Databricks; LLM extraction, evaluation and go/no-go are
-> implemented and being run within the free-tier quota. Demo site works locally with sample data.
+> Status: the full pipeline runs daily on Databricks (Bronze → Silver → LLM → Gold → evaluation and go/no-go).
+> The demo site reads exported Gold data.
 
 ## What it shows
 
@@ -68,6 +68,16 @@ the title ("Maanteiden hoitourakka Viinijärvi"), and the model maps Viinijärvi
 TED has structured region (NUTS) and value fields for many notices. They are withheld from the prompt and used as
 ground truth, giving accuracy, coverage and a hallucination signal for euro amounts without manual labelling.
 Results are stored per prompt version, so prompt changes can be compared.
+
+| Metric (extract-v1, Gemini 3.5 Flash Lite) | Result | n |
+|---|---|---|
+| Region given for single-region notices (coverage) | 98 % | 557 |
+| Given regions that match TED (precision) | 96 % | 546 |
+| Correct region over all single-region notices | 94 % | 557 |
+| Euro value within ±5 % of TED, where both exist | 68 % | 22 |
+
+Most region errors are neighbouring regions (e.g. Satakunta vs Varsinais-Suomi for contracts on their border).
+Euro values are the weak spot: few notices state one in the text, so the field is not used in scoring.
 
 **The go/no-go score is computed, not generated.**
 The model rates two qualitative factors with reasons, *fit* to a bidder profile and *risk*. *Competition* comes from
