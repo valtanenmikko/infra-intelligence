@@ -1,0 +1,50 @@
+# Daily export of Gold tables to site/data/site.json, after the Databricks job (10:30 Europe/Helsinki).
+name: export-site-data
+
+on:
+  schedule:
+    - cron: "15 10 * * *"   # UTC; leaves time for the LLM steps of the Databricks job
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: export-site-data
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Unit tests
+        run: python -m unittest discover -s tests -t .
+
+      - name: Export Gold tables
+        env:
+          DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
+          DATABRICKS_WAREHOUSE_ID: ${{ vars.DATABRICKS_WAREHOUSE_ID }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: python scripts/export_site_data.py
+
+      - name: Commit if data changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add site/data/site.json
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "chore(data): refresh site data"
+            git push
+          fi
