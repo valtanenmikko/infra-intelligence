@@ -145,7 +145,12 @@ bronze_ted → bronze_prh → silver → llm_extract → gold → llm_eval
 Gold runs even if the LLM step fails (e.g. quota), so market tables stay fresh. The Gemini key is read from a
 secret scope: `databricks secrets put-secret infra-intelligence gemini-api-key`.
 
-Export the site data (needs a Databricks token and SQL warehouse ID):
+The GitHub Actions workflow `export-site-data` exports Gold to `site/data/site.json` every day after the job and
+commits it if the data changed. It reads the repository variables `DATABRICKS_HOST` and `DATABRICKS_WAREHOUSE_ID`
+and the secret `DATABRICKS_TOKEN`. When the token expires the workflow fails; create a new token in Databricks
+(Settings → Developer → Access tokens) and replace the secret.
+
+Export manually (needs a Databricks token and SQL warehouse ID):
 
 ```bash
 DATABRICKS_HOST=... DATABRICKS_TOKEN=... DATABRICKS_WAREHOUSE_ID=... python scripts/export_site_data.py
@@ -155,7 +160,6 @@ cd site && python -m http.server 8000
 ## Roadmap
 
 - Job definition as code with Terraform (Databricks provider); the scheduled job currently exists via the CLI
-- GitHub Actions: nightly export of `site.json` and deploy to GitHub Pages
 - Construction cost index (Statistics Finland) for inflation risk on multi-year contracts
 - Azure variant: Terraform module for ADLS Gen2, Key Vault and Data Factory orchestration
 
