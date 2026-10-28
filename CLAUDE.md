@@ -9,7 +9,7 @@ This file overrides the generic parent `Projektit/CLAUDE.md` where they conflict
 ## Hard rules
 
 - **Zero cost.** No paid cloud resources or paid API calls. LLM = Gemini Flash free tier.
-- **Repo stays private** until the user explicitly asks to publish. Never change visibility or enable Pages on your own.
+- **Repo is public** (published 2026-10-28) and the site is live at https://valtanenmikko.github.io/infra-intelligence/. Everything pushed is visible; scan for secrets before every commit.
 - The demo must not use any company's branding or imply it was made for/with a specific company. Companies appear only as data (e.g. tender winners).
 - No new pip packages without asking. Tests use stdlib `unittest` + `unittest.mock`.
 - Conventional commits, no Co-Authored-By lines.
@@ -24,7 +24,7 @@ This file overrides the generic parent `Projektit/CLAUDE.md` where they conflict
 | Medallion | `workspace.bronze` → `workspace.silver` → `workspace.gold` |
 | LLM | Gemini free tier with automatic model fallback (`config.EXTRACTION_MODELS` / `ASSESSMENT_MODELS`). Extraction: 3.5/3.1 Flash Lite, 15 RPM, **500 requests/day**. Go/no-go: 3.8 Flash (5 RPM, 20/day, often 503 overloaded) → 3.6 Flash → 3.5 Flash Lite. Quotas reset at midnight Pacific time. Batch notices, process each once per prompt version |
 | IaC | Terraform: Databricks objects (always), Azure + ADF module (documented variant, apply only if free credits) |
-| Demo | Static site built by GitHub Actions from Gold data → GitHub Pages (only when published) |
+| Demo | Static site on GitHub Pages. `export-site-data` workflow (daily 10:15 UTC) commits `site.json`; `deploy-pages` publishes `site/` after it and on site pushes |
 
 ## Layout
 
