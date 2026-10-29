@@ -123,6 +123,10 @@ select, .segmented button {
 .badge[data-rec="Ei tarjota"] { --dot: var(--status-critical); }
 .score { font-size: 2rem; font-weight: 700; margin-top: 4px; }
 .score small { font-size: 0.85rem; color: var(--text-muted); font-weight: 400; }
+.scope { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 4px 0 0; }
+.scope div { display: flex; flex-direction: column; }
+.scope dt { font: 500 0.7rem/1.3 var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+.scope dd { margin: 0; font-weight: 600; font-size: 0.95rem; color: var(--text-primary); }
 .factors { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
 .factor { font-size: 0.85rem; color: var(--text-secondary); display: flex; flex-direction: column; }
 .factor-name { color: var(--text-primary); font-weight: 500; }

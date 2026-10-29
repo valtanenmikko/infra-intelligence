@@ -105,6 +105,12 @@ function tenderCard(t) {
     ? t.past_winners.map((w) => `${w.company} (${w.wins})`).join(", ")
     : "ei aiempia voittoja tiedossa";
   const days = t.days_left;
+  // Scope as stated in the notice text (LLM-extracted); empty when the notice gives no figures
+  const km = (v) => `${fmtInt.format(Math.round(v))} km`;
+  const scope = [
+    ["Tiestö", t.road_km, km], ["Sorateitä", t.gravel_road_km, km], ["Talvihoito Ise/Is", t.high_class_winter_km, km],
+    ["Kävely ja pyöräily", t.cycleway_km, km], ["Vaativuus", t.difficulty, (v) => v],
+  ].filter(([, v]) => v != null);
   return el("li", { class: "tender" },
     el("div", {},
       el("h3", { text: t.title }),
@@ -117,6 +123,8 @@ function tenderCard(t) {
     el("div", { class: "verdict" },
       el("span", { class: "badge", "data-rec": t.recommendation, text: t.recommendation }),
       el("div", { class: "score" }, String(t.score), el("small", { text: " / 100" }))),
+    scope.length ? el("dl", { class: "scope", "aria-label": "Laajuus ilmoituksen mukaan" },
+      scope.map(([label, v, fmt]) => el("div", {}, el("dt", { text: label }), el("dd", { text: fmt(v) })))) : null,
     el("div", { class: "factors" },
       factor("Soveltuvuus", t.fit, "tekoälyn arvio"),
       factor("Kilpailu (5 = vähäinen)", t.competition,
@@ -127,6 +135,7 @@ function tenderCard(t) {
       el("p", { text: t.summary }),
       el("p", {}, el("strong", { text: "Soveltuvuus: " }), t.fit_reason),
       el("p", {}, el("strong", { text: "Riskit: " }), t.risk_reason),
+      t.resource_notes?.length ? el("p", {}, el("strong", { text: "Resurssitarve: " }), t.resource_notes.join(" · ")) : null,
       el("p", {}, el("strong", { text: "Aiemmat voittajat: " }), winners),
       t.questions?.length ? el("ul", {}, t.questions.map((q) => el("li", { text: q }))) : null,
       t.url ? el("p", {}, el("a", { href: t.url, target: "_blank", rel: "noopener", text: "Ilmoitus TEDissä ↗" })) : null));
