@@ -206,6 +206,9 @@ AS WITH open AS (
   SELECT n.* EXCEPT (regions), n.effective_regions AS regions, b.buyer_name
   FROM workspace.gold.notices_enriched n LEFT JOIN workspace.silver.buyers b USING (buyer_id)
   WHERE n.notice_category = 'competition' AND n.tender_deadline >= current_date()
+  -- Buyers sometimes republish the same competition as a new notice; keep only the latest one
+  QUALIFY row_number() OVER (PARTITION BY n.buyer_id, n.title, n.tender_deadline
+                             ORDER BY n.publication_date DESC, n.publication_number DESC) = 1
 ),
 -- Past awards comparable to each open tender, tagged by how they match. Regional history matters for
 -- state road maintenance: all ELY centres share one buyer ID, so buyer history alone is nationwide.
