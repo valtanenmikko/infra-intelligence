@@ -61,6 +61,7 @@ QUERIES: dict[str, str] = {
                a.summary, a.fit_reason, a.risk_reason, to_json(a.questions_for_bid_team) AS questions,
                a.road_km, a.gravel_road_km, a.high_class_winter_km, a.cycleway_km, a.difficulty,
                to_json(a.resource_notes) AS resource_notes, o.price_share, to_json(o.award_criteria) AS award_criteria, o.win_chance,
+               a.scope_clarity, a.contract_terms, a.operational_demands,
                to_json(coalesce(o.region_past_top_winners, o.buyer_past_top_winners)) AS past_winners, o.ted_url AS url
         FROM workspace.gold.open_tenders o JOIN a USING (publication_number)
         ORDER BY a.score DESC
@@ -71,6 +72,12 @@ QUERIES: dict[str, str] = {
         WHERE prompt_version = (SELECT max(prompt_version) FROM workspace.gold.llm_eval_metrics)
     """,
     "bid_backtest": "SELECT metric, value, n FROM workspace.gold.bid_factor_backtest",
+    # Comparable to the EU Single Market Scoreboard indicators (single bidder, awarded on price only)
+    "eu_indicators": """
+        SELECT count(bids_received) AS n_bids, avg(CAST(is_single_bid AS INT)) AS single_bid_share,
+               count(price_share) AS n_price, avg(CASE WHEN price_share >= 1 THEN 1.0 ELSE 0 END) AS price_only_share
+        FROM workspace.gold.award_facts
+    """,
     "criteria": """
         SELECT criteria_band AS band, awards, avg_bids, share_low_competition
         FROM workspace.gold.competition_by_criteria ORDER BY band_order
@@ -78,11 +85,12 @@ QUERIES: dict[str, str] = {
 }
 
 INT_FIELDS = {"notices", "awards", "competitions", "open_tenders", "wins", "n", "days_left", "score", "fit",
-              "competition", "risk", "slice_awards"}
+              "competition", "risk", "slice_awards", "scope_clarity", "contract_terms",
+              "operational_demands", "n_bids", "n_price"}
 FLOAT_FIELDS = {"single_winner_value_eur", "avg_bids", "share_low_competition", "share_single_bid", "won_value_eur",
                 "share_of_awards", "awarded_value_eur", "top_winner_share", "option_years", "estimated_value_eur",
                 "expected_bids", "median_spread", "value", "road_km", "gravel_road_km", "high_class_winter_km",
-                "cycleway_km", "price_share", "win_chance"}
+                "cycleway_km", "price_share", "win_chance", "single_bid_share", "price_only_share"}
 BOOL_FIELDS = {"region_from_llm"}
 JSON_FIELDS = {"questions", "past_winners", "resource_notes", "award_criteria"}
 EVAL_LABELS = {
@@ -145,5 +153,6 @@ def build_site_data(sql: SqlRunner, today: date) -> dict[str, Any]:
             {**m, "label": EVAL_LABELS[m["metric"]]} for m in data["llm_eval"] if m["metric"] in EVAL_LABELS
         ],
         "criteria": data["criteria"],
+        "eu_indicators": data["eu_indicators"][0],
         "bid_backtest": {m["metric"]: {"value": m["value"], "n": m["n"]} for m in data["bid_backtest"]},
     }

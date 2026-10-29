@@ -70,6 +70,7 @@ class FakeSql:
         "price_spread": [{"n": "17", "median_spread": "0.35"}],
         "llm_eval": [{"metric": "region_accuracy", "value": "0.9", "n": "400"}, {"metric": "value_without_ted_value", "value": "0.1", "n": "5"}],
         "bid_backtest": [{"metric": "bids_mae_shrunk", "value": "2.0", "n": "212"}],
+        "eu_indicators": [{"n_bids": "222", "single_bid_share": "0.113", "n_price": "243", "price_only_share": "0.683"}],
         "criteria": [{"band": "Pelkkä hinta", "awards": "40", "avg_bids": "5.1", "share_low_competition": "0.2"}],
     }
 
@@ -98,6 +99,10 @@ class BuildSiteDataTest(unittest.TestCase):
 
     def test_eval_keeps_labelled_metrics_only(self):
         self.assertEqual(self.data["llm_eval"], [{"metric": "region_accuracy", "value": 0.9, "n": 400, "label": "Maakunta oikein"}])
+
+    def test_eu_indicators_are_one_row(self):
+        self.assertEqual(self.data["eu_indicators"], {"n_bids": 222, "single_bid_share": 0.113, "n_price": 243,
+                                                      "price_only_share": 0.683})
 
     def test_criteria_bands_are_cast(self):
         self.assertEqual(self.data["criteria"], [{"band": "Pelkkä hinta", "awards": 40, "avg_bids": 5.1, "share_low_competition": 0.2}])
