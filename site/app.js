@@ -5,6 +5,7 @@ const fmtDec = new Intl.NumberFormat("fi-FI", { maximumFractionDigits: 1 });
 const fmtPct = new Intl.NumberFormat("fi-FI", { style: "percent", maximumFractionDigits: 0 });
 const fmtDate = new Intl.DateTimeFormat("fi-FI", { day: "numeric", month: "numeric", year: "numeric" });
 const fmtShortDate = new Intl.DateTimeFormat("fi-FI", { day: "numeric", month: "numeric" });
+const fmtMonth = new Intl.DateTimeFormat("fi-FI", { month: "short" });
 
 const OTHERS = "Muut toimijat";
 const SMALL_SAMPLE = 15;
@@ -167,11 +168,40 @@ function renderCapacity(openTenders) {
     "Lista on järjestetty pisteiden ja takarajan mukaan priorisointia varten.");
 }
 
+// Open tenders per deadline week (Monday-based), stacked by recommendation, so bid-team peaks are visible
+function renderDeadlines(openTenders) {
+  const card = document.getElementById("deadline-card");
+  card.hidden = openTenders.length === 0;
+  if (card.hidden) return;
+  const monday = (d) => { const m = new Date(d); m.setHours(0, 0, 0, 0); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; };
+  const weeks = [];
+  const last = monday(openTenders.map((t) => t.deadline).sort().at(-1));
+  for (let w = monday(new Date()); w <= last; w = new Date(w.getFullYear(), w.getMonth(), w.getDate() + 7)) weeks.push(w);
+  const counts = weeks.map((w) => REC_ORDER.map((r) =>
+    openTenders.filter((t) => t.recommendation === r && monday(t.deadline).getTime() === w.getTime()).length));
+  const max = Math.max(...counts.map((c) => c.reduce((a, b) => a + b, 0)));
+  const busiest = weeks[counts.findIndex((c) => c.reduce((a, b) => a + b, 0) === max)];
+  document.getElementById("deadline-chart").replaceChildren(...weeks.map((w, i) => {
+    const total = counts[i].reduce((a, b) => a + b, 0);
+    return el("div", { class: "week", title: `Viikko ${fmtShortDate.format(w)} alkaen: ${total} takarajaa` },
+      el("span", { class: "week-count", text: total ? String(total) : "" }),
+      el("div", { class: "week-bar", style: `height:${(total / max) * 100}%` },
+        ...REC_ORDER.map((r, j) => counts[i][j]
+          ? el("span", { "data-rec": r, style: `flex:${counts[i][j]}` }) : null)),
+      // Month name on the first week of each month keeps labels readable on narrow screens
+      el("span", { class: "week-label", text: w.getDate() <= 7 ? fmtMonth.format(w) : "" }));
+  }));
+  document.getElementById("deadline-chart").setAttribute("aria-label",
+    `Takarajoja ${weeks.length} viikon aikana, eniten (${max}) viikolla ${fmtShortDate.format(busiest)} alkaen`);
+}
+
 function renderTenders(openTenders) {
   const catSel = document.getElementById("tender-category");
   const recSel = document.getElementById("tender-rec");
   options(catSel, [...new Set(openTenders.map((t) => t.category))].sort());
-  options(recSel, REC_ORDER);
+  const recCount = (r) => openTenders.filter((t) => t.recommendation === r).length;
+  recSel.replaceChildren(el("option", { value: "", text: "Kaikki" }),
+    ...REC_ORDER.map((r) => el("option", { value: r, text: `${r} (${recCount(r)})` })));
   const list = document.getElementById("tender-list");
   const more = el("button", { type: "button", class: "show-more" });
   list.after(more);
@@ -220,7 +250,7 @@ function renderMarket(data) {
     hbar(document.getElementById("market-chart"), [...companies, ...others], {
       value: (r) => r[measure],
       label: (r) => r.company,
-      display: (r) => (isValue ? fmtEur(r.won_value_eur) : `${fmtInt.format(r.wins)} · ${fmtPct.format(r.share_of_awards)}`),
+      display: (r) => (isValue ? fmtEur(r.won_value_eur) : `${fmtPct.format(r.share_of_awards)} (${fmtInt.format(r.wins)} voittoa)`),
       tip: (r) => `${r.company}: ${fmtInt.format(r.wins)} voittoa (${fmtPct.format(r.share_of_awards)} hankinnoista), ${fmtEur(r.won_value_eur)}`,
       muted: (r) => r.company === OTHERS,
     });
@@ -278,7 +308,8 @@ function renderBuyers(data) {
     { title: "Tilaaja", cls: "sticky", get: (r) => r.buyer },
     { title: "Ilmoitukset", cls: "num hide-sm", get: (r) => fmtInt.format(r.notices) },
     { title: "Hankinnat", cls: "num", get: (r) => fmtInt.format(r.awards) },
-    { title: "Sopimusarvo", cls: "num", get: (r) => fmtEur(r.awarded_value_eur) },
+    // Zero means only framework awards, whose value is not attributed
+    { title: "Sopimusarvo", cls: "num", get: (r) => (r.awarded_value_eur ? fmtEur(r.awarded_value_eur) : "–") },
     { title: "Pääluokka", cls: "hide-sm", get: (r) => r.main_category },
     { title: "Tarjouksia ka.", cls: "num", get: (r) => fmtDec.format(r.avg_bids) },
     { title: "Useimmin voittanut", get: (r) => (r.top_winner ? `${r.top_winner} (${fmtPct.format(r.top_winner_share)})` : "–") },
@@ -319,6 +350,7 @@ async function main() {
     .filter((t) => t.days_left >= 0);
   renderMeta(data, openTenders);
   renderCapacity(openTenders);
+  renderDeadlines(openTenders);
   renderTenders(openTenders);
   renderMarket(data);
   renderCompetition(data);

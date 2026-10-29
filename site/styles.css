@@ -209,3 +209,21 @@ select, .segmented button {
 
 .criteria-card { margin-top: 16px; }
 .capacity { margin: 0 0 16px; }
+
+.hero-period .live { color: var(--text-secondary); display: block; margin-top: 4px; }
+.hero-period .live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--status-good); margin: 0 7px 1px 0; }
+
+/* Deadline weeks: stacked columns per week */
+.deadline-card { margin-bottom: 16px; }
+.weeks { display: flex; align-items: flex-end; gap: 4px; height: 120px; }
+.week { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; }
+.week-bar { width: 100%; display: flex; flex-direction: column-reverse; border-radius: 3px 3px 0 0; overflow: hidden; background: var(--surface-2); min-height: 2px; }
+.week-bar span { display: block; }
+.week-count { font: 500 0.75rem/1.4 var(--mono); color: var(--text-secondary); }
+.week-label { font: 400 0.68rem/1.6 var(--mono); color: var(--text-muted); white-space: nowrap; height: 1.1rem; overflow: visible; }
+.week-bar [data-rec="Tarjoa"], .key[data-rec="Tarjoa"] { background: var(--status-good); }
+.week-bar [data-rec="Harkitse"], .key[data-rec="Harkitse"] { background: var(--status-warning); }
+.week-bar [data-rec="Ei tarjota"], .key[data-rec="Ei tarjota"] { background: var(--status-critical); }
+.key { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin: 0 5px 0 10px; }
+.key:first-child { margin-left: 0; }
+@media (max-width: 640px) { .week-label { font-size: 0.6rem; } }
