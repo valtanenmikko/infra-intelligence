@@ -225,6 +225,10 @@ AS WITH open AS (
   SELECT n.* EXCEPT (regions), n.effective_regions AS regions, b.buyer_name
   FROM workspace.gold.notices_enriched n LEFT JOIN workspace.silver.buyers b USING (buyer_id)
   WHERE n.notice_category = 'competition' AND n.tender_deadline >= current_date()
+    -- A result notice for the same procedure means it was awarded or cancelled, even if the deadline is ahead
+    AND NOT EXISTS (SELECT 1 FROM workspace.gold.notices_enriched r
+                    WHERE r.procedure_id = n.procedure_id AND r.notice_category = 'award'
+                      AND r.publication_date >= n.publication_date)
   -- Buyers sometimes republish the same competition as a new notice; keep only the latest one per procedure
   QUALIFY row_number() OVER (PARTITION BY coalesce(n.procedure_id, concat_ws('|', n.buyer_id, n.title, n.tender_deadline))
                              ORDER BY n.publication_date DESC, n.publication_number DESC) = 1

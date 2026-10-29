@@ -120,7 +120,7 @@ another free model when one is overloaded or out of daily quota.
 | Bid counts reported as several statistics per lot | Use total tenders, falling back to e-submissions (mandatory above EU thresholds) |
 | Multi-lot tenders made "single-bid" rates look inflated (talvihoito 48 %) | Count a tender as low-competition only if no lot got more bids (34 %) |
 | Highest bid 500× the lowest | Exclude spreads above 5× as unit or lot mix-ups |
-| The same competition republished as a new notice (same buyer, title and deadline) | Open tenders keep only the latest notice |
+| The same competition republished as a new notice; a cancelled competition relaunched under a new procedure | Open tenders keep the latest notice per procedure and drop procedures that already have a result notice |
 
 ## Limitations
 
