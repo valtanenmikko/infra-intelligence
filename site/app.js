@@ -144,7 +144,8 @@ function renderTenders(openTenders) {
   const draw = () => {
     const rows = openTenders
       .filter((t) => (!catSel.value || t.category === catSel.value) && (!recSel.value || t.recommendation === recSel.value))
-      .sort((a, b) => b.score - a.score);
+      // Equal scores are common (similar maintenance contracts), so the nearest deadline comes first
+      .sort((a, b) => b.score - a.score || a.days_left - b.days_left);
     const shown = expanded ? rows : rows.slice(0, TENDERS_COLLAPSED);
     list.replaceChildren(...(rows.length ? shown.map(tenderCard) : [el("li", { class: "empty", text: "Ei avoimia kilpailutuksia valinnoilla." })]));
     more.hidden = rows.length <= TENDERS_COLLAPSED;
