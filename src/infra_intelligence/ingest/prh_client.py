@@ -4,7 +4,7 @@ import re
 import time
 from typing import Any
 
-from infra_intelligence.ingest.ted_client import RETRYABLE_STATUS, HttpSession
+from infra_intelligence.ingest.ted_client import RETRYABLE_STATUS
 
 PRH_COMPANIES_URL = "https://avoindata.prh.fi/opendata-ytj-api/v3/companies"
 
