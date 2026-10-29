@@ -26,6 +26,8 @@ First findings from 814 notices (1/2024–10/2026):
   16 % in road maintenance.
 - **State road maintenance is concentrated.** One contractor won 40 % of the ELY centres' awards.
 - **Bids spread widely.** Where both are reported, the highest bid is typically ~35 % above the lowest.
+- **Price-only tenders are thinner.** 34 % of lowest-price awards drew at most two bids, versus 6 % where price
+  weighs 50–69 % (mostly state road maintenance, so category is a confounder).
 
 ## Architecture
 
@@ -54,7 +56,7 @@ package from `src/`, so business logic is unit tested locally and the notebooks 
 |---|---|---|
 | Bronze (raw) | `ted_notices`, `prh_companies` | Raw JSON, incremental and idempotent `MERGE`; PRH lookups cached and refreshed every 90 days |
 | Silver (cleaned, conformed) | `notices`, `notice_winners`, `companies`, `buyers`, `llm_extractions` | Typed records, infra scope by main CPV, entity resolution by business ID |
-| Gold (business-ready) | `market_share`, `competition`, `competition_by_region`, `buyer_profiles`, `open_tenders`, `price_spread`, `bid_assessments`, `bid_factor_backtest`, `llm_eval_metrics` | SQL with `GROUPING SETS` rollups and in-notebook quality assertions |
+| Gold (business-ready) | `market_share`, `competition`, `competition_by_region`, `competition_by_criteria`, `buyer_profiles`, `open_tenders`, `price_spread`, `bid_assessments`, `bid_factor_backtest`, `llm_eval_metrics` | SQL with `GROUPING SETS` rollups and in-notebook quality assertions |
 
 ## Design decisions
 
@@ -128,7 +130,10 @@ another free model when one is overloaded or out of daily quota.
 - Framework agreement values cannot be attributed to individual winners.
 - History starts in 2024. The winner ID and bid-count fields come from eForms (mandatory since late 2023); older
   notices use a different format and are not parsed.
-- The go/no-go assessment uses a fictional example bidder profile.
+- The go/no-go assessment uses a fictional example bidder profile. Contract scope and resource needs come from the
+  notice text only; task quantities and equipment lists are in tender attachments that the open API does not serve.
+- LLM ratings are sensitive to the prompt: adding award criteria (bid-v5) moved most road maintenance contracts from
+  *Tarjoa* to *Harkitse*. Each version is stored, so changes can be compared.
 - Independent portfolio project, not affiliated with any company or authority in the data.
 
 ## Repository layout
@@ -148,7 +153,7 @@ tests/         unit tests (stdlib unittest, mocks for all external APIs)
 ## Running
 
 ```bash
-python -m unittest discover -s tests -t .      # 101 tests, no network
+python -m unittest discover -s tests -t .      # 114 tests, no network
 ```
 
 On Databricks the pipeline runs as the scheduled job `infra-intelligence-daily` (10:30 Europe/Helsinki, after
@@ -178,6 +183,7 @@ cd site && python -m http.server 8000
 
 - Job definition as code with Terraform (Databricks provider); the scheduled job currently exists via the CLI
 - Construction cost index (Statistics Finland) for inflation risk on multi-year contracts
+- Consistency eval for the go/no-go ratings (same tenders assessed repeatedly)
 - Azure variant: Terraform module for ADLS Gen2, Key Vault and Data Factory orchestration
 
 ## Stack
