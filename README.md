@@ -83,7 +83,7 @@ Most region errors are neighbouring regions (e.g. Satakunta vs Varsinais-Suomi f
 Euro values are the weak spot: few notices state one in the text, so the field is not used in scoring.
 
 **The go/no-go score is computed, not generated.**
-The model rates two qualitative factors with reasons, *fit* to a bidder profile and *risk*. *Competition* comes from
+The model rates *fit* to a bidder profile and three risk factors with reasons: *scope clarity*, *contract terms* and *operational demands* (risk = their mean). *Competition* comes from
 historical bid counts. A fixed weighted formula (fit 40 %, competition 30 %, risk 30 %) produces the 0–100 score and
 the recommendation, so results are reproducible and the model does no arithmetic.
 
@@ -121,6 +121,22 @@ assertion fails the run if a hidden name leaks, and tender descriptions are not 
 **Zero cost.** Databricks Free Edition, Gemini free tier, public APIs and GitHub. The pipeline is built for those
 limits: LLM calls are batched, processed once per prompt version, resumable after a quota stop, and fall back to
 another free model when one is overloaded or out of daily quota.
+
+## Research basis
+
+The scoring and indicators follow established work rather than ad-hoc rules:
+
+| Part of the model | Basis |
+|---|---|
+| Go/no-go factors: fit (type of work, experience), scope clarity, contract terms, operational demands, competition | Bid/no-bid studies of contractors group the factors into project, contract, client, contractor and market; scope clarity, contract terms, type of work and current workload rank highest ([Aldossari 2024](https://www.mdpi.com/2075-5309/14/10/3114); [Leśniak & Plebankiewicz 2015](https://bohrium.dp.tech/paper/arxiv/814565370722516993); [Construction Innovation](https://www.emerald.com/ci/article/16/2/127/35800/Critical-factors-influencing-the-bid-no-bid)) |
+| Win chance 1/k in a k-bidder contest, averaged over the bidder-count distribution | Equal-probability model and the Friedman/Gates bidding models; the number of bidders is itself random ([Friedman's model: errors and corrections](https://ascelibrary.com/doi/10.1061/%28ASCE%29CO.1943-7862.0001695); [Ballesteros-Pérez et al. 2015](https://centaur.reading.ac.uk/51067)) |
+| Bid portfolio under limited capacity | Simultaneous multi-contract bidding as 0–1 selection with win probabilities ([Operations Research 1971](https://pubsonline.informs.org/doi/10.1287/opre.19.2.469)); sequential vs simultaneous bidding ([JORS 1978](https://informahealthcare.com/doi/abs/10.1057/jors.1978.208)) |
+| Single-bidder share and price-only share | EU [Single Market Scoreboard](https://single-market-scoreboard.ec.europa.eu/) indicators; single bidding as a standard competition and integrity risk measure ([Public Organization Review 2023](https://link.springer.com/article/10.1007/s11115-023-00742-0)) |
+| No incumbent bonus | Incumbent advantage is linked to concentration and low transparency, and falls with more bidders and open procedures ([Albalate et al.](https://digibug.ugr.es/rdf/handle/10481/85881); [Iossa & Waterson](https://ceistorvergata.it/ceis-research-papers/36-635/maintaining-competition-in-recurrent-procurement-contracts-a-case-study-on-the-london-bus-market)); consistent with the open, 3–4-bidder road maintenance market here |
+
+**EU comparison.** Of the infrastructure awards here, 11 % had a single bid (Finland all sectors 15 %, EU 28 % in the
+2024 Scoreboard; the Scoreboard rates ≤ 10 % as good) and 68 % were awarded on price alone (EU 54 %, threshold 80 %).
+The single-bid share counts an award only when no lot got more than one bid, so it is a conservative estimate.
 
 ## Data quality issues found and handled
 
@@ -165,7 +181,7 @@ tests/         unit tests (stdlib unittest, mocks for all external APIs)
 ## Running
 
 ```bash
-python -m unittest discover -s tests -t .      # 114 tests, no network
+python -m unittest discover -s tests -t .      # 118 tests, no network
 ```
 
 On Databricks the pipeline runs as the scheduled job `infra-intelligence-daily` (10:30 Europe/Helsinki, after
