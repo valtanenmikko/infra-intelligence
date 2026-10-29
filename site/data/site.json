@@ -13,7 +13,7 @@
     "awards": 284,
     "competitions": 461,
     "open_tenders": 23,
-    "single_winner_value_eur": 1551819148.0300002,
+    "single_winner_value_eur": 1551819148.03,
     "avg_bids": 4.1,
     "share_low_competition": 0.2882882882882883
   },
@@ -46,7 +46,7 @@
       "category": "Kaikki",
       "company": "YIT Road Oy",
       "wins": 11,
-      "won_value_eur": 147930088.41,
+      "won_value_eur": 147930088.41000003,
       "share_of_awards": 0.03873239436619718,
       "slice_awards": 284
     },
@@ -468,7 +468,7 @@
     },
     {
       "category": "Talvihoito",
-      "company": "EP-Urakointi Oy",
+      "company": "Koneurakointi Jarkko Kosunen Oy",
       "wins": 2,
       "won_value_eur": null,
       "share_of_awards": 0.03508771929824561,
@@ -476,7 +476,7 @@
     },
     {
       "category": "Talvihoito",
-      "company": "Koneurakointi Jarkko Kosunen Oy",
+      "company": "EP-Urakointi Oy",
       "wins": 2,
       "won_value_eur": null,
       "share_of_awards": 0.03508771929824561,
@@ -1164,298 +1164,6 @@
   ],
   "open_tenders": [
     {
-      "id": "698225-2026",
-      "title": "Maanteiden hoitourakka Savonlinna 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Etelä-Savo",
-      "region_from_llm": true,
-      "deadline": "2027-01-26",
-      "days_left": 89,
-      "period": "2027–2032",
-      "option_years": 0.0,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 77,
-      "fit": 5,
-      "competition": 3,
-      "risk": 4,
-      "expected_bids": 3.5,
-      "summary": "Savonlinnan alueen maanteiden perushoitourakka 2027–2032, tiestöä noin 1 110 km.",
-      "fit_reason": "Perusmuotoinen maanteiden hoitourakka sopii erinomaisesti tarjoajan kalustolle ja osaamiselle.",
-      "risk_reason": "Vaativuustasoltaan perusurakka eli teknisesti matalariskinen, mutta pitkä 5v sopimus ilman mainittua indeksiehtoa tuo hintariskin. Aiempi voittaja alueella Destia Oy.",
-      "questions": [
-        "Onko sopimuksessa indeksitarkistus pykälää?",
-        "Mikä on tavoitehinnan jako urakoitsijan ja tilaajan välillä?"
-      ],
-      "road_km": 1110.0,
-      "gravel_road_km": 460.0,
-      "high_class_winter_km": 75.0,
-      "cycleway_km": 45.0,
-      "difficulty": "perusurakka",
-      "resource_notes": [
-        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
-        "Suuri soratieosuus (460 km)",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/698225-2026"
-    },
-    {
-      "id": "696691-2026",
-      "title": "Maanteiden hoitourakka Siikalatva 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Pohjois-Pohjanmaa",
-      "region_from_llm": true,
-      "deadline": "2027-03-16",
-      "days_left": 138,
-      "period": "2027–2032",
-      "option_years": null,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Siikalatvan urakka-alueen maanteiden kesä- ja talvihoitourakka 2027–2032.",
-      "fit_reason": "Maanteiden kunnossapitourakka vastaa täysin tarjoajan osaamista ja kalustoedellytyksiä.",
-      "risk_reason": "5 vuoden sopimusaika ilman indeksiehtoa sekä vesitaloustehtävien erityisvastuut. Aiempi voittaja mm. Destia Oy.",
-      "questions": [
-        "Mitä erityisvaatimuksia ja vastuita vesitalousosaston tehtävät tuovat tähän urakkaan?"
-      ],
-      "road_km": 785.0,
-      "gravel_road_km": 305.0,
-      "high_class_winter_km": 60.0,
-      "cycleway_km": 15.0,
-      "difficulty": "perusurakka",
-      "resource_notes": [
-        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
-        "Sisältää vesitalousosaston tehtäviä"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 3
-        },
-        {
-          "company": "Oulun Konetyö Oy",
-          "wins": 2
-        },
-        {
-          "company": "YIT Road Oy",
-          "wins": 2
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/696691-2026"
-    },
-    {
-      "id": "697187-2026",
-      "title": "Maanteiden hoitourakka Imatra 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Etelä-Karjala",
-      "region_from_llm": true,
-      "deadline": "2027-01-26",
-      "days_left": 89,
-      "period": "2027–2032",
-      "option_years": 0.0,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Imatran maanteiden hoitourakka 2027–2032 (noin 1015 km). Vaativa urakka.",
-      "fit_reason": "Urakka vastaa täysin tarjoajan profiilia ja osaamista.",
-      "risk_reason": "5-vuotinen tavoitehintainen sopimus ilman mainittua indeksiehtoa. Alueen aiempi voittaja mm. Destia Oy.",
-      "questions": [
-        "Onko tavoitehinnan riskinjakoalue riittävä?",
-        "Miten Ise-luokan teiden hoito varmistetaan alueella?"
-      ],
-      "road_km": 1015.0,
-      "gravel_road_km": 325.0,
-      "high_class_winter_km": 130.0,
-      "cycleway_km": 75.0,
-      "difficulty": "vaativa urakka",
-      "resource_notes": [
-        "Ise 2-ajorataista 30 km, Is 2-ajorataista 5 km ja Is 1-ajorataista 95 km",
-        "Hoidonjohtotehtävät ja hankinnat",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Aventi Oy",
-          "wins": 1
-        },
-        {
-          "company": "Destia Oy",
-          "wins": 1
-        },
-        {
-          "company": "Eltel Networks Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/697187-2026"
-    },
-    {
-      "id": "697236-2026",
-      "title": "Maanteiden hoitourakka Loimaa 2027-2030",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Varsinais-Suomi",
-      "region_from_llm": true,
-      "deadline": "2027-03-16",
-      "days_left": 138,
-      "period": "2027–2030",
-      "option_years": null,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Loimaan alueen maanteiden kesä- ja talvihoitourakka noin 750 km tiestölle vuosille 2027–2030.",
-      "fit_reason": "Maanteiden kesä- ja talvihoitourakka vastaa täysin tarjoajan profiilia ja suorituskykyä.",
-      "risk_reason": "Tavoitehintamalli ja indeksiehdon puuttuminen luovat kaupallista riskiä. Aiempi voittaja alueella vahvasti Destia Oy.",
-      "questions": [
-        "Miten tavoitehinnan ylitykset ja alitukset jakautuvat tilaajan ja urakoitsijan välillä?"
-      ],
-      "road_km": 750.0,
-      "gravel_road_km": 250.0,
-      "high_class_winter_km": 150.0,
-      "cycleway_km": 20.0,
-      "difficulty": "perusurakka",
-      "resource_notes": [
-        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 4
-        },
-        {
-          "company": "Betonilaatta Oy",
-          "wins": 1
-        },
-        {
-          "company": "ETH Group Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/697236-2026"
-    },
-    {
-      "id": "697571-2026",
-      "title": "Maanteiden hoitourakka Rovaniemi 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Lappi",
-      "region_from_llm": true,
-      "deadline": "2027-01-26",
-      "days_left": 89,
-      "period": "2027–2032",
-      "option_years": null,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Rovaniemen maanteiden hoitourakka 2027–2032 (noin 1090 km). Vaativa urakka.",
-      "fit_reason": "Maanteiden hoitourakka kuuluu täysin tarjoajan ydinosaamiseen ja kalustoon.",
-      "risk_reason": "Viisivuotinen tavoitehintainen sopimus ja pohjoiset talviolosuhteet lisäävät riskiä. Aiempi voittaja alueella mm. Alltime ja Pimara.",
-      "questions": [
-        "Miten indeksiehto tai sen puuttuminen vaikuttaa tavoitehintaan?",
-        "Riiittääkö oma kalusto ja resurssit pohjoisen laajaan soratieverkkoon?"
-      ],
-      "road_km": 1090.0,
-      "gravel_road_km": 410.0,
-      "high_class_winter_km": 105.0,
-      "cycleway_km": 115.0,
-      "difficulty": "vaativa urakka",
-      "resource_notes": [
-        "Is 1-ajorataista noin 105 km",
-        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Alltime Suomi Oy",
-          "wins": 2
-        },
-        {
-          "company": "Pimara Väyläpalvelut Oy",
-          "wins": 2
-        },
-        {
-          "company": "Aventi Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/697571-2026"
-    },
-    {
-      "id": "697627-2026",
-      "title": "Maanteiden hoitourakka Heinola 2027-2030",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Päijät-Häme",
-      "region_from_llm": true,
-      "deadline": "2027-03-16",
-      "days_left": 138,
-      "period": "2027–2030",
-      "option_years": 0.0,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Heinolan alueen maanteiden hoitourakka noin 1 000 km tiestölle vuosille 2027–2030.",
-      "fit_reason": "Urakka sopii erinomaisesti profiilin maantie- ja talvihoitokapasiteettiin.",
-      "risk_reason": "Vaativa luokitus, runsaasti sorateitä (435 km) ja tavoitehintamalli ilman ilmoitettua indeksiehtoa. Alueen aiempina voittajina mm. Destia Oy.",
-      "questions": [
-        "Miten tavoitehinta ja kustannusten jako on muotoiltu tarjouspyynnössä?"
-      ],
-      "road_km": 1000.0,
-      "gravel_road_km": 435.0,
-      "high_class_winter_km": 125.0,
-      "cycleway_km": 90.0,
-      "difficulty": "vaativa urakka",
-      "resource_notes": [
-        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
-        "Laaja soratieverkosto"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 2
-        },
-        {
-          "company": "Capelon Oy",
-          "wins": 1
-        },
-        {
-          "company": "Tekniikka-Tuominen Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/697627-2026"
-    },
-    {
       "id": "697861-2026",
       "title": "Maanteiden hoitourakka Viinijärvi 2027-2032",
       "buyer": "ELY-keskukset / elinvoimakeskukset",
@@ -1473,12 +1181,12 @@
       "competition": 3,
       "risk": 3,
       "expected_bids": 3.5,
-      "summary": "Viinijärven maanteiden hoitourakka 2027–2032 Pohjois-Karjalassa, sisältäen tiestön kesä- ja talvihoidon.",
-      "fit_reason": "Täydellinen osuma urakoitsijan ydinosaamiseen: maanteiden hoitourakka, johon kuuluu talvi- ja kesähoito. ELY-urakoissa aiemmin voittanut muun muassa Destia Oy ja YIT Road Oy.",
-      "risk_reason": "5-vuotinen sopimuskausi ja tavoitehintainen sopimusmalli ilman mainittua indeksiehtoa edellyttävät tarkkaa kustannushallintaa.",
+      "summary": "Viinijärven maanteiden hoitourakka 2027–2032, yhteensä noin 1 165 km tiestöä.",
+      "fit_reason": "Täydellinen osuma tarjoajan ydinliiketoimintaan (maanteiden hoitourakka, oma kalusto ja päivystys). Laatu- ja asiantuntijapainotus (35 %) tukee kokenutta urakoitsijaa. Aiempi voittaja alueella Destia Oy.",
+      "risk_reason": "Viisivuotinen sopimuskausi ja tavoitehintamalli ilman indeksiehtomuotoilua luovat hintariskiä.",
       "questions": [
-        "Miten tavoitehintaisen sopimuksen riskit jaettaneen tilaajan kanssa?",
-        "Onko organisaatiolla valmius hoidonjohtotehtäviin Viinijärven alueella?"
+        "Ketkä asetetaan avainhenkilöiksi asiantuntijatenttiin?",
+        "Miten varmistetaan riittävä talvihoidon kalustoresurssi pisteytyksen tavoittelemiseksi?"
       ],
       "road_km": 1165.0,
       "gravel_road_km": 495.0,
@@ -1486,10 +1194,33 @@
       "cycleway_km": 65.0,
       "difficulty": "perusurakka",
       "resource_notes": [
-        "Is 1 -ajorataa n. 140 km ja Is 2 -ajorataa n. 5 km",
-        "Ib 1 -ajorataa n. 135 km",
-        "Hoidonjohtotehtävät kuuluvat urakkaan",
-        "Tavoitehintainen palvelusopimus"
+        "Tavoitehintainen palvelusopimus",
+        "Hoidonjohtotehtävät",
+        "Talvi- ja kesähoito",
+        "Päivystysvelvoite"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
@@ -1502,101 +1233,6 @@
         }
       ],
       "url": "https://ted.europa.eu/fi/notice/-/detail/697861-2026"
-    },
-    {
-      "id": "698057-2026",
-      "title": "Maanteiden hoitourakka Kristiinankaupunki 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Pohjanmaa",
-      "region_from_llm": true,
-      "deadline": "2026-12-01",
-      "days_left": 33,
-      "period": "2027–2032",
-      "option_years": 0.0,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Kristiinankaupungin maanteiden hoitourakka 2027–2032 Pohjanmaalla, käsittäen kesä- ja talvihoidon.",
-      "fit_reason": "Vastaa täysin urakoitsijan ydinliiketoimintaa eli maanteiden hoitourakointia. Vastaavissa urakoissa aiemmin menestynyt mm. Destia Oy.",
-      "risk_reason": "Viisivuotinen sopimuskausi ja tavoitehintamalli ilman mainintaa indeksiehdoista tuovat kustannusriskiä.",
-      "questions": [
-        "Löytyykö Pohjanmaan alueelta riittävästi omaa kalustoa ja sub-urakoitsijoita talvihoitoon?",
-        "Miten tavoitehinnan riskimarginaali lasketaan tarjoukseen?"
-      ],
-      "road_km": 900.0,
-      "gravel_road_km": 245.0,
-      "high_class_winter_km": 130.0,
-      "cycleway_km": 45.0,
-      "difficulty": "perusurakka",
-      "resource_notes": [
-        "Is 1 -ajorataa n. 130 km",
-        "Ib 1 -ajorataa n. 185 km",
-        "Hoidonjohtotehtävät kuuluvat urakkaan",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/698057-2026"
-    },
-    {
-      "id": "698165-2026",
-      "title": "Maanteiden hoitourakka Pello 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Lappi",
-      "region_from_llm": true,
-      "deadline": "2027-02-16",
-      "days_left": 110,
-      "period": "2027–2032",
-      "option_years": 0.0,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Pellon maanteiden hoitourakka 2027–2032 (noin 720 km). Perusurakka.",
-      "fit_reason": "Sopii täysin tarjoajan toimenkuvaan ja kalustoprofiiliin.",
-      "risk_reason": "Pitkä 5-vuotinen sopimus pohjoisissa talviolosuhteissa. Alueen aiempia voittajia Alltime ja Pimara.",
-      "questions": [
-        "Kuinka päivystys ja kalusto sijoitetaan pitkien välimatkojen alueella?",
-        "Mikä on tavoitehinnan jakosuhde?"
-      ],
-      "road_km": 720.0,
-      "gravel_road_km": 240.0,
-      "high_class_winter_km": null,
-      "cycleway_km": 45.0,
-      "difficulty": "perusurakka",
-      "resource_notes": [
-        "Perusurakka ilman Ise/Is-luokan teitä",
-        "Pohjoiset talviolosuhteet",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Alltime Suomi Oy",
-          "wins": 2
-        },
-        {
-          "company": "Pimara Väyläpalvelut Oy",
-          "wins": 2
-        },
-        {
-          "company": "Aventi Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/698165-2026"
     },
     {
       "id": "698166-2026",
@@ -1616,21 +1252,45 @@
       "competition": 3,
       "risk": 3,
       "expected_bids": 3.5,
-      "summary": "Alavuden urakka-alueen maanteiden kesä- ja talvihoitotyöt sekä hoidonjohto 2027–2032.",
-      "fit_reason": "Kohde sopii täydellisesti tarjoajan ydinliiketoimintaan (maanteiden hoitourakat ja talvihoito).",
-      "risk_reason": "Pitkä sopimuskausi (5 v) ilman indeksiehtoa sekä tavoitehintamalli aiheuttavat kustannusriskiä. Aiempi voittaja alueella mm. Destia Oy.",
+      "summary": "Alavuden maanteiden hoitourakka vuosille 2027-2032. Tilaaja ELY-keskus.",
+      "fit_reason": "Perusurakka sopii erinomaisesti keskisuuren urakoitsijan ydinosaamiseen ja kapasiteettiin.",
+      "risk_reason": "Viiden vuoden sopimuskausi ilman hintaindeksiä tuo pitkän aikavälin kustannusriskiä.",
       "questions": [
-        "Miten tavoitehintamallin kustannus- ja riskinjako on määritelty?",
-        "Sisältyykö sopimukseen mitään indeksitarkistusmekanismia pitkälle kaudelle?"
+        "Mitä erityisvaatimuksia vesitalousosaston tehtävät tuovat urakkaan?"
       ],
       "road_km": 1050.0,
       "gravel_road_km": 400.0,
-      "high_class_winter_km": 100.0,
+      "high_class_winter_km": 5.0,
       "cycleway_km": 60.0,
       "difficulty": "perusurakka",
       "resource_notes": [
-        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
-        "Sisältää vesitalousosaston tehtäviä"
+        "Talvihoitoluokka Is 5 km",
+        "Sorateitä 400 km",
+        "Kävely- ja pyöräilyväyliä 60 km",
+        "Vesitalousosaston tehtäviä"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
@@ -1649,116 +1309,15 @@
       "url": "https://ted.europa.eu/fi/notice/-/detail/698166-2026"
     },
     {
-      "id": "698430-2026",
-      "title": "Maanteiden hoitourakka Sastamala 2027-2032",
+      "id": "697105-2026",
+      "title": "Maanteiden hoitourakka Kiuruvesi 2027-2029",
       "buyer": "ELY-keskukset / elinvoimakeskukset",
       "category": "Teiden kunnossapito",
-      "region": "Pirkanmaa",
-      "region_from_llm": true,
-      "deadline": "2026-12-01",
-      "days_left": 33,
-      "period": "2027–2032",
-      "option_years": null,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Sastamalan alueen maanteiden kesä- ja talvihoitourakka 2027–2032. Tiestöä noin 1 155 km.",
-      "fit_reason": "Sopii täysin tarjoajan ydinosaamiseen (maanteiden hoito- ja kunnossapito, talvihoito). Alue ja urakkakoko sopivat profiiliin.",
-      "risk_reason": "Viisivuotinen sopimus ilman mainittua indeksiehtoa. Tavoitehintainen urakka ja suuri soratieosuus nostavat riskiä. Aiempi voittaja alueella mm. Destia Oy.",
-      "questions": [
-        "Onko sopimuksessa indeksitarkistusta inflaation varalle?",
-        "Miten tavoitehinta ja kannustimet määräytyvät?"
-      ],
-      "road_km": 1155.0,
-      "gravel_road_km": 500.0,
-      "high_class_winter_km": 135.0,
-      "cycleway_km": 60.0,
-      "difficulty": "vaativa urakka",
-      "resource_notes": [
-        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 4
-        },
-        {
-          "company": "Pimara Väyläpalvelut Oy",
-          "wins": 2
-        },
-        {
-          "company": "Cramo Finland Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/698430-2026"
-    },
-    {
-      "id": "699348-2026",
-      "title": "Maanteiden hoitourakka Tampere 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Pirkanmaa",
-      "region_from_llm": true,
-      "deadline": "2027-01-26",
-      "days_left": 89,
-      "period": "2027–2032",
-      "option_years": null,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Tampereen alueen maanteiden kesä- ja talvihoitourakka noin 900 km tiestölle vuosille 2027–2032.",
-      "fit_reason": "Vastaa täysin tarjoajan profiilia maanteiden hoidossa ja talvissapitotöissä vilkkaalla alueella.",
-      "risk_reason": "Erittäin vaativa urakka vilkkaassa liikenneympäristössä. Pitkä sopimusaika ja indeksiehtotiedon puute nostavat kaupallista riskiä. Aiempi voittaja alueella mm. Destia Oy.",
-      "questions": [
-        "Miten liikenteenohjaus ja vilkas liikenneympäristö on huomioitu kustannusarviossa?",
-        "Sisältyykö sopimukseen indeksisidonnaisuus?"
-      ],
-      "road_km": 900.0,
-      "gravel_road_km": 115.0,
-      "high_class_winter_km": 420.0,
-      "cycleway_km": 150.0,
-      "difficulty": "erittäin vaativa urakka",
-      "resource_notes": [
-        "Hoidonjohtotehtävät ja hoitotyöt",
-        "MDSS-järjestelmän hyödyntäminen",
-        "Korkeat vilkkaan liikenteen laatuvaatimukset (Ise/Is)"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 4
-        },
-        {
-          "company": "Pimara Väyläpalvelut Oy",
-          "wins": 2
-        },
-        {
-          "company": "Cramo Finland Oy",
-          "wins": 1
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/699348-2026"
-    },
-    {
-      "id": "699504-2026",
-      "title": "Maanteiden hoitourakka Merikarvia 2027-2031",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Satakunta",
+      "region": "Pohjois-Savo",
       "region_from_llm": true,
       "deadline": "2027-04-06",
       "days_left": 159,
-      "period": "2027–2031",
+      "period": "2027–2029",
       "option_years": null,
       "estimated_value_eur": null,
       "recommendation": "Tarjoa",
@@ -1767,31 +1326,62 @@
       "competition": 3,
       "risk": 3,
       "expected_bids": 3.5,
-      "summary": "Merikarvian maanteiden hoitourakka vuosille 2027-2031, tiestöä noin 525 km. Aiempi voittaja-historia painottuu suuremmille toimijoille kuten Destialle.",
-      "fit_reason": "Sopii erinomaisesti ydinliiketoimintaan maanteiden hoito- ja kunnossapitourakka.",
-      "risk_reason": "Pitkä neljän vuoden sopimuskausi ja tavoitehintamalli.",
+      "summary": "Kiuruveden maanteiden hoitourakka 2027-2029, tiestöä noin 510 km.",
+      "fit_reason": "Kiuruveden hoitourakka sopii erinomaisesti yhtiön tarjontaan ja maantieteelliseen toiminta-alueeseen.",
+      "risk_reason": "Suhteellisen korkea sorateiden osuus suhteessa kokonaispituuteen lisää hoidon kustannusriskiä.",
       "questions": [
-        "Miten tavoitehintamallin riskit on huomioitu hinnoittelussa?",
-        "Onko kalustoa riittävästi vaativaan talvihoitoluokkaan Is?"
+        "Miten sorateiden kunnossapidon kustannukset on laskettu?",
+        "Onko alueella paikallisia aliurakoitsijoita sorateiden hoitoon?"
       ],
-      "road_km": 525.0,
-      "gravel_road_km": 180.0,
-      "high_class_winter_km": 80.0,
-      "cycleway_km": 40.0,
+      "road_km": 510.0,
+      "gravel_road_km": 335.0,
+      "high_class_winter_km": 15.0,
+      "cycleway_km": 20.0,
       "difficulty": "perusurakka",
       "resource_notes": [
-        "Is 1-ajorataista noin 80 km",
-        "Sorateitä noin 180 km",
-        "Kävely- ja pyöräilyväyliä noin 40 km",
-        "Hoidonjohtotehtävät kuuluu urakoitsijalle"
+        "Sopimuskausi lyhyempi (2027-2029)",
+        "Hoidonjohtotehtävät ja hankinnat kuuluvat urakoitsijalle",
+        "Vaativuusluokka perusurakka",
+        "Savon Kuljetus ja Destia usein voittajina alueella"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
-          "company": "PAV Oy Ab",
-          "wins": 1
+          "company": "Savon Kuljetus Oy",
+          "wins": 3
+        },
+        {
+          "company": "Destia Oy",
+          "wins": 2
+        },
+        {
+          "company": "YIT Road Oy",
+          "wins": 2
         }
       ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/699504-2026"
+      "url": "https://ted.europa.eu/fi/notice/-/detail/697105-2026"
     },
     {
       "id": "700077-2026",
@@ -1811,12 +1401,12 @@
       "competition": 3,
       "risk": 3,
       "expected_bids": 3.5,
-      "summary": "Pielaveden maanteiden hoitourakka 2027–2032 (noin 940 km). Perusurakka.",
-      "fit_reason": "Perusvaatimustason maanteiden hoitourakka sopii erinomaisesti profiiliin.",
-      "risk_reason": "Pitkä sopimuskausi ja tavoitehintamalli. Alueen aiempia voittajia Savon Kuljetus, Destia ja YIT.",
+      "summary": "Pielaveden maanteiden hoitourakka vuosille 2027-2032. Tiestöä noin 940 km.",
+      "fit_reason": "Kohde on maanteiden hoitourakka, mikä kuuluu yrityksen ydinliiketoimintaan. Laadun osuus vertailuperusteista (35 %) korostaa kalustoa ja asiantuntemusta.",
+      "risk_reason": "Pitkä sopimuskausi ilman selkeää hintaindeksiehtoa ja tavoitehintamalli tuovat riskejä.",
       "questions": [
-        "Miten 500 km soratieverkon hoito järjestetään tehokkaasti?",
-        "Onko paikallista aliurakoitsijaverkostoa käytettävissä?"
+        "Miten riskit on huomioitu tavoitehintamallissa?",
+        "Onko kalustoresurssit varmistettu alueella pitkälle sopimuskaudelle?"
       ],
       "road_km": 940.0,
       "gravel_road_km": 500.0,
@@ -1824,9 +1414,32 @@
       "cycleway_km": 35.0,
       "difficulty": "perusurakka",
       "resource_notes": [
-        "Suuri soratieosuus (500 km)",
-        "Is-luokkaa yhteensä 20 km",
-        "Tavoitehintainen palvelusopimus"
+        "Hoidonjohtotehtävät kuuluvat urakoitsijalle",
+        "Is 2-ajorataista noin 5 km",
+        "Is 1-ajorataista noin 15 km"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
@@ -1845,57 +1458,6 @@
       "url": "https://ted.europa.eu/fi/notice/-/detail/700077-2026"
     },
     {
-      "id": "749002-2026",
-      "title": "Maanteiden hoitourakka Oulu 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Pohjois-Pohjanmaa",
-      "region_from_llm": true,
-      "deadline": "2026-12-01",
-      "days_left": 33,
-      "period": "2027–2032",
-      "option_years": null,
-      "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 70,
-      "fit": 5,
-      "competition": 3,
-      "risk": 3,
-      "expected_bids": 3.5,
-      "summary": "Oulun alueen maanteiden kesä- ja talvihoitourakka 2027–2032 (ilman lauttaväylävelvoitetta).",
-      "fit_reason": "Maanteiden hoitourat ovat keskeistä ydinliiketoimintaa ja kalusto löytyy koko maahan.",
-      "risk_reason": "Erittäin vaativa urakkaluokka, tiukat laatuvaatimukset ja pitkä sopimuskausi ilman ilmoitettua indeksiehtoa. Aiemmat voittajat mm. Destia Oy ja Oulun Konetyö Oy.",
-      "questions": [
-        "Onko sopimuksessa indeksiehto?",
-        "Mitä resursseja MDSS-järjestelmän käyttö ja vesitalousosaston tehtävät vaativat?"
-      ],
-      "road_km": 1285.0,
-      "gravel_road_km": 285.0,
-      "high_class_winter_km": 250.0,
-      "cycleway_km": 170.0,
-      "difficulty": "erittäin vaativa urakka",
-      "resource_notes": [
-        "Vesitalousosaston tehtävät",
-        "MDSS-järjestelmän hyödyntäminen",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 3
-        },
-        {
-          "company": "Oulun Konetyö Oy",
-          "wins": 2
-        },
-        {
-          "company": "YIT Road Oy",
-          "wins": 2
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/749002-2026"
-    },
-    {
       "id": "698926-2026",
       "title": "Maanteiden hoitourakka Pyhäjärvi 2027-2032",
       "buyer": "ELY-keskukset / elinvoimakeskukset",
@@ -1907,17 +1469,18 @@
       "period": "2027–2032",
       "option_years": null,
       "estimated_value_eur": null,
-      "recommendation": "Tarjoa",
-      "score": 68,
-      "fit": 4,
+      "recommendation": "Harkitse",
+      "score": 62,
+      "fit": 5,
       "competition": 3,
-      "risk": 4,
+      "risk": 2,
       "expected_bids": 3.5,
-      "summary": "Pyhäjärven maanteiden hoitourakka vuosille 2027-2032, laajuus noin 970 km. Sisältää vesitalousosaston tehtäviä.",
-      "fit_reason": "Laaja maantiehoitourakka, joka sopii keskisuurelle urakoitsijalle.",
-      "risk_reason": "Pitkä viiden vuoden sopimuskausi ja vesitalousosaston tehtävät erikoistehtävänä.",
+      "summary": "Pyhäjärven maanteiden hoitourakka vuosille 2027-2032. Tiestöä yhteensä noin 970 km.",
+      "fit_reason": "Kohde on maanteiden hoitourakka, mikä sopii täydellisesti yhtiön ydinliiketoimintaan. Laaja kokemus ja kalusto soveltuvat tähän.",
+      "risk_reason": "Pitkä 5 vuoden sopimuskausi ilman selkeää hintaindeksiehtoa ja tavoitehintamalli nostavat kaupallista riskiä.",
       "questions": [
-        "Mitä vesitalousosaston tehtävät käytännössä vaativat resursseilta?"
+        "Miten tavoitehintamallin riskit on huomioitu tarjouksessa?",
+        "Onko sorateiden suuren määrän hoitoon riittävästi paikallista kalustoa?"
       ],
       "road_km": 970.0,
       "gravel_road_km": 415.0,
@@ -1925,10 +1488,33 @@
       "cycleway_km": 40.0,
       "difficulty": "perusurakka",
       "resource_notes": [
-        "Is 1-ajorataista noin 100 km",
-        "Sorateitä noin 415 km",
-        "Kävely- ja pyöräilyväyliä noin 40 km",
-        "Sisältää vesitalousosaston tehtäviä"
+        "Hoidonjohtotehtävät ja hankinnat kuuluvat urakoitsijalle",
+        "Vesitalousosaston tehtäviä sisältyy urakkaan",
+        "Vaativuusluokka on perusurakka",
+        "Vertailuhinnan paino 65%"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
@@ -1947,15 +1533,15 @@
       "url": "https://ted.europa.eu/fi/notice/-/detail/698926-2026"
     },
     {
-      "id": "700025-2026",
-      "title": "Maanteiden hoitourakka Jyväskylä 2027-2031",
+      "id": "698430-2026",
+      "title": "Maanteiden hoitourakka Sastamala 2027-2032",
       "buyer": "ELY-keskukset / elinvoimakeskukset",
       "category": "Teiden kunnossapito",
-      "region": "Keski-Suomi",
+      "region": "Pirkanmaa",
       "region_from_llm": true,
-      "deadline": "2027-03-16",
-      "days_left": 138,
-      "period": "2027–2031",
+      "deadline": "2026-12-01",
+      "days_left": 33,
+      "period": "2027–2032",
       "option_years": null,
       "estimated_value_eur": null,
       "recommendation": "Harkitse",
@@ -1964,49 +1550,74 @@
       "competition": 3,
       "risk": 2,
       "expected_bids": 3.5,
-      "summary": "Jyväskylän alueen maanteiden hoitourakka noin 1 180 km tiestölle vuosille 2027–2031.",
-      "fit_reason": "Maa- ja maantiehoitourakka soveltuu täysin tarjoajan profiiliin ja valtakunnalliseen päivystysorganisaatioon.",
-      "risk_reason": "Erittäin vaativa urakka vilkkailla teillä, suuri korkean talvihoitoluokan km-määrä sekä tavoitehintariski ilman indeksiehtoa. Alueella aiemmin mm. Destia Oy.",
+      "summary": "Sastamalan alueen maanteiden hoitourakka 2027–2032, noin 1 155 km tiestölle.",
+      "fit_reason": "Täydellinen osuma tarjoajan ydinosaamiseen. Laatutekijöiden 35 % painoarvo suosii laadukasta ja kokenutta urakoitsijaa. Destia ja Pimara ovat voittaneet vastaavia urakoita alueella.",
+      "risk_reason": "Urakka on määritelty vaativaksi urakaksi. Suuri soratieosuus (500 km) ja 5 vuoden sopimus ilman mainittua indeksilauseketta lisäävät riskiä.",
       "questions": [
-        "Riittääkö oma päivystys- ja kalustokapasiteetti korkean vaatimustason Ise-luokan reiteille?",
-        "Onko sanktio- ja laatutasovaatimuksia tarkennettu vilkkaimmin liikennöidyille osuuksille?"
+        "Onko Sastamalan alueella valmiiksi sopivaa kalustoa ja tiestön hoitopaikkaa?",
+        "Miten varaudutaan vaativan luokituksen sekä suuren soratieosuuden hoitokustannuksiin?"
       ],
-      "road_km": 1180.0,
-      "gravel_road_km": 390.0,
-      "high_class_winter_km": 300.0,
-      "cycleway_km": 205.0,
-      "difficulty": "erittäin vaativa urakka",
+      "road_km": 1155.0,
+      "gravel_road_km": 500.0,
+      "high_class_winter_km": 135.0,
+      "cycleway_km": 60.0,
+      "difficulty": "vaativa urakka",
       "resource_notes": [
-        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
-        "Huomattava määrä Ise-luokan teitä sekä pyöräilyväyliä"
+        "Tavoitehintainen palvelusopimus",
+        "Hoidonjohtotehtävät",
+        "Suuri soratieosuus",
+        "Päivystys- ja kalustovaatimukset"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
           "company": "Destia Oy",
+          "wins": 4
+        },
+        {
+          "company": "Pimara Väyläpalvelut Oy",
           "wins": 2
         },
         {
-          "company": "Flowplus Oy",
-          "wins": 1
-        },
-        {
-          "company": "Sähkö Via Oy",
+          "company": "Cramo Finland Oy",
           "wins": 1
         }
       ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/700025-2026"
+      "url": "https://ted.europa.eu/fi/notice/-/detail/698430-2026"
     },
     {
-      "id": "700109-2026",
-      "title": "Maanteiden hoitourakka Lahti 2027-2030",
+      "id": "698057-2026",
+      "title": "Maanteiden hoitourakka Kristiinankaupunki 2027-2032",
       "buyer": "ELY-keskukset / elinvoimakeskukset",
       "category": "Teiden kunnossapito",
-      "region": "Päijät-Häme",
+      "region": "Pohjanmaa",
       "region_from_llm": true,
-      "deadline": "2027-02-16",
-      "days_left": 110,
-      "period": "2027–2030",
-      "option_years": null,
+      "deadline": "2026-12-01",
+      "days_left": 33,
+      "period": "2027–2032",
+      "option_years": 0.0,
       "estimated_value_eur": null,
       "recommendation": "Harkitse",
       "score": 62,
@@ -2014,38 +1625,115 @@
       "competition": 3,
       "risk": 2,
       "expected_bids": 3.5,
-      "summary": "Lahden maanteiden hoitourakka 2027–2030 (noin 1140 km). Erittäin vaativa urakka.",
-      "fit_reason": "Vahvaa ydinosaamisaluetta sisältäen vaativaa talvi- ja kesähoitoa.",
-      "risk_reason": "Erittäin vaativa urakka vilkkaasti liikennöidyillä teillä ja tavoitehintamalli ilman indeksiehtoa. Aiempi voittaja mm. Destia.",
+      "summary": "Kristiinankaupungin maanteiden hoitourakka 2027-2032, noin 900 km tiestöä. Perusurakka.",
+      "fit_reason": "Perusurakan vaativuustaso sopii erinomaisesti keskisuuren urakoitsijan profiiliin ja kalustolle.",
+      "risk_reason": "Pitkä sopimuskausi ilman indeksiehtoa ja tavoitehintamalli tuovat riskiä.",
       "questions": [
-        "Riittääkö kalustokapasiteetti vilkkaiden Ise-luokan väylien hoitoon?",
-        "Miten liikenteenohjaus ja turvallisuus organisoidaan monikaistateillä?"
+        "Miten alueen resursointi järjestetään muihin urakoihin nähden?"
       ],
-      "road_km": 1140.0,
-      "gravel_road_km": 300.0,
-      "high_class_winter_km": 335.0,
-      "cycleway_km": 125.0,
-      "difficulty": "erittäin vaativa urakka",
+      "road_km": 900.0,
+      "gravel_road_km": 245.0,
+      "high_class_winter_km": 130.0,
+      "cycleway_km": 45.0,
+      "difficulty": "perusurakka",
       "resource_notes": [
-        "Erittäin korkea korkean talvihoitoluokan määrä (335 km Ise/Is-teitä)",
-        "Erittäin vaativa urakka vilkasliikenteisillä monikaistateillä",
-        "Tavoitehintainen palvelusopimus 3 vuodelle"
+        "Perusurakan vaatimustaso",
+        "Hoidonjohtotehtävät"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
           "company": "Destia Oy",
-          "wins": 2
-        },
-        {
-          "company": "Capelon Oy",
-          "wins": 1
-        },
-        {
-          "company": "Tekniikka-Tuominen Oy",
           "wins": 1
         }
       ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/700109-2026"
+      "url": "https://ted.europa.eu/fi/notice/-/detail/698057-2026"
+    },
+    {
+      "id": "698225-2026",
+      "title": "Maanteiden hoitourakka Savonlinna 2027-2032",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Etelä-Savo",
+      "region_from_llm": true,
+      "deadline": "2027-01-26",
+      "days_left": 89,
+      "period": "2027–2032",
+      "option_years": 0.0,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 62,
+      "fit": 5,
+      "competition": 3,
+      "risk": 2,
+      "expected_bids": 3.5,
+      "summary": "Savonlinnan maanteiden hoitourakka 2027-2032, noin 1 110 km tiestöä. Perusurakka.",
+      "fit_reason": "Savonlinnan perusurakka sopii erinomaisesti profiiliin ja kokoluokkaan.",
+      "risk_reason": "Pitkä sopimuskausi ja tavoitehintaisuus ilman selkeää indeksiä.",
+      "questions": [
+        "Onko alueella paikallista kalustoa ja henkilöstöä valmiina?"
+      ],
+      "road_km": 1110.0,
+      "gravel_road_km": 460.0,
+      "high_class_winter_km": 75.0,
+      "cycleway_km": 45.0,
+      "difficulty": "perusurakka",
+      "resource_notes": [
+        "Hoidonjohtotehtävät ja hoitotöiden hankinnat",
+        "Laaja soratieosuus"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Destia Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/698225-2026"
     },
     {
       "id": "696737-2026",
@@ -2060,16 +1748,17 @@
       "option_years": null,
       "estimated_value_eur": null,
       "recommendation": "Harkitse",
-      "score": 60,
-      "fit": 4,
+      "score": 62,
+      "fit": 5,
       "competition": 3,
-      "risk": 3,
+      "risk": 2,
       "expected_bids": 3.5,
-      "summary": "Keuruun maanteiden hoitourakka vuosille 2027-2032, laajuus noin 840 km.",
-      "fit_reason": "Sopii kokonsa puolesta profiiliin, maanteiden hoito on ydintä.",
-      "risk_reason": "Pitkä sopimuskausi vuoteen 2032 saakka ilman mainittua indeksiehtoa.",
+      "summary": "Keuruun urakka-alueen maanteiden kesä- ja talvihoito vuosina 2027-2032, noin 840 km tiestöä.",
+      "fit_reason": "Keuruun hoitourakka vastaa suoraan yhtiön vahvuuksia maanteiden kunnossapidossa.",
+      "risk_reason": "Pitkä sopimuskausi vuoteen 2032 asti ja suuri soratieosuus ilman indeksiehtoa tuovat riskiä.",
       "questions": [
-        "Miten pitkän sopimuskauden kustannusriskit on katettu?"
+        "Miten pitkän sopimuskauden kustannusvaihtelut on katettu?",
+        "Millainen resursointi vaaditaan sorateiden kunnossapitoon?"
       ],
       "road_km": 840.0,
       "gravel_road_km": 440.0,
@@ -2077,10 +1766,33 @@
       "cycleway_km": 30.0,
       "difficulty": "perusurakka",
       "resource_notes": [
-        "Sorateitä noin 440 km",
-        "Is 1-ajorataista noin 30 km",
-        "Kävely- ja pyöräilyväyliä noin 30 km",
-        "Hoidonjohtotehtävät kuuluu urakoitsijalle"
+        "Tavoitehintainen palvelusopimus",
+        "Hoidonjohtotehtävät ja hankinnat kuuluvat urakoitsijalle",
+        "Vaativuusluokka perusurakka",
+        "Aiemmat voittajat alueella Destia, Flowplus ja Sähkö Via"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
@@ -2099,15 +1811,155 @@
       "url": "https://ted.europa.eu/fi/notice/-/detail/696737-2026"
     },
     {
-      "id": "697105-2026",
-      "title": "Maanteiden hoitourakka Kiuruvesi 2027-2029",
+      "id": "697236-2026",
+      "title": "Maanteiden hoitourakka Loimaa 2027-2030",
       "buyer": "ELY-keskukset / elinvoimakeskukset",
       "category": "Teiden kunnossapito",
-      "region": "Pohjois-Savo",
+      "region": "Varsinais-Suomi",
+      "region_from_llm": true,
+      "deadline": "2027-03-16",
+      "days_left": 138,
+      "period": "2027–2030",
+      "option_years": null,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 62,
+      "fit": 5,
+      "competition": 3,
+      "risk": 2,
+      "expected_bids": 3.5,
+      "summary": "Loimaan alueen maanteiden hoitourakka vuosille 2027-2030, noin 750 km tiestöä.",
+      "fit_reason": "Loimaan perusurakka vastaa erinomaisesti keskisuuren infraurakoitsijan profiilia ja kalustoa.",
+      "risk_reason": "Perusurakka kohtuullisella sopimuskaudella, tavoitehintamalli vaatii kuitenkin tarkkaa seurantaa.",
+      "questions": [
+        "Onko alueella paikallista kalustoa saatavilla sopivasti?"
+      ],
+      "road_km": 750.0,
+      "gravel_road_km": 250.0,
+      "high_class_winter_km": 150.0,
+      "cycleway_km": 20.0,
+      "difficulty": "perusurakka",
+      "resource_notes": [
+        "Is 1-ajorataista noin 150 km",
+        "Ib 1-ajorataista noin 115 km",
+        "Ic 1-ajorataista noin 30 km"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Destia Oy",
+          "wins": 4
+        },
+        {
+          "company": "Betonilaatta Oy",
+          "wins": 1
+        },
+        {
+          "company": "ETH Group Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/697236-2026"
+    },
+    {
+      "id": "699504-2026",
+      "title": "Maanteiden hoitourakka Merikarvia 2027-2031",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Satakunta",
       "region_from_llm": true,
       "deadline": "2027-04-06",
       "days_left": 159,
-      "period": "2027–2029",
+      "period": "2027–2031",
+      "option_years": null,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 62,
+      "fit": 5,
+      "competition": 3,
+      "risk": 2,
+      "expected_bids": 3.5,
+      "summary": "Merikarvian urakka-alueen maanteiden kesä- ja talvihoito vuosina 2027-2031, noin 525 km tiestöä.",
+      "fit_reason": "Merikarvian hoitourakka on profiiliin sopiva maanteiden kunnossapitotehtävä.",
+      "risk_reason": "Tavoitehintamalli ja neljän vuoden sopimuskausi ilman indeksiehtoa luovat kaupallista riskiä.",
+      "questions": [
+        "Onko talvihoidon kalustoresurssi riittävä suhteessa vaatimuksiin?",
+        "Miten tavoitehintariski hallitaan sopimuskauden aikana?"
+      ],
+      "road_km": 525.0,
+      "gravel_road_km": 180.0,
+      "high_class_winter_km": 80.0,
+      "cycleway_km": 40.0,
+      "difficulty": "perusurakka",
+      "resource_notes": [
+        "Sopimuskausi 2027-2031",
+        "Tavoitehintainen palvelusopimus",
+        "Vaativuusluokka perusurakka",
+        "Vertailuhinta 65 % ja laatulupaukset 18 %"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "PAV Oy Ab",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/699504-2026"
+    },
+    {
+      "id": "700025-2026",
+      "title": "Maanteiden hoitourakka Jyväskylä 2027-2031",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Keski-Suomi",
+      "region_from_llm": true,
+      "deadline": "2027-03-16",
+      "days_left": 138,
+      "period": "2027–2031",
       "option_years": null,
       "estimated_value_eur": null,
       "recommendation": "Harkitse",
@@ -2116,30 +1968,348 @@
       "competition": 3,
       "risk": 3,
       "expected_bids": 3.5,
-      "summary": "Kiuruveden maanteiden hoitourakka vuosille 2027-2029, pituus noin 510 km. Usein kilpailutettu alue.",
-      "fit_reason": "Vastaa hyvin yrityksen profiilia, mutta suuri sorateiden osuus vaatii sopivaa kalustoa.",
-      "risk_reason": "Korkea sorateiden osuus suhteessa kokonaispituuteen.",
+      "summary": "Jyväskylän maanteiden hoitourakka vuosille 2027-2031, noin 1 180 km tiestöä.",
+      "fit_reason": "Jyväskylän hoitourakka sopii profiiliin, mutta luokitus on erittäin vaativa vilkkaiden teiden vuoksi. Vaatii vahvaa kalustoa ja resursseja.",
+      "risk_reason": "Erittäin vaativa urakka vilkkaasti liikennöidyillä teillä kasvattaa talvi-, päivystys- ja laatupenaltiriskiä.",
       "questions": [
-        "Riittääkö sorateiden kunnossapitokalusto tälle alueelle?"
+        "Riittävätkö resurssit Ise-luokan talvihoidon vaatimuksiin?",
+        "Miten hoidonjohto on resursoitu näin vilkkaalla alueella?"
       ],
-      "road_km": 510.0,
-      "gravel_road_km": 335.0,
-      "high_class_winter_km": 15.0,
-      "cycleway_km": 20.0,
-      "difficulty": "perusurakka",
+      "road_km": 1180.0,
+      "gravel_road_km": 390.0,
+      "high_class_winter_km": 300.0,
+      "cycleway_km": 205.0,
+      "difficulty": "erittäin vaativa urakka",
       "resource_notes": [
-        "Sorateitä noin 335 km",
-        "Is 1-ajorataista noin 15 km",
-        "Kävely- ja pyöräilyväyliä noin 20 km",
-        "Hoidonjohtotehtävät kuuluu urakoitsijalle"
+        "Ise 2-ajorataista noin 65 km",
+        "Ise 1-ajorataista noin 50 km",
+        "Is 1-ajorataista noin 185 km"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
       ],
       "past_winners": [
         {
-          "company": "Savon Kuljetus Oy",
-          "wins": 3
+          "company": "Destia Oy",
+          "wins": 2
+        },
+        {
+          "company": "Flowplus Oy",
+          "wins": 1
+        },
+        {
+          "company": "Sähkö Via Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/700025-2026"
+    },
+    {
+      "id": "697571-2026",
+      "title": "Maanteiden hoitourakka Rovaniemi 2027-2032",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Lappi",
+      "region_from_llm": true,
+      "deadline": "2027-01-26",
+      "days_left": 89,
+      "period": "2027–2032",
+      "option_years": null,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 60,
+      "fit": 4,
+      "competition": 3,
+      "risk": 3,
+      "expected_bids": 3.5,
+      "summary": "Rovaniemen maanteiden hoitourakka vuosille 2027-2032. Tilaaja ELY-keskus.",
+      "fit_reason": "Vastaa hyvin yhtiön ydinliiketoimintaa maanteiden hoidossa, mutta vaativa urakka ja Lapin olosuhteet vaativat erityispanostusta kalustoon.",
+      "risk_reason": "Pitkä sopimuskausi ilman selkeää indeksiehtoa ja Lapin vaativat sääolosuhteet kasvattavat riskiä.",
+      "questions": [
+        "Miten varmistetaan riittävä kalustoresurssi Lapin alueella?",
+        "Onko tarjouslaskennassa huomioitu tavoitehintaisen sopimusmallin riskit?"
+      ],
+      "road_km": 1090.0,
+      "gravel_road_km": 410.0,
+      "high_class_winter_km": 105.0,
+      "cycleway_km": 115.0,
+      "difficulty": "vaativa urakka",
+      "resource_notes": [
+        "Talvihoitoluokka Is 105 km",
+        "Sorateitä 410 km",
+        "Kävely- ja pyöräilyväyliä 115 km",
+        "Hoidonjohtotehtävät kuuluvat urakoitsijalle"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Alltime Suomi Oy",
+          "wins": 2
+        },
+        {
+          "company": "Pimara Väyläpalvelut Oy",
+          "wins": 2
+        },
+        {
+          "company": "Aventi Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/697571-2026"
+    },
+    {
+      "id": "697187-2026",
+      "title": "Maanteiden hoitourakka Imatra 2027-2032",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Etelä-Karjala",
+      "region_from_llm": true,
+      "deadline": "2027-01-26",
+      "days_left": 89,
+      "period": "2027–2032",
+      "option_years": 0.0,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 60,
+      "fit": 4,
+      "competition": 3,
+      "risk": 3,
+      "expected_bids": 3.5,
+      "summary": "Imatran maanteiden hoitourakka vuosille 2027-2032. Tilaaja ELY-keskus.",
+      "fit_reason": "Sopii hyvin yhtiön profiiliin ja maanteiden hoito-osaamiseen.",
+      "risk_reason": "Pitkä sopimuskausi ja tavoitehintamalli tuovat kaupallista riskiä.",
+      "questions": [
+        "Millainen on alueen alihankintaverkosto talvikunnossapidossa?"
+      ],
+      "road_km": 1015.0,
+      "gravel_road_km": 325.0,
+      "high_class_winter_km": 35.0,
+      "cycleway_km": 75.0,
+      "difficulty": "vaativa urakka",
+      "resource_notes": [
+        "Talvihoitoluokka Ise ja Is yhteensä 35 km",
+        "Sorateitä 325 km",
+        "Kävely- ja pyöräilyväyliä 75 km",
+        "Hoidonjohtotehtävät urakoitsijalle"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Aventi Oy",
+          "wins": 1
         },
         {
           "company": "Destia Oy",
+          "wins": 1
+        },
+        {
+          "company": "Eltel Networks Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/697187-2026"
+    },
+    {
+      "id": "698165-2026",
+      "title": "Maanteiden hoitourakka Pello 2027-2032",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Lappi",
+      "region_from_llm": true,
+      "deadline": "2027-02-16",
+      "days_left": 110,
+      "period": "2027–2032",
+      "option_years": 0.0,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 60,
+      "fit": 4,
+      "competition": 3,
+      "risk": 3,
+      "expected_bids": 3.5,
+      "summary": "Pellon maanteiden hoitourakka vuosille 2027-2032. Tilaaja ELY-keskus.",
+      "fit_reason": "Perusurakka soveltuu kokonsa puolesta hyvin, vaikka maantieteellinen sijainti vaatii pohjoisen kalustoa.",
+      "risk_reason": "Pohjoiset talviolosuhteet ja pitkä sopimuskausi ilman selkeää suojausta.",
+      "questions": [
+        "Onko meillä paikallisia kumppaneita Pellon alueella?"
+      ],
+      "road_km": 720.0,
+      "gravel_road_km": 240.0,
+      "high_class_winter_km": null,
+      "cycleway_km": 45.0,
+      "difficulty": "perusurakka",
+      "resource_notes": [
+        "Sorateitä 240 km",
+        "Kävely- ja pyöräilyväyliä 45 km",
+        "Hoidonjohtotehtävät urakoitsijalle",
+        "Pohjoiset talviolosuhteet"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Alltime Suomi Oy",
+          "wins": 2
+        },
+        {
+          "company": "Pimara Väyläpalvelut Oy",
+          "wins": 2
+        },
+        {
+          "company": "Aventi Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/698165-2026"
+    },
+    {
+      "id": "696691-2026",
+      "title": "Maanteiden hoitourakka Siikalatva 2027-2032",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Pohjois-Pohjanmaa",
+      "region_from_llm": true,
+      "deadline": "2027-03-16",
+      "days_left": 138,
+      "period": "2027–2032",
+      "option_years": null,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 60,
+      "fit": 4,
+      "competition": 3,
+      "risk": 3,
+      "expected_bids": 3.5,
+      "summary": "Siikalatvan maanteiden hoitourakka vuosille 2027-2032, noin 785 km tiestöä.",
+      "fit_reason": "Siikalatvan hoitourakka sopii ydinliiketoimintaan, mutta sisältää erillistehtäviä.",
+      "risk_reason": "Pitkä 5 vuoden sopimuskausi ja vesitalousosaston tehtävät tuovat lisävastuita.",
+      "questions": [
+        "Miten vesitalousosaston tehtävät on hinnoiteltu ja resursoitu?"
+      ],
+      "road_km": 785.0,
+      "gravel_road_km": 305.0,
+      "high_class_winter_km": 60.0,
+      "cycleway_km": 15.0,
+      "difficulty": "perusurakka",
+      "resource_notes": [
+        "Vesitalousosaston tehtävät sisältyvät urakkaan",
+        "Is 1-ajorataista noin 60 km"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Destia Oy",
+          "wins": 3
+        },
+        {
+          "company": "Oulun Konetyö Oy",
           "wins": 2
         },
         {
@@ -2147,7 +2317,301 @@
           "wins": 2
         }
       ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/697105-2026"
+      "url": "https://ted.europa.eu/fi/notice/-/detail/696691-2026"
+    },
+    {
+      "id": "697627-2026",
+      "title": "Maanteiden hoitourakka Heinola 2027-2030",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Päijät-Häme",
+      "region_from_llm": true,
+      "deadline": "2027-03-16",
+      "days_left": 138,
+      "period": "2027–2030",
+      "option_years": 0.0,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 60,
+      "fit": 4,
+      "competition": 3,
+      "risk": 3,
+      "expected_bids": 3.5,
+      "summary": "Heinolan maanteiden hoitourakka vuosille 2027-2030, noin 1 000 km tiestöä.",
+      "fit_reason": "Heinolan alueen vaativa maantiehoitourakka sopii yrityksen osaamisalueelle. Laaja kevyen liikenteen verk.",
+      "risk_reason": "Vaativa urakka ja merkittävä määrä pyöräteiden hoitoa nostavat talvihoidon riskejä.",
+      "questions": [
+        "Miten kevyen liikenteen väylien korkeat hoitoluokat on kalustettu?"
+      ],
+      "road_km": 1000.0,
+      "gravel_road_km": 435.0,
+      "high_class_winter_km": 125.0,
+      "cycleway_km": 90.0,
+      "difficulty": "vaativa urakka",
+      "resource_notes": [
+        "Ise 2-ajorataista noin 30 km",
+        "Ise 1-ajorataista noin 40 km",
+        "Laaja kevyen liikenteen verkko"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Destia Oy",
+          "wins": 2
+        },
+        {
+          "company": "Capelon Oy",
+          "wins": 1
+        },
+        {
+          "company": "Tekniikka-Tuominen Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/697627-2026"
+    },
+    {
+      "id": "700109-2026",
+      "title": "Maanteiden hoitourakka Lahti 2027-2030",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Päijät-Häme",
+      "region_from_llm": true,
+      "deadline": "2027-02-16",
+      "days_left": 110,
+      "period": "2027–2030",
+      "option_years": null,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 52,
+      "fit": 4,
+      "competition": 3,
+      "risk": 2,
+      "expected_bids": 3.5,
+      "summary": "Lahden maanteiden hoitourakka vuosille 2027-2030. Tilaaja ELY-keskus.",
+      "fit_reason": "Vastaa yhtiön osaamista, mutta erittäin vaativa urakka vilkkailla teillä vaatii korkeaa laatua.",
+      "risk_reason": "Erittäin vaativa urakka vilkkaasti liikennöidyillä monikaistateillä nostaa toteutusriskiä.",
+      "questions": [
+        "Riittävätkö resurssit Ise-luokan teiden hoitoon ruuhka-Suomessa?"
+      ],
+      "road_km": 1140.0,
+      "gravel_road_km": 300.0,
+      "high_class_winter_km": 120.0,
+      "cycleway_km": 125.0,
+      "difficulty": "erittäin vaativa urakka",
+      "resource_notes": [
+        "Talvihoitoluokka Ise 115 km",
+        "Sorateitä 300 km",
+        "Kävely- ja pyöräilyväyliä 125 km",
+        "Vilkkaat monikaistatiet"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Destia Oy",
+          "wins": 2
+        },
+        {
+          "company": "Capelon Oy",
+          "wins": 1
+        },
+        {
+          "company": "Tekniikka-Tuominen Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/700109-2026"
+    },
+    {
+      "id": "749002-2026",
+      "title": "Maanteiden hoitourakka Oulu 2027-2032",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Pohjois-Pohjanmaa",
+      "region_from_llm": true,
+      "deadline": "2026-12-01",
+      "days_left": 33,
+      "period": "2027–2032",
+      "option_years": null,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 52,
+      "fit": 4,
+      "competition": 3,
+      "risk": 2,
+      "expected_bids": 3.5,
+      "summary": "Oulun maanteiden hoitourakka vuosille 2027-2032. Sisältää kesä- ja talvihoidon, MDSS-järjestelmän sekä vesitalousosaston tehtävät.",
+      "fit_reason": "Kohde kuuluu ydinosaamiseen (maanteiden hoito), mutta vaativuustaso on erittäin vaativa ja hinta-painotus (65 %) on merkittävä.",
+      "risk_reason": "Pitkä sopimuskausi ja tavoitehintainen palvelusopimus ilman ilmoitettua indeksiehtoa nostavat kaupallista riskiä.",
+      "questions": [
+        "Miten varmistetaan talvihoidon kalustoresurssit ja MDSS-järjestelmän osaaminen?",
+        "Onko sopimuksessa hintaindeksiehtoa, vaikka sitä ei tiedoissa mainittu?"
+      ],
+      "road_km": 1285.0,
+      "gravel_road_km": 285.0,
+      "high_class_winter_km": 270.0,
+      "cycleway_km": 170.0,
+      "difficulty": "erittäin vaativa urakka",
+      "resource_notes": [
+        "Edellyttää MDSS-järjestelmän hyödyntämistä",
+        "Vesitalousosaston tehtävät sisältyvät urakkaan",
+        "Laaja kalustotarve talvihoitoon"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Destia Oy",
+          "wins": 3
+        },
+        {
+          "company": "Oulun Konetyö Oy",
+          "wins": 2
+        },
+        {
+          "company": "YIT Road Oy",
+          "wins": 2
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/749002-2026"
+    },
+    {
+      "id": "699348-2026",
+      "title": "Maanteiden hoitourakka Tampere 2027-2032",
+      "buyer": "ELY-keskukset / elinvoimakeskukset",
+      "category": "Teiden kunnossapito",
+      "region": "Pirkanmaa",
+      "region_from_llm": true,
+      "deadline": "2027-01-26",
+      "days_left": 89,
+      "period": "2027–2032",
+      "option_years": null,
+      "estimated_value_eur": null,
+      "recommendation": "Harkitse",
+      "score": 52,
+      "fit": 4,
+      "competition": 3,
+      "risk": 2,
+      "expected_bids": 3.5,
+      "summary": "Tampereen maanteiden hoitourakka 2027-2032, noin 900 km tiestöä. Erittäin vaativa urakka.",
+      "fit_reason": "Tampereen vilkas liikenneympäristö ja erittäin vaativa taso edellyttävät vahvaa kokemusta.",
+      "risk_reason": "Vilkas liikenneympäristö ja pitkä sopimuskausi kasvattavat riskilukuja.",
+      "questions": [
+        "Miten hallitaan vilkkaan alueen työturvallisuus ja ruuhkahaitat?"
+      ],
+      "road_km": 900.0,
+      "gravel_road_km": 115.0,
+      "high_class_winter_km": 315.0,
+      "cycleway_km": 150.0,
+      "difficulty": "erittäin vaativa urakka",
+      "resource_notes": [
+        "Vilkas liikenneympäristö",
+        "MDSS-järjestelmän hyödyntäminen",
+        "Laaja korkean luokan talvihoito"
+      ],
+      "price_share": 0.65,
+      "award_criteria": [
+        {
+          "name": "Vertailuhinta",
+          "kind": "price",
+          "share": 0.65
+        },
+        {
+          "name": "Laatulupaukset",
+          "kind": "quality",
+          "share": 0.18
+        },
+        {
+          "name": "Vastuuhenkilöiden asiantuntijatentti",
+          "kind": "quality",
+          "share": 0.1
+        },
+        {
+          "name": "Talvihoidon kalustoresurssi",
+          "kind": "quality",
+          "share": 0.07
+        }
+      ],
+      "past_winners": [
+        {
+          "company": "Destia Oy",
+          "wins": 4
+        },
+        {
+          "company": "Pimara Väyläpalvelut Oy",
+          "wins": 2
+        },
+        {
+          "company": "Cramo Finland Oy",
+          "wins": 1
+        }
+      ],
+      "url": "https://ted.europa.eu/fi/notice/-/detail/699348-2026"
     },
     {
       "id": "734981-2026",
@@ -2167,12 +2631,12 @@
       "competition": 2,
       "risk": 4,
       "expected_bids": 3.9,
-      "summary": "Raision kaupungin ulkovalaistuksen hoito- ja kunnossapitopalvelut katualueilla ja kiinteistöillä 2027–2028.",
-      "fit_reason": "Katuvalaistuksen kunnossapito liittyy kunnossapitoon, mutta on valaistustekninen erikoisala. Alueella aiemmin voittanut mm. Destia Oy.",
-      "risk_reason": "Lyhyt kaksivuotinen sopimuskausi pienentää pitkän aikavälin sitoutumisriskiä, vaikkakin vaatii tehokkaan haltuunoton.",
+      "summary": "Raision kaupungin ulkovalaistuksen kunnossapito ja hoito vuosina 2027–2028.",
+      "fit_reason": "Ulkovalaistuksen hoito kuuluu osittain osaamisalueeseen. Vertailoperusteena 100 % hinta, mikä edellyttää erittäin kilpailukykyistä hinnoittelua. Alueella aiemmin voittanut mm. Destia Oy.",
+      "risk_reason": "Lyhyt kaksivuotinen sopimuskausi ilman ilmoitettua indeksiehtoa, mutta kohde on paikallinen ja rajattu.",
       "questions": [
-        "Onko sähkö- ja valaistusverkkokalusto ja -henkilöstö valmiina Raision alueella?",
-        "Sisältyykö sopimukseen 24/7 päivystysvelvoitetta?"
+        "Onko paikallisalueella riittävästi sähköasentajaresursseja?",
+        "Katetaanko tarjouksella kaikki sopimuksenmukaiset kiinteistöt ja yleiset alueet?"
       ],
       "road_km": null,
       "gravel_road_km": null,
@@ -2180,7 +2644,16 @@
       "cycleway_km": null,
       "difficulty": null,
       "resource_notes": [
-        "Sopimuskausi 2027–2028"
+        "Ulkovalaistusverkon kunnossapito",
+        "Kaduilla, kiinteistöillä ja yleisillä alueilla"
+      ],
+      "price_share": 1.0,
+      "award_criteria": [
+        {
+          "name": "Kokonaishinta",
+          "kind": "price",
+          "share": 1.0
+        }
       ],
       "past_winners": [
         {
@@ -2216,12 +2689,12 @@
       "competition": 2,
       "risk": 2,
       "expected_bids": 3.9,
-      "summary": "Vaasan kaupungin sekä Fintrafficin liikenteenhallintalaitteiden ja valaistusverkon ylläpito sekä 24/7 hätätyöpäivystys usealla paikkakunnalla.",
-      "fit_reason": "Kyseessä on erikoistunut liikenteenhallinta- ja ulkovalaistuksen huoltourakka, joka eroaa urakoitsijan ydinalueesta eli maantien- ja kadunhoidosta.",
-      "risk_reason": "Tiukat vasteajat hätätyöpäivystyksessä laajalla alueella ja vaativa 24/7-valmius lisäävät toiminnallista riskiä.",
+      "summary": "Vaasan kaupungin ja Fintrafficin katu- ja liikennevalojen sekä ulkovalaistuksen ylläpito- ja hätätyöpäivystysurakka.",
+      "fit_reason": "Sähkö-, liikennevalo- ja ulkovalaistusverkon ylläpito vaatii erikoisosaamista ja -kalustoa. Halvin hinta ratkaisee, mikä korostaa tiukkaa kulurakennetta.",
+      "risk_reason": "Laaja maantieteellinen alue (2h–3h vasteajat) ja 24/7 päivystysvelvoite aiheuttavat merkittävän operaatioriskin.",
       "questions": [
-        "Riittääkö oma talonsisäinen osaaminen Keylight-, C2SmartLight-, Tmacs- ja RMS-järjestelmien hallintaan?",
-        "Miten 2-3 tunnin vasteajat saavutetaan maantieteellisesti hajautetuissa päivystyskohteissa?"
+        "Riittääkö oma asentaja- ja päivystyskapasiteetti tiukkoihin vasteaikoihin laajalla alueella?",
+        "Onko Keylight- ja C2SmartLight-järjestelmien osaaminen riittävällä tasolla?"
       ],
       "road_km": null,
       "gravel_road_km": null,
@@ -2229,10 +2702,13 @@
       "cycleway_km": null,
       "difficulty": null,
       "resource_notes": [
-        "24/7 hätätyöpäivystys ja tiukat vasteajat (2-3 h)",
-        "Noin 19 000 valaisinta",
-        "54 liikennevaloristeystä Vaasassa ja lähikunnissa"
+        "19 000 valaisimen ulkovalaistusverkko",
+        "54 liikennevaloristeystä",
+        "24/7 hätätyöpäivystys",
+        "Tiukat vasteajat (2-3 h)"
       ],
+      "price_share": 1.0,
+      "award_criteria": [],
       "past_winners": [
         {
           "company": "Destia Oy",
@@ -2259,12 +2735,12 @@
       "competition": 2,
       "risk": 3,
       "expected_bids": 4.5,
-      "summary": "Puolustusvoimien kuiturakentamisen ja kaapeliverkon ylläpidon puitesopimus vuosille 2027–2030 varuskunta- ja harjoitusalueilla.",
-      "fit_reason": "Urakka edellyttää erikoistunutta kuitu- ja kaapelirakentamista, joka tarjoajan profiilin mukaan vaatii aliurakoitsijan ja on pois ydinosaamisalueelta.",
-      "risk_reason": "Puolustusvoimien turvallisuusluokitellut alueet asettavat tiukkoja vaatimuksia henkilöstölle ja toiminnalle.",
+      "summary": "Puolustusvoimien kuiturakentamisen ja kaapeliverkon ylläpidon puitesopimus vuosille 2027–2030.",
+      "fit_reason": "Erikoistunut kuitu- ja tietoliikennerakentaminen ei kuulu tarjoajan omaan ydinosaamiseen ilman aliurakoitsijoita. Pelkkä hinta vertailuperusteena.",
+      "risk_reason": "Turvallisuusluokitellut kohteet ja mahdolliset vesistökaapeloinnit lisäävät toteutusriskiä.",
       "questions": [
-        "Löytyykö luotettava aliurakoitsijakumppani kuitu- ja kuparikaapeliasennuksiin?",
-        "Täyttääkö henkilöstö Puolustusvoimien turvallisuusselvitysvaatimukset?"
+        "Löytyykö luotettava aliurakoitsija kuitu- ja kupariasennuksiin?",
+        "Onko henkilöstöllä tarvittavat turvallisuusselvitykset kunnossa?"
       ],
       "road_km": null,
       "gravel_road_km": null,
@@ -2272,10 +2748,12 @@
       "cycleway_km": null,
       "difficulty": null,
       "resource_notes": [
-        "Vähäisessä määrin vesistökaapelin asennusta",
-        "Kuparikaapeleiden asennustyöt",
-        "Puitesopimus 1 toimittajan kanssa"
+        "Kuitu- ja kuparikaapelointi",
+        "Varuskunta- ja harjoitusalueet",
+        "Vähäistä vesistökaapelin asennusta"
       ],
+      "price_share": 1.0,
+      "award_criteria": [],
       "past_winners": [
         {
           "company": "TLT-Connection Oy",
@@ -2313,6 +2791,32 @@
       "value": 0.6818181818181818,
       "n": 22,
       "label": "Arvo täsmää (±5 %)"
+    }
+  ],
+  "criteria": [
+    {
+      "band": "Pelkkä hinta",
+      "awards": 131,
+      "avg_bids": 4.3,
+      "share_low_competition": 0.3435114503816794
+    },
+    {
+      "band": "Hinta 70–99 %",
+      "awards": 33,
+      "avg_bids": 4.5,
+      "share_low_competition": 0.15151515151515152
+    },
+    {
+      "band": "Hinta 50–69 %",
+      "awards": 35,
+      "avg_bids": 4.2,
+      "share_low_competition": 0.05714285714285714
+    },
+    {
+      "band": "Hinta alle 50 %",
+      "awards": 1,
+      "avg_bids": 2.0,
+      "share_low_competition": 1.0
     }
   ],
   "bid_backtest": {
