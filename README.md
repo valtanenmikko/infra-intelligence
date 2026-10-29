@@ -114,6 +114,12 @@ by Jensen's inequality the average of 1 / bids is larger than 1 / average bids (
 mean 0.47). Real win rates depend on price competitiveness, which public data does not show, and tenders are
 assumed independent although the competitors overlap. The math was checked against brute-force enumeration.
 
+Capacity can be set as a number of contracts or as road kilometres, since road length drives equipment and staff
+in maintenance contracts (510–1 285 km here). With sizes the choice becomes a knapsack-type problem where the greedy
+order fails: by value it reached 69.9 of an optimal 83.3 at 2 000 km. The planner starts from the better of value
+order and value-per-km order and improves it by dropping and refilling one tender at a time; on the published data
+this matched brute-force optima at 1 000–2 000 km and was within 1 % at 3 000 km.
+
 **Privacy by default.** Sole traders often trade under a personal name. A winner's name is published only if PRH
 open data knows the ID as a company that is not a sole trader; others are grouped as *Muut toimijat*. A Gold
 assertion fails the run if a hidden name leaks, and tender descriptions are not exported to the site.
