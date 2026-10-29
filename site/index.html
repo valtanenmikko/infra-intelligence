@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <a class="skip-link" href="#main">Siirry sisältöön</a>
@@ -72,7 +72,7 @@
       <div class="section-head">
         <p class="eyebrow">01 · Tarjousäly</p>
         <h2 id="tenders-title">Avoimet kilpailutukset</h2>
-        <p class="section-note">Tekoäly arvioi soveltuvuuden ja riskit esimerkkiprofiilille. Kilpailutekijä lasketaan historian tarjousmääristä, ja pisteet tulevat kiinteästä kaavasta.</p>
+        <p class="section-note">Tekoäly arvioi soveltuvuuden ja riskit esimerkkiprofiilille. Kilpailutekijä lasketaan historian tarjousmääristä, ja pisteet tulevat kiinteästä kaavasta. <a href="#scoring">Miten pisteet lasketaan</a></p>
       </div>
       <div class="filters" role="group" aria-label="Suodata kilpailutuksia">
         <label>Luokka <select id="tender-category"></select></label>
@@ -150,6 +150,17 @@
         <p class="section-note">LLM ei näe TEDin rakenteista maakunta- eikä arvotietoa, joten niitä käytetään vertailukohtana.</p>
         <dl id="eval-tiles" class="tiles"></dl>
       </div>
+      <div id="scoring">
+        <h3>Go/no-go-pisteet</h3>
+        <p class="section-note">Tekoäly antaa kaksi arviota perusteluineen, kilpailutekijä lasketaan historiasta ja pisteet kiinteästä kaavasta. Tulos on siksi toistettava.</p>
+        <ul class="limits">
+          <li><strong>Soveltuvuus 40 %</strong> – tekoäly arvioi 1–5, kuinka hyvin työ vastaa esimerkkiurakoitsijan profiilia.</li>
+          <li><strong>Kilpailu 30 %</strong> – odotettu tarjousmäärä tilaajan aiemmista hankinnoista, tasoitettuna luokan keskiarvolla. Mitä vähemmän tarjouksia, sitä parempi.</li>
+          <li><strong>Riski 30 %</strong> – tekoäly arvioi 1–5 sopimuskauden, sanktioiden, päivystyksen ja indeksiehdon perusteella.</li>
+          <li>Painotettu keskiarvo skaalataan 0–100:aan: <strong>Tarjoa</strong> ≥ 65, <strong>Harkitse</strong> ≥ 45. Jos soveltuvuus on 1, suositus on aina ”Ei tarjota”.</li>
+        </ul>
+        <p id="backtest-note" class="callout" hidden></p>
+      </div>
       <h3>Rajoitteet</h3>
       <ul class="limits">
         <li>Mukana vain EU-kynnysarvon ylittävät hankinnat (rakennusurakat noin 5,5 M€), eivät kansalliset pienhankinnat.</li>
@@ -174,6 +185,6 @@
   </footer>
 
   <div id="tooltip" class="tooltip" aria-hidden="true" hidden></div>
-  <script src="app.js?v=4" defer></script>
+  <script src="app.js?v=5" defer></script>
 </body>
 </html>

@@ -68,6 +68,7 @@ QUERIES: dict[str, str] = {
         SELECT metric, value, n FROM workspace.gold.llm_eval_metrics
         WHERE prompt_version = (SELECT max(prompt_version) FROM workspace.gold.llm_eval_metrics)
     """,
+    "bid_backtest": "SELECT metric, value, n FROM workspace.gold.bid_factor_backtest",
 }
 
 INT_FIELDS = {"notices", "awards", "competitions", "open_tenders", "wins", "n", "days_left", "score", "fit",
@@ -136,4 +137,5 @@ def build_site_data(sql: SqlRunner, today: date) -> dict[str, Any]:
         "llm_eval": [
             {**m, "label": EVAL_LABELS[m["metric"]]} for m in data["llm_eval"] if m["metric"] in EVAL_LABELS
         ],
+        "bid_backtest": {m["metric"]: {"value": m["value"], "n": m["n"]} for m in data["bid_backtest"]},
     }

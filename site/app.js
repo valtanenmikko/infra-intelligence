@@ -254,6 +254,21 @@ function renderEval(data) {
       el("dd", {}, fmtPct.format(m.value), el("small", { text: `n = ${fmtInt.format(m.n)}` })))));
 }
 
+function renderBacktest(data) {
+  const b = data.bid_backtest || {};
+  const mae = b.bids_mae_shrunk, cat = b.bids_mae_category, rewin = b.incumbent_rewin_rate, rand = b.random_bidder_win_rate;
+  const parts = [];
+  if (mae && cat) {
+    parts.push(`Takautuva testi: tarjousmäärän ennuste osui keskimäärin ${fmtDec.format(mae.value)} tarjouksen päähän toteutuneesta (${fmtInt.format(mae.n)} ratkaistua hankintaa, pelkällä luokan keskiarvolla ${fmtDec.format(cat.value)}).`);
+  }
+  if (rewin && rand) {
+    parts.push(`Edellinen voittaja voitti seuraavan vastaavan hankinnan ${fmtPct.format(rewin.value)} tapauksista, kun satunnaisen tarjoajan odotusarvo on ${fmtPct.format(rand.value)} (n = ${fmtInt.format(rewin.n)}), joten vakiotoimittajalle ei anneta pisteissä etua.`);
+  }
+  const note = document.getElementById("backtest-note");
+  note.textContent = parts.join(" ");
+  note.hidden = parts.length === 0;
+}
+
 async function main() {
   const res = await fetch("data/site.json", { cache: "no-cache" });
   if (!res.ok) throw new Error(`site.json: ${res.status}`);
@@ -268,6 +283,7 @@ async function main() {
   renderCompetition(data);
   renderBuyers(data);
   renderEval(data);
+  renderBacktest(data);
 }
 
 main().catch((e) => {

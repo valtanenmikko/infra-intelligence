@@ -69,6 +69,7 @@ class FakeSql:
                           "questions": '["Q?"]', "past_winners": None, "option_years": "2.0"}],
         "price_spread": [{"n": "17", "median_spread": "0.35"}],
         "llm_eval": [{"metric": "region_accuracy", "value": "0.9", "n": "400"}, {"metric": "value_without_ted_value", "value": "0.1", "n": "5"}],
+        "bid_backtest": [{"metric": "bids_mae_shrunk", "value": "2.0", "n": "212"}],
     }
 
     def query(self, statement):
@@ -96,6 +97,9 @@ class BuildSiteDataTest(unittest.TestCase):
 
     def test_eval_keeps_labelled_metrics_only(self):
         self.assertEqual(self.data["llm_eval"], [{"metric": "region_accuracy", "value": 0.9, "n": 400, "label": "Maakunta oikein"}])
+
+    def test_bid_backtest_is_keyed_by_metric(self):
+        self.assertEqual(self.data["bid_backtest"], {"bids_mae_shrunk": {"value": 2.0, "n": 212}})
 
     def test_open_tender_title_is_cleaned(self):
         self.assertEqual(self.data["open_tenders"][0]["title"], "Maanteiden hoitourakka Oulu 2027-2032")
