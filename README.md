@@ -19,6 +19,7 @@ register (PRH), and adds a go/no-go assessment for every open tender.
 | Who buys, and is there an incumbent? | Buyer profiles with the most frequent winners and their share |
 | Which open tenders fit us? | Each open competition with history (same buyer, same region) and a go/no-go score |
 | How far apart are bids? | Lowest vs highest bid where both are reported |
+| Which tenders should we bid, given limited equipment and staff? | A bid portfolio that maximises expected value while keeping the chance of winning more contracts than capacity below a set limit |
 
 First findings from 814 notices (1/2024–10/2026):
 
@@ -101,6 +102,14 @@ awards. The score now uses the shrunk estimate. Nesting regional history inside 
 deadline instead of inventing precision. An incumbent bonus was also considered, but the winner of the previous
 comparable award (same buyer, category and region) won the next one in only 23 % of cases (n = 75), below the 33 %
 expected for a random bidder. Past winners are shown to the bid team as context, not scored.
+
+**Recommendations are per tender; capacity is shared.**
+Most bids are lost, so a contractor with capacity for two contracts should bid on more than two. The site's bid
+portfolio planner treats each bid as an independent win with probability 1 / expected bids (an even contest) and
+computes the distribution of wins (Poisson binomial). Tenders are added by expected value (score × win chance)
+as long as the chance of winning more contracts than capacity stays below the chosen limit. With capacity for two,
+it suggests four bids: 1.1 expected wins and a 7 % chance of overcommitting. Real win rates depend on price
+competitiveness, which public data does not show.
 
 **Privacy by default.** Sole traders often trade under a personal name. A winner's name is published only if PRH
 open data knows the ID as a company that is not a sole trader; others are grouped as *Muut toimijat*. A Gold
