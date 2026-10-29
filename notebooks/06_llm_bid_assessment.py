@@ -5,7 +5,10 @@
 # MAGIC **risk**, with reasons. **Competition** comes from historical bid counts, and the score (0–100) and
 # MAGIC recommendation from a fixed formula in `bid_assessment.py`, so the LLM never does the arithmetic.
 # MAGIC
-# MAGIC Each tender is assessed once per `PROMPT_VERSION`, five tenders per request (free tier: 20 requests/day).
+# MAGIC The same call extracts the scope and resource needs stated in the description (road km, winter classes,
+# MAGIC difficulty level, equipment and staffing notes); figures not stated in the text stay null.
+# MAGIC
+# MAGIC Each tender is assessed once per `PROMPT_VERSION`, five tenders per request.
 
 # COMMAND ----------
 
@@ -57,6 +60,15 @@ spark.sql(f"""
     )
     COMMENT 'Go/no-go assessments of open tenders for the example bidder profile'
 """)
+
+# Columns added after the first release (bid-v4 scope and resource needs); ADD COLUMNS keeps older rows
+RESOURCE_COLUMNS = {
+    "road_km": "DOUBLE", "gravel_road_km": "DOUBLE", "high_class_winter_km": "DOUBLE", "cycleway_km": "DOUBLE",
+    "difficulty": "STRING", "resource_notes": "ARRAY<STRING>",
+}
+missing = [f"{c} {t}" for c, t in RESOURCE_COLUMNS.items() if c not in spark.table(TABLE).columns]
+if missing:
+    spark.sql(f"ALTER TABLE {TABLE} ADD COLUMNS ({', '.join(missing)})")
 
 tenders = [
     r.asDict(recursive=True)

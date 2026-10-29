@@ -10,7 +10,7 @@ Split of responsibilities, so the result is reproducible and auditable:
 from dataclasses import dataclass
 from typing import Any
 
-PROMPT_VERSION = "bid-v3"
+PROMPT_VERSION = "bid-v4"
 BATCH_SIZE = 5  # tenders per request
 
 # Example bidder used in the demo. A real deployment would load the company's own profile.
@@ -26,7 +26,20 @@ Rate only what the given text and data support. Write all text in Finnish, short
 fit (1-5): how well the work matches the bidder profile. 5 = core business, 1 = outside capabilities.
 risk (1-5): delivery and commercial risk for the bidder. 5 = low risk, 1 = high risk
   (very long term, heavy penalties or on-call duty, unclear scope, no price index clause on a multi-year contract).
-Mention the incumbent or frequent past winners if the history shows them. Do not estimate prices."""
+Mention the incumbent or frequent past winners if the history shows them. Do not estimate prices.
+
+resources: scope and resource needs stated in the description. Give numbers only when the text states them,
+otherwise null; never estimate.
+  road_km: total road length in the contract. gravel_road_km: gravel roads.
+  high_class_winter_km: roads in winter maintenance classes Ise and Is (the most demanding: most equipment and
+  on-call staff). cycleway_km: walking and cycling routes. difficulty: the stated difficulty level.
+  notes: at most 4 short notes on equipment, staffing, on-call duty, qualifications or special tasks in the text.
+Use the scope in fit and risk: compare its size and demands to the bidder profile."""
+
+# Difficulty levels used in Finnish state road maintenance contracts (Väylävirasto)
+DIFFICULTY_LEVELS = ["perusurakka", "vaativa urakka", "erittäin vaativa urakka"]
+MAX_ROAD_KM = 20_000
+DESCRIPTION_CHARS = 3000
 
 ASSESSMENT_SCHEMA: dict[str, Any] = {
     "type": "OBJECT",
@@ -43,8 +56,22 @@ ASSESSMENT_SCHEMA: dict[str, Any] = {
                     "risk_reason": {"type": "STRING"},
                     "summary": {"type": "STRING"},
                     "questions_for_bid_team": {"type": "ARRAY", "items": {"type": "STRING"}},
+                    "resources": {
+                        "type": "OBJECT",
+                        "properties": {
+                            "road_km": {"type": "NUMBER", "nullable": True},
+                            "gravel_road_km": {"type": "NUMBER", "nullable": True},
+                            "high_class_winter_km": {"type": "NUMBER", "nullable": True},
+                            "cycleway_km": {"type": "NUMBER", "nullable": True},
+                            "difficulty": {"type": "STRING", "enum": DIFFICULTY_LEVELS, "nullable": True},
+                            "notes": {"type": "ARRAY", "items": {"type": "STRING"}},
+                        },
+                        "required": ["road_km", "gravel_road_km", "high_class_winter_km", "cycleway_km",
+                                     "difficulty", "notes"],
+                    },
                 },
-                "required": ["id", "fit", "fit_reason", "risk", "risk_reason", "summary", "questions_for_bid_team"],
+                "required": ["id", "fit", "fit_reason", "risk", "risk_reason", "summary", "questions_for_bid_team",
+                             "resources"],
             },
         }
     },
@@ -73,6 +100,12 @@ class BidAssessment:
     recommendation: str
     summary: str
     questions_for_bid_team: list[str]
+    road_km: float | None = None
+    gravel_road_km: float | None = None
+    high_class_winter_km: float | None = None
+    cycleway_km: float | None = None
+    difficulty: str | None = None
+    resource_notes: list[str] | None = None
 
 
 def expected_bids(tender: dict[str, Any]) -> float | None:
@@ -142,6 +175,7 @@ def _tender_block(tender: dict[str, Any]) -> str:
         f"Laajuus: {tender.get('scope_summary') or ''}",
         f"Vaatimukset: {'; '.join(tender.get('key_requirements') or [])}",
         f"Tunnistetut riskit: {'; '.join(tender.get('risks') or [])}",
+        f"Kuvaus: {(tender.get('description') or '')[:DESCRIPTION_CHARS]}",
         "\nHistoria (EU-kynnysarvon ylittävät hankinnat 2024–):",
         f"Saman tilaajan ja luokan aiemmat voittajat: {_winners(tender.get('buyer_past_top_winners'))}",
         f"Saman alueen ja luokan aiemmat voittajat: {_winners(tender.get('region_past_top_winners'))}",
@@ -181,6 +215,7 @@ def parse_assessment(data: Any, tender: dict[str, Any]) -> BidAssessment:
     competition = competition_score(bids)
     score = overall_score(fit, competition, risk)
     questions = [str(q).strip() for q in data.get("questions_for_bid_team") or [] if str(q).strip()][:3]
+    resources = parse_resources(data.get("resources"))
     return BidAssessment(
         publication_number=tender["publication_number"],
         fit=fit,
@@ -193,4 +228,28 @@ def parse_assessment(data: Any, tender: dict[str, Any]) -> BidAssessment:
         recommendation=recommendation(score, fit),
         summary=str(data.get("summary") or "").strip(),
         questions_for_bid_team=questions,
+        **resources,
     )
+
+
+def _km(value: Any, limit: float) -> float | None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not 0 < value <= limit:
+        return None
+    return float(value)
+
+
+def parse_resources(data: Any) -> dict[str, Any]:
+    """Validate the scope figures. Parts larger than the stated total are dropped as misreads."""
+    data = data if isinstance(data, dict) else {}
+    road = _km(data.get("road_km"), MAX_ROAD_KM)
+    part_limit = road if road is not None else MAX_ROAD_KM
+    difficulty = data.get("difficulty")
+    notes = data.get("notes") if isinstance(data.get("notes"), list) else []
+    return {
+        "road_km": road,
+        "gravel_road_km": _km(data.get("gravel_road_km"), part_limit),
+        "high_class_winter_km": _km(data.get("high_class_winter_km"), part_limit),
+        "cycleway_km": _km(data.get("cycleway_km"), part_limit),
+        "difficulty": difficulty if difficulty in DIFFICULTY_LEVELS else None,
+        "resource_notes": [str(n).strip() for n in notes if str(n).strip()][:4],
+    }

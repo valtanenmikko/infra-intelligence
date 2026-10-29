@@ -7,6 +7,7 @@ from infra_intelligence.llm.bid_assessment import (
     overall_score,
     parse_assessment,
     parse_assessments,
+    parse_resources,
     recommendation,
 )
 
@@ -31,6 +32,7 @@ TENDER = {
     "buyer_past_avg_bids": 3.5,
     "buyer_past_bid_awards": 3,
     "category_avg_bids": 3.9,
+    "description": "Sopimukseen kuuluvaa tiestöä on yhteensä noin 900 kilometriä, josta soratietä noin 245 km.",
 }
 
 LLM_OUTPUT = {
@@ -81,6 +83,12 @@ class PromptTest(unittest.TestCase):
         self.assertIn("2027–2032", p)
         self.assertIn("Destia Oy (30)", p)
         self.assertIn("Odotettu tarjousmäärä historian perusteella: 3.7", p)
+        self.assertIn("Kuvaus: Sopimukseen kuuluvaa tiestöä on yhteensä noin 900", p)
+
+    def test_long_description_is_truncated(self):
+        p = build_prompt([{**TENDER, "description": "x" * 10_000}])
+        self.assertIn("x" * 3000, p)
+        self.assertNotIn("x" * 3001, p)
 
     def test_batch_prompt_has_one_block_per_tender(self):
         p = build_prompt([TENDER, {**TENDER, "publication_number": "700002-2026"}])
@@ -116,6 +124,27 @@ class ParseAssessmentsTest(unittest.TestCase):
             parse_assessments({}, [TENDER])
 
 
+class ParseResourcesTest(unittest.TestCase):
+    def test_valid_figures_are_kept(self):
+        r = parse_resources({"road_km": 900, "gravel_road_km": 245, "high_class_winter_km": 130, "cycleway_km": 45.0,
+                             "difficulty": "perusurakka", "notes": [" Päivystys 24/7 ", "", "a", "b", "c", "d"]})
+        self.assertEqual((r["road_km"], r["gravel_road_km"], r["high_class_winter_km"], r["cycleway_km"]),
+                         (900.0, 245.0, 130.0, 45.0))
+        self.assertEqual(r["difficulty"], "perusurakka")
+        self.assertEqual(r["resource_notes"], ["Päivystys 24/7", "a", "b", "c"])
+
+    def test_parts_above_total_and_invalid_values_are_dropped(self):
+        r = parse_resources({"road_km": 900, "gravel_road_km": 2450, "high_class_winter_km": -5, "cycleway_km": True,
+                             "difficulty": "helppo", "notes": "ei lista"})
+        self.assertEqual(r, {"road_km": 900.0, "gravel_road_km": None, "high_class_winter_km": None,
+                             "cycleway_km": None, "difficulty": None, "resource_notes": []})
+
+    def test_missing_resources_give_empty_scope(self):
+        r = parse_resources(None)
+        self.assertIsNone(r["road_km"])
+        self.assertEqual(r["resource_notes"], [])
+
+
 class ParseAssessmentTest(unittest.TestCase):
     def test_combines_llm_ratings_with_computed_competition(self):
         a = parse_assessment(LLM_OUTPUT, {**TENDER, "buyer_past_bid_awards": 30})
@@ -124,6 +153,10 @@ class ParseAssessmentTest(unittest.TestCase):
         self.assertEqual(a.recommendation, "Tarjoa")
         self.assertEqual(a.fit_reason, "Ydinliiketoimintaa.")
         self.assertEqual(a.questions_for_bid_team, ["Kalustotilanne?", "Aliurakoitsijat?", "Päivystys?"])
+
+    def test_resources_are_attached(self):
+        a = parse_assessment({**LLM_OUTPUT, "resources": {"road_km": 900, "difficulty": "vaativa urakka"}}, TENDER)
+        self.assertEqual((a.road_km, a.difficulty, a.resource_notes), (900.0, "vaativa urakka", []))
 
     def test_rejects_out_of_range_ratings(self):
         for bad in (0, 6, "5", True, None):
