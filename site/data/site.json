@@ -12,7 +12,7 @@
     "notices": 815,
     "awards": 284,
     "competitions": 461,
-    "open_tenders": 24,
+    "open_tenders": 23,
     "single_winner_value_eur": 1551819148.0300002,
     "avg_bids": 4.1,
     "share_low_competition": 0.2882882882882883
@@ -2148,58 +2148,6 @@
         }
       ],
       "url": "https://ted.europa.eu/fi/notice/-/detail/697105-2026"
-    },
-    {
-      "id": "698762-2026",
-      "title": "Maanteiden hoitourakka Oulu 2027-2032",
-      "buyer": "ELY-keskukset / elinvoimakeskukset",
-      "category": "Teiden kunnossapito",
-      "region": "Pohjois-Pohjanmaa",
-      "region_from_llm": true,
-      "deadline": "2026-12-01",
-      "days_left": 33,
-      "period": "2027–2032",
-      "option_years": 0.0,
-      "estimated_value_eur": null,
-      "recommendation": "Harkitse",
-      "score": 52,
-      "fit": 4,
-      "competition": 3,
-      "risk": 2,
-      "expected_bids": 3.5,
-      "summary": "Oulun alueen maanteiden hoitourakka 2027–2032 sekä Oulunsalo-Hailuoto-lauttaväylän talviaukipito.",
-      "fit_reason": "Maanteiden hoitotyö vastaa ydinosaamista, mutta lauttaväylän aukipito talvella voi vaatia erikoiskalustoa tai aliurakointia.",
-      "risk_reason": "Erittäin vaativa urakka, pitkä sopimuskausi, ei indeksiä mainittu. Lauttaväylän aukipitovelvoite sisältää operatiivisen riskin. Aiempi voittaja mm. Destia Oy.",
-      "questions": [
-        "Mitä kalustoa lauttaväylän aukipito edellyttää ja löytyykö sitä omasta takaa?",
-        "Miten laatu- ja MDSS-kemikaalioptimointivaatimukset vaikuttavat sanktioihin?"
-      ],
-      "road_km": 1285.0,
-      "gravel_road_km": 285.0,
-      "high_class_winter_km": 250.0,
-      "cycleway_km": 170.0,
-      "difficulty": "erittäin vaativa urakka",
-      "resource_notes": [
-        "Oulunsalo-Hailuoto lauttaväylän aukipito talvella",
-        "Vesitalousosaston tehtävät",
-        "MDSS-järjestelmän hyödyntäminen",
-        "Tavoitehintainen palvelusopimus"
-      ],
-      "past_winners": [
-        {
-          "company": "Destia Oy",
-          "wins": 3
-        },
-        {
-          "company": "Oulun Konetyö Oy",
-          "wins": 2
-        },
-        {
-          "company": "YIT Road Oy",
-          "wins": 2
-        }
-      ],
-      "url": "https://ted.europa.eu/fi/notice/-/detail/698762-2026"
     },
     {
       "id": "734981-2026",
