@@ -105,11 +105,14 @@ expected for a random bidder. Past winners are shown to the bid team as context,
 
 **Recommendations are per tender; capacity is shared.**
 Most bids are lost, so a contractor with capacity for two contracts should bid on more than two. The site's bid
-portfolio planner treats each bid as an independent win with probability 1 / expected bids (an even contest) and
-computes the distribution of wins (Poisson binomial). Tenders are added by expected value (score × win chance)
-as long as the chance of winning more contracts than capacity stays below the chosen limit. With capacity for two,
-it suggests four bids: 1.1 expected wins and a 7 % chance of overcommitting. Real win rates depend on price
-competitiveness, which public data does not show.
+portfolio planner treats each bid as an independent win and computes the distribution of wins (Poisson binomial).
+Tenders are added by expected value (score × win chance) as long as the chance of winning more contracts than
+capacity stays below the chosen limit. With capacity for two, it suggests four bids: 1.2 expected wins and a 9 %
+chance of overcommitting. The win chance is the historical share of winners per bidder for the buyer and category
+(shrunk like the bid estimate). A first version used 1 / expected bids, which the backtest showed to be biased:
+by Jensen's inequality the average of 1 / bids is larger than 1 / average bids (mean error 0.24 vs 0.20; actual
+mean 0.47). Real win rates depend on price competitiveness, which public data does not show, and tenders are
+assumed independent although the competitors overlap. The math was checked against brute-force enumeration.
 
 **Privacy by default.** Sole traders often trade under a personal name. A winner's name is published only if PRH
 open data knows the ID as a company that is not a sole trader; others are grouped as *Muut toimijat*. A Gold
