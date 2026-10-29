@@ -1,8 +1,9 @@
 """Go/no-go assessment for open tenders.
 
 Split of responsibilities, so the result is reproducible and auditable:
-- the LLM rates qualitative factors it can read from text (fit to the bidder profile, delivery/commercial risk)
-  and explains them;
+- the LLM rates qualitative factors it can read from text (fit to the bidder profile and three risk factors)
+  and explains them. Risk is split into the factor groups that bid/no-bid studies of contractors rank highest
+  (scope clarity, contract terms, operational demands), so each rating is narrower and easier to check;
 - the competition factor is computed from historical bid counts, not by the LLM;
 - the overall score and recommendation come from a fixed formula in code.
 """
@@ -10,7 +11,7 @@ Split of responsibilities, so the result is reproducible and auditable:
 from dataclasses import dataclass
 from typing import Any
 
-PROMPT_VERSION = "bid-v5"
+PROMPT_VERSION = "bid-v6"
 BATCH_SIZE = 5  # tenders per request
 
 # Example bidder used in the demo. A real deployment would load the company's own profile.
@@ -24,8 +25,13 @@ SYSTEM_PROMPT = """You assess open public infrastructure tenders for a Finnish c
 Rate only what the given text and data support. Write all text in Finnish, short and concrete.
 
 fit (1-5): how well the work matches the bidder profile. 5 = core business, 1 = outside capabilities.
-risk (1-5): delivery and commercial risk for the bidder. 5 = low risk, 1 = high risk
-  (very long term, heavy penalties or on-call duty, unclear scope, no price index clause on a multi-year contract).
+Risk is rated as three separate factors, each 1-5 where 5 = low risk:
+  scope_clarity: is the work clearly defined (quantities, area, tasks)? 1 = vague or "see attachments" only.
+  contract_terms: duration, price index clause, payment model (e.g. target price), options. 1 = long fixed-price
+    contract without an index clause.
+  operational_demands: on-call duty, response times, penalties, stated difficulty level, special tasks.
+    1 = very demanding (e.g. erittäin vaativa, heavy on-call).
+risk_reason explains the lowest of the three.
 Mention the incumbent or frequent past winners if the history shows them. Do not estimate prices.
 
 resources: scope and resource needs stated in the description. Give numbers only when the text states them,
@@ -54,7 +60,9 @@ ASSESSMENT_SCHEMA: dict[str, Any] = {
                     "id": {"type": "STRING"},
                     "fit": {"type": "INTEGER"},
                     "fit_reason": {"type": "STRING"},
-                    "risk": {"type": "INTEGER"},
+                    "scope_clarity": {"type": "INTEGER"},
+                    "contract_terms": {"type": "INTEGER"},
+                    "operational_demands": {"type": "INTEGER"},
                     "risk_reason": {"type": "STRING"},
                     "summary": {"type": "STRING"},
                     "questions_for_bid_team": {"type": "ARRAY", "items": {"type": "STRING"}},
@@ -72,7 +80,8 @@ ASSESSMENT_SCHEMA: dict[str, Any] = {
                                      "difficulty", "notes"],
                     },
                 },
-                "required": ["id", "fit", "fit_reason", "risk", "risk_reason", "summary", "questions_for_bid_team",
+                "required": ["id", "fit", "fit_reason", "scope_clarity", "contract_terms", "operational_demands",
+                             "risk_reason", "summary", "questions_for_bid_team",
                              "resources"],
             },
         }
@@ -108,6 +117,9 @@ class BidAssessment:
     cycleway_km: float | None = None
     difficulty: str | None = None
     resource_notes: list[str] | None = None
+    scope_clarity: int | None = None
+    contract_terms: int | None = None
+    operational_demands: int | None = None
 
 
 def expected_bids(tender: dict[str, Any]) -> float | None:
@@ -197,6 +209,14 @@ def _tender_block(tender: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+RISK_FACTORS = ("scope_clarity", "contract_terms", "operational_demands")
+
+
+def risk_from_factors(*ratings: int) -> int:
+    """Risk = mean of the factor ratings, rounded half up (Python's round() would round 2.5 down to 2)."""
+    return int(sum(ratings) / len(ratings) + 0.5)
+
+
 def _rating(value: Any) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 5:
         raise ValueError(f"Rating must be an integer 1-5, got {value!r}")
@@ -223,7 +243,9 @@ def parse_assessments(data: Any, tenders: list[dict[str, Any]]) -> list[BidAsses
 def parse_assessment(data: Any, tender: dict[str, Any]) -> BidAssessment:
     if not isinstance(data, dict):
         raise ValueError("Assessment is not an object")
-    fit, risk = _rating(data.get("fit")), _rating(data.get("risk"))
+    fit = _rating(data.get("fit"))
+    factors = {k: _rating(data.get(k)) for k in RISK_FACTORS}
+    risk = risk_from_factors(*factors.values())
     bids = expected_bids(tender)
     competition = competition_score(bids)
     score = overall_score(fit, competition, risk)
@@ -242,6 +264,7 @@ def parse_assessment(data: Any, tender: dict[str, Any]) -> BidAssessment:
         summary=str(data.get("summary") or "").strip(),
         questions_for_bid_team=questions,
         **resources,
+        **factors,
     )
 
 

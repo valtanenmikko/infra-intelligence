@@ -2,7 +2,7 @@
 # MAGIC %md
 # MAGIC # 06 · LLM: go/no-go assessment for open tenders
 # MAGIC For each open competition in `gold.open_tenders`, Gemini rates **fit** to an example bidder profile and
-# MAGIC **risk**, with reasons. **Competition** comes from historical bid counts, and the score (0–100) and
+# MAGIC three **risk** factors (scope clarity, contract terms, operational demands), with reasons. **Competition** comes from historical bid counts, and the score (0–100) and
 # MAGIC recommendation from a fixed formula in `bid_assessment.py`, so the LLM never does the arithmetic.
 # MAGIC
 # MAGIC The same call extracts the scope and resource needs stated in the description (road km, winter classes,
@@ -61,12 +61,14 @@ spark.sql(f"""
     COMMENT 'Go/no-go assessments of open tenders for the example bidder profile'
 """)
 
-# Columns added after the first release (bid-v4 scope and resource needs); ADD COLUMNS keeps older rows
-RESOURCE_COLUMNS = {
+# Columns added after the first release (bid-v4 scope and resource needs, bid-v6 risk factors);
+# ADD COLUMNS keeps older rows
+ADDED_COLUMNS = {
     "road_km": "DOUBLE", "gravel_road_km": "DOUBLE", "high_class_winter_km": "DOUBLE", "cycleway_km": "DOUBLE",
     "difficulty": "STRING", "resource_notes": "ARRAY<STRING>",
+    "scope_clarity": "INT", "contract_terms": "INT", "operational_demands": "INT",
 }
-missing = [f"{c} {t}" for c, t in RESOURCE_COLUMNS.items() if c not in spark.table(TABLE).columns]
+missing = [f"{c} {t}" for c, t in ADDED_COLUMNS.items() if c not in spark.table(TABLE).columns]
 if missing:
     spark.sql(f"ALTER TABLE {TABLE} ADD COLUMNS ({', '.join(missing)})")
 

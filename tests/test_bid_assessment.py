@@ -9,6 +9,7 @@ from infra_intelligence.llm.bid_assessment import (
     parse_assessments,
     parse_resources,
     recommendation,
+    risk_from_factors,
 )
 
 TENDER = {
@@ -37,7 +38,7 @@ TENDER = {
 
 LLM_OUTPUT = {
     "fit": 5, "fit_reason": " Ydinliiketoimintaa. ",
-    "risk": 3, "risk_reason": "Pitkä kausi, indeksiehto olemassa.",
+    "scope_clarity": 4, "contract_terms": 2, "operational_demands": 3, "risk_reason": "Pitkä kausi, indeksiehto olemassa.",
     "summary": "Kiinnostava hoitourakka.",
     "questions_for_bid_team": ["Kalustotilanne?", "", "Aliurakoitsijat?", "Päivystys?", "Liikaa"],
 }
@@ -66,6 +67,12 @@ class ScoringTest(unittest.TestCase):
         self.assertEqual(overall_score(1, 1, 1), 0)
         self.assertEqual(overall_score(5, 5, 5), 100)
         self.assertEqual(overall_score(5, 3, 3), 70)
+
+    def test_risk_from_factors_rounds_half_up(self):
+        self.assertEqual(risk_from_factors(2, 3, 3), 3)  # 2.67
+        self.assertEqual(risk_from_factors(2, 2, 3), 2)  # 2.33
+        self.assertEqual(risk_from_factors(2, 3), 3)     # 2.5 -> 3, not banker's rounding
+        self.assertEqual(risk_from_factors(5, 5, 5), 5)
 
     def test_recommendation_thresholds(self):
         self.assertEqual(recommendation(70, 4), "Tarjoa")
@@ -123,7 +130,7 @@ class ParseAssessmentsTest(unittest.TestCase):
         self.assertEqual(results[1].competition, 5)  # computed from that tender's own history
 
     def test_invalid_item_is_skipped_not_fatal(self):
-        results = parse_assessments({"items": [{**LLM_OUTPUT, "id": "700001-2026", "risk": 9}]}, [TENDER])
+        results = parse_assessments({"items": [{**LLM_OUTPUT, "id": "700001-2026", "contract_terms": 9}]}, [TENDER])
         self.assertEqual(results, [])
 
     def test_missing_items_raises(self):
@@ -160,6 +167,14 @@ class ParseAssessmentTest(unittest.TestCase):
         self.assertEqual(a.recommendation, "Tarjoa")
         self.assertEqual(a.fit_reason, "Ydinliiketoimintaa.")
         self.assertEqual(a.questions_for_bid_team, ["Kalustotilanne?", "Aliurakoitsijat?", "Päivystys?"])
+
+    def test_risk_is_mean_of_factors(self):
+        a = parse_assessment(LLM_OUTPUT, {**TENDER, "buyer_past_bid_awards": 30})
+        self.assertEqual((a.scope_clarity, a.contract_terms, a.operational_demands, a.risk), (4, 2, 3, 3))
+
+    def test_missing_risk_factor_is_rejected(self):
+        with self.assertRaises(ValueError):
+            parse_assessment({k: v for k, v in LLM_OUTPUT.items() if k != "contract_terms"}, TENDER)
 
     def test_resources_are_attached(self):
         a = parse_assessment({**LLM_OUTPUT, "resources": {"road_km": 900, "difficulty": "vaativa urakka"}}, TENDER)
