@@ -23,3 +23,6 @@ venv/
 # Local scratch
 .tmp/
 .DS_Store
+
+# Local assistant instructions
+CLAUDE.md
