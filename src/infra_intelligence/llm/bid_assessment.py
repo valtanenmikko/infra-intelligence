@@ -10,8 +10,8 @@ Split of responsibilities, so the result is reproducible and auditable:
 from dataclasses import dataclass
 from typing import Any
 
-PROMPT_VERSION = "bid-v2"
-BATCH_SIZE = 5  # tenders per request (free tier: 20 requests/day)
+PROMPT_VERSION = "bid-v3"
+BATCH_SIZE = 5  # tenders per request
 
 # Example bidder used in the demo. A real deployment would load the company's own profile.
 BIDDER_PROFILE = """Esimerkkiprofiili: keskisuuri suomalainen infraurakoitsija.
@@ -52,6 +52,10 @@ ASSESSMENT_SCHEMA: dict[str, Any] = {
 }
 
 WEIGHTS = {"fit": 0.4, "competition": 0.3, "risk": 0.3}
+# Weight of the category average when estimating bids from a buyer's history. Chosen by backtest
+# (gold.bid_factor_backtest): small buyer samples are noisy, and regional history alone was worse than the
+# category average, so it is not used for the estimate.
+SHRINKAGE_K = 3
 BID_THRESHOLD = 65
 CONSIDER_THRESHOLD = 45
 
@@ -72,11 +76,14 @@ class BidAssessment:
 
 
 def expected_bids(tender: dict[str, Any]) -> float | None:
-    """Most specific history available: same region and category, then same buyer, then category average."""
-    for key in ("region_past_avg_bids", "buyer_past_avg_bids", "category_avg_bids"):
-        if tender.get(key) is not None:
-            return float(tender[key])
-    return None
+    """Buyer's average bid count shrunk toward the category average: (n * buyer + k * category) / (n + k)."""
+    category, buyer = tender.get("category_avg_bids"), tender.get("buyer_past_avg_bids")
+    n = tender.get("buyer_past_bid_awards") or 0
+    if category is None:
+        return float(buyer) if buyer is not None else None
+    if buyer is None or n == 0:
+        return round(float(category), 1)
+    return round((n * float(buyer) + SHRINKAGE_K * float(category)) / (n + SHRINKAGE_K), 1)
 
 
 def competition_score(bids: float | None) -> int:

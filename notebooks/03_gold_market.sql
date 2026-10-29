@@ -217,7 +217,8 @@ comparable AS (
   FROM open o JOIN workspace.gold.award_facts a ON a.infra_category = o.infra_category AND arrays_overlap(a.regions, o.regions)
 ),
 history AS (
-  SELECT open_id, scope, count(*) AS past_awards, round(avg(bids_received), 1) AS past_avg_bids
+  SELECT open_id, scope, count(*) AS past_awards, count(bids_received) AS past_bid_awards,
+         round(avg(bids_received), 1) AS past_avg_bids
   FROM comparable GROUP BY ALL
 ),
 past_winners AS (
@@ -259,6 +260,7 @@ SELECT
   o.description,
   coalesce(hb.past_awards, 0)                            AS buyer_past_awards,
   hb.past_avg_bids                                       AS buyer_past_avg_bids,
+  coalesce(hb.past_bid_awards, 0)                        AS buyer_past_bid_awards,
   wb.top_winners                                         AS buyer_past_top_winners,
   coalesce(hr.past_awards, 0)                            AS region_past_awards,
   hr.past_avg_bids                                       AS region_past_avg_bids,
@@ -271,6 +273,56 @@ LEFT JOIN past_winners wb ON wb.open_id = o.publication_number AND wb.scope = 'b
 LEFT JOIN history hr      ON hr.open_id = o.publication_number AND hr.scope = 'region'
 LEFT JOIN past_winners wr ON wr.open_id = o.publication_number AND wr.scope = 'region'
 LEFT JOIN category_bids c ON c.infra_category = o.infra_category;
+
+-- COMMAND ----------
+
+-- Backtest of the go/no-go history factors: each past award is predicted from awards published before it only.
+-- bids_mae_*: mean absolute error of the expected bid count. "shrunk" is the method used for open tenders
+-- (buyer average pulled toward the category average with weight k = 3, bid_assessment.SHRINKAGE_K).
+-- incumbent_rewin_rate: how often a winner of the previous comparable award (same buyer, category and region)
+-- wins again, vs the win rate of a random bidder (1 / bids).
+CREATE OR REPLACE TABLE workspace.gold.bid_factor_backtest
+COMMENT 'Out-of-time accuracy of the bid-count forecast and the incumbent re-win rate'
+AS WITH a AS (SELECT * FROM workspace.gold.award_facts WHERE bids_received IS NOT NULL),
+pred AS (
+  SELECT t.bids_received AS actual,
+    (SELECT avg(h.bids_received) FROM a h WHERE h.publication_date < t.publication_date
+       AND h.infra_category = t.infra_category) AS cat,
+    (SELECT avg(h.bids_received) FROM a h WHERE h.publication_date < t.publication_date
+       AND h.infra_category = t.infra_category AND h.buyer_id = t.buyer_id) AS buy,
+    (SELECT count(*) FROM a h WHERE h.publication_date < t.publication_date
+       AND h.infra_category = t.infra_category AND h.buyer_id = t.buyer_id) AS buy_n,
+    (SELECT avg(h.bids_received) FROM a h WHERE h.publication_date < t.publication_date
+       AND h.infra_category = t.infra_category AND arrays_overlap(h.regions, t.regions)) AS reg
+  FROM a t
+),
+awards AS (
+  SELECT f.publication_number, f.publication_date, f.buyer_id, f.infra_category, f.regions, f.bids_received,
+         collect_set(w.winner_id) AS winners
+  FROM workspace.gold.award_facts f JOIN workspace.silver.notice_winners w USING (publication_number)
+  WHERE NOT f.is_framework AND w.winner_id IS NOT NULL
+  GROUP BY ALL
+),
+incumbent AS (
+  SELECT t.winners, t.bids_received,
+    (SELECT max_by(h.winners, h.publication_date) FROM awards h WHERE h.publication_date < t.publication_date
+       AND h.buyer_id = t.buyer_id AND h.infra_category = t.infra_category
+       AND arrays_overlap(h.regions, t.regions)) AS previous_winners
+  FROM awards t
+)
+SELECT 'bids_mae_shrunk' AS metric, round(avg(abs((coalesce(buy * buy_n, 0) + 3 * cat) / (buy_n + 3) - actual)), 2) AS value,
+       count(*) AS n FROM pred WHERE cat IS NOT NULL
+UNION ALL
+SELECT 'bids_mae_category', round(avg(abs(cat - actual)), 2), count(*) FROM pred WHERE cat IS NOT NULL
+UNION ALL
+SELECT 'bids_mae_region_buyer_category', round(avg(abs(coalesce(reg, buy, cat) - actual)), 2), count(*)
+FROM pred WHERE cat IS NOT NULL
+UNION ALL
+SELECT 'incumbent_rewin_rate', round(avg(CASE WHEN arrays_overlap(winners, previous_winners) THEN 1.0 ELSE 0 END), 2),
+       count(*) FROM incumbent WHERE previous_winners IS NOT NULL
+UNION ALL
+SELECT 'random_bidder_win_rate', round(avg(1.0 / greatest(bids_received, 1)), 2), count(*)
+FROM incumbent WHERE previous_winners IS NOT NULL AND bids_received IS NOT NULL;
 
 -- COMMAND ----------
 

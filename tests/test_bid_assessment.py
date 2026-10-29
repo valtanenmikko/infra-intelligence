@@ -29,6 +29,7 @@ TENDER = {
     "region_past_top_winners": None,
     "region_past_avg_bids": None,
     "buyer_past_avg_bids": 3.5,
+    "buyer_past_bid_awards": 3,
     "category_avg_bids": 3.9,
 }
 
@@ -41,10 +42,17 @@ LLM_OUTPUT = {
 
 
 class ExpectedBidsTest(unittest.TestCase):
-    def test_prefers_most_specific_history(self):
-        self.assertEqual(expected_bids({**TENDER, "region_past_avg_bids": 2.0}), 2.0)
-        self.assertEqual(expected_bids(TENDER), 3.5)
+    def test_shrinks_buyer_history_toward_category(self):
+        self.assertEqual(expected_bids(TENDER), 3.7)  # (3 * 3.5 + 3 * 3.9) / 6
+        self.assertEqual(expected_bids({**TENDER, "buyer_past_bid_awards": 30}), 3.5)
+
+    def test_regional_history_is_not_used(self):
+        self.assertEqual(expected_bids({**TENDER, "region_past_avg_bids": 1.0}), 3.7)
+
+    def test_falls_back_to_available_history(self):
         self.assertEqual(expected_bids({**TENDER, "buyer_past_avg_bids": None}), 3.9)
+        self.assertEqual(expected_bids({**TENDER, "buyer_past_bid_awards": 0}), 3.9)
+        self.assertEqual(expected_bids({**TENDER, "category_avg_bids": None}), 3.5)
         self.assertIsNone(expected_bids({"publication_number": "x"}))
 
 
@@ -72,7 +80,7 @@ class PromptTest(unittest.TestCase):
         self.assertIn("Viinijärvi", p)
         self.assertIn("2027–2032", p)
         self.assertIn("Destia Oy (30)", p)
-        self.assertIn("Odotettu tarjousmäärä historian perusteella: 3.5", p)
+        self.assertIn("Odotettu tarjousmäärä historian perusteella: 3.7", p)
 
     def test_batch_prompt_has_one_block_per_tender(self):
         p = build_prompt([TENDER, {**TENDER, "publication_number": "700002-2026"}])
@@ -87,7 +95,7 @@ class PromptTest(unittest.TestCase):
 
 class ParseAssessmentsTest(unittest.TestCase):
     def test_batch_keeps_valid_items_in_input_order(self):
-        other = {**TENDER, "publication_number": "700002-2026", "buyer_past_avg_bids": 1.2}
+        other = {**TENDER, "publication_number": "700002-2026", "buyer_past_avg_bids": 1.2, "buyer_past_bid_awards": 30}
         items = [
             {**LLM_OUTPUT, "id": "700002-2026"},
             {**LLM_OUTPUT, "id": "700001-2026"},
@@ -110,7 +118,7 @@ class ParseAssessmentsTest(unittest.TestCase):
 
 class ParseAssessmentTest(unittest.TestCase):
     def test_combines_llm_ratings_with_computed_competition(self):
-        a = parse_assessment(LLM_OUTPUT, TENDER)
+        a = parse_assessment(LLM_OUTPUT, {**TENDER, "buyer_past_bid_awards": 30})
         self.assertEqual((a.fit, a.risk, a.competition, a.expected_bids), (5, 3, 3, 3.5))
         self.assertEqual(a.score, 70)
         self.assertEqual(a.recommendation, "Tarjoa")
