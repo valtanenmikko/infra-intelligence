@@ -2913,7 +2913,7 @@
     "n_bids": 222,
     "single_bid_share": 0.11261261261261261,
     "n_price": 243,
-    "price_only_share": 0.58451
+    "price_only_share": 0.68313
   },
   "bid_backtest": {
     "bids_mae_region_buyer_category": {
