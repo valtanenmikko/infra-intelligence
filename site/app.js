@@ -178,8 +178,8 @@ function winDistribution(probs) {
   return dist;
 }
 
-/** Win chance in an even contest: one in the expected number of bidders. */
-const winChance = (t) => 1 / Math.max(t.expected_bids || 3, 1);
+/** Win chance in an even contest, from history (winners per bidder); 1 / expected bids only as a fallback. */
+const winChance = (t) => t.win_chance ?? 1 / Math.max(t.expected_bids || 3, 1);
 
 /**
  * Greedy bid portfolio: add tenders by expected value (score x win chance), skipping any that would push the
