@@ -3,7 +3,7 @@ from datetime import date
 
 from infra_intelligence.reference import cpv_category, notice_category
 from infra_intelligence.transform.companies import CompanyRecord
-from infra_intelligence.transform.silver import parse_notice, parse_winners, single_winner_pair
+from infra_intelligence.transform.silver import award_criteria, parse_notice, parse_winners, single_winner_pair
 
 AWARD = {
     "publication-number": "254711-2024",
@@ -138,6 +138,38 @@ class ReferenceTest(unittest.TestCase):
         self.assertEqual(notice_category("can-modif"), "modification")
         self.assertEqual(notice_category("cn-standard"), "competition")
         self.assertEqual(notice_category("pin-only"), "prior_information")
+
+
+class AwardCriteriaTest(unittest.TestCase):
+    def test_weighted_criteria_give_price_share_and_named_shares(self):
+        raw = {"award-criterion-type-lot": ["price", "quality", "quality", "quality"],
+               "award-criterion-number-lot": ["65", "18", "10", "7"],
+               "award-criterion-name-lot": {"fin": ["Vertailuhinta", "Laatulupaukset", "Tentti", "Kalustoresurssi"]}}
+        price, criteria = award_criteria(raw)
+        self.assertEqual(price, 0.65)
+        self.assertEqual(criteria[0], ("Vertailuhinta", "price", 0.65))
+        self.assertEqual(criteria[-1], ("Kalustoresurssi", "quality", 0.07))
+
+    def test_criteria_repeated_per_lot_are_counted_once(self):
+        raw = {"award-criterion-type-lot": ["price", "quality"] * 3,
+               "award-criterion-number-lot": ["70", "30"] * 3,
+               "award-criterion-name-lot": {"fin": ["Hinta", "Laatu"] * 3}}
+        self.assertEqual(award_criteria(raw), (0.7, [("Hinta", "price", 0.7), ("Laatu", "quality", 0.3)]))
+
+    def test_points_are_converted_to_shares(self):
+        raw = {"award-criterion-type-lot": ["price", "quality"], "award-criterion-number-lot": ["80", "20"]}
+        self.assertEqual(award_criteria(raw), (0.8, []))  # no names: share only
+
+    def test_price_only_without_weights_is_lowest_price(self):
+        self.assertEqual(award_criteria({"award-criterion-type-lot": ["price", "price"]}), (1.0, []))
+
+    def test_missing_weights_with_quality_is_unknown(self):
+        self.assertEqual(award_criteria({"award-criterion-type-lot": ["price", "quality"]}), (None, []))
+        self.assertEqual(award_criteria({}), (None, []))
+
+    def test_parse_notice_carries_criteria_and_procedure(self):
+        n = parse_notice({**AWARD, "procedure-identifier": "abc", "award-criterion-type-lot": ["price"]})
+        self.assertEqual((n.procedure_id, n.price_share, n.award_criteria), ("abc", 1.0, []))
 
 
 if __name__ == "__main__":

@@ -73,7 +73,8 @@ NOTICES_SCHEMA = """
     main_cpv STRING, infra_category STRING, cpv_codes ARRAY<STRING>, procedure_type STRING, regions ARRAY<STRING>,
     tender_deadline DATE, total_value_eur DOUBLE, estimated_lot_value_eur DOUBLE, lot_count INT,
     tenders_received_min INT, tenders_received_max INT, lowest_tender_eur DOUBLE, highest_tender_eur DOUBLE,
-    is_framework BOOLEAN, winner_ids ARRAY<STRING>, winner_names_raw ARRAY<STRING>, winner_size STRING
+    is_framework BOOLEAN, winner_ids ARRAY<STRING>, winner_names_raw ARRAY<STRING>, winner_size STRING,
+    procedure_id STRING, price_share DOUBLE, award_criteria ARRAY<STRUCT<name: STRING, kind: STRING, share: DOUBLE>>
 """
 WINNERS_SCHEMA = "publication_number STRING, winner_id STRING, winner_name STRING, is_registered_company BOOLEAN, is_single_winner BOOLEAN"
 COMPANIES_SCHEMA = """

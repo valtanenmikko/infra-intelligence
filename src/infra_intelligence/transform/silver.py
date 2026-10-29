@@ -1,6 +1,6 @@
 """Parse raw TED notices (Bronze JSON) into typed Silver records."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
@@ -39,6 +39,11 @@ class NoticeRecord:
     winner_ids: list[str]
     winner_names_raw: list[str]
     winner_size: str | None
+    procedure_id: str | None = None
+    # Share of price (and life-cycle cost) in the award criteria, 0-1; None when weights are not reported
+    price_share: float | None = None
+    # (name, kind, share) per named criterion; empty when names or weights are missing
+    award_criteria: list[tuple[str, str, float]] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -95,6 +100,30 @@ def _submission_counts(raw: dict[str, Any], code: str) -> list[int]:
     return [int(v) for c, v in pairs if c == code and str(v).isdigit()]
 
 
+PRICE_CRITERIA = {"price", "cost"}
+
+
+def award_criteria(raw: dict[str, Any]) -> tuple[float | None, list[tuple[str, str, float]]]:
+    """Price share and named criteria with their shares.
+
+    The arrays repeat per lot, so shares are ratios (identical lots keep the same ratio). A notice with only
+    price criteria is lowest-price (share 1) even without weights; otherwise missing weights give None.
+    """
+    kinds = raw.get("award-criterion-type-lot") or []
+    if not kinds:
+        return None, []
+    weights = [_to_float(w) for w in raw.get("award-criterion-number-lot") or []]
+    if len(weights) != len(kinds) or None in weights or sum(weights) <= 0:
+        return (1.0 if set(kinds) <= PRICE_CRITERIA else None), []
+    price = round(sum(w for k, w in zip(kinds, weights) if k in PRICE_CRITERIA) / sum(weights), 3)
+    names = _localized(raw.get("award-criterion-name-lot"))
+    if len(names) != len(kinds):
+        return price, []
+    named = dict.fromkeys(zip(names, kinds, weights))  # de-duplicate criteria repeated per lot
+    total = sum(w for _, _, w in named)
+    return price, [(n, k, round(w / total, 3)) for n, k, w in named]
+
+
 def winner_ids(raw: dict[str, Any]) -> list[str]:
     return _unique([normalize_business_id(i) for i in raw.get("winner-identifier") or []])
 
@@ -122,6 +151,7 @@ def parse_notice(raw: dict[str, Any]) -> NoticeRecord:
     estimated = _floats(raw.get("estimated-value-lot"))
     sizes = _unique(raw.get("winner-size"))
     ids = winner_ids(raw)
+    price_share, criteria = award_criteria(raw)
 
     return NoticeRecord(
         publication_number=raw["publication-number"],
@@ -149,6 +179,9 @@ def parse_notice(raw: dict[str, Any]) -> NoticeRecord:
         winner_ids=ids,
         winner_names_raw=_unique(_localized(raw.get("winner-name"))),
         winner_size=sizes[0] if len(ids) == 1 and len(sizes) == 1 else None,
+        procedure_id=raw.get("procedure-identifier") or None,
+        price_share=price_share,
+        award_criteria=criteria,
     )
 
 

@@ -51,6 +51,12 @@ TED_FIELDS: list[str] = [
     # Parallel arrays: code "tenders" = total tenders received per lot.
     "received-submissions-type-code",
     "received-submissions-type-val",
+    # Award criteria: parallel arrays per criterion (repeated per lot); weights are percentages or points.
+    "award-criterion-type-lot",
+    "award-criterion-name-lot",
+    "award-criterion-number-lot",
+    # Stable across republished and modified notices of the same procedure
+    "procedure-identifier",
 ]
 
 CATALOG = "workspace"

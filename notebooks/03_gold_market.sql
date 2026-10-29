@@ -71,6 +71,7 @@ AS SELECT
   size(n.winner_ids)              AS winner_count,
   n.total_value_eur               AS contract_value_eur,
   n.tenders_received_max          AS bids_received,
+  n.price_share,
   n.tenders_received_max <= 1     AS is_single_bid,
   n.tenders_received_max <= 2     AS is_low_competition,
   n.lowest_tender_eur,
@@ -165,6 +166,24 @@ GROUP BY 1;
 
 -- COMMAND ----------
 
+-- Does the weight of price in the award criteria change how many bids a tender attracts?
+CREATE OR REPLACE TABLE workspace.gold.competition_by_criteria
+COMMENT 'Bids and low-competition share by the price share of the award criteria'
+AS SELECT
+  CASE WHEN price_share >= 1   THEN 'Pelkkä hinta'
+       WHEN price_share >= 0.7 THEN 'Hinta 70–99 %'
+       WHEN price_share >= 0.5 THEN 'Hinta 50–69 %'
+       ELSE 'Hinta alle 50 %' END                         AS criteria_band,
+  CASE WHEN price_share >= 1 THEN 1 WHEN price_share >= 0.7 THEN 2 WHEN price_share >= 0.5 THEN 3 ELSE 4 END AS band_order,
+  count(*)                                              AS awards,
+  round(avg(bids_received), 1)                          AS avg_bids,
+  avg(CAST(is_low_competition AS INT))                  AS share_low_competition
+FROM workspace.gold.award_facts
+WHERE price_share IS NOT NULL AND bids_received IS NOT NULL
+GROUP BY 1, 2;
+
+-- COMMAND ----------
+
 CREATE OR REPLACE TABLE workspace.gold.buyer_profiles
 COMMENT 'Per buyer: procurement volume, main category, competition and the most frequent winners'
 AS WITH notices AS (
@@ -206,8 +225,8 @@ AS WITH open AS (
   SELECT n.* EXCEPT (regions), n.effective_regions AS regions, b.buyer_name
   FROM workspace.gold.notices_enriched n LEFT JOIN workspace.silver.buyers b USING (buyer_id)
   WHERE n.notice_category = 'competition' AND n.tender_deadline >= current_date()
-  -- Buyers sometimes republish the same competition as a new notice; keep only the latest one
-  QUALIFY row_number() OVER (PARTITION BY n.buyer_id, n.title, n.tender_deadline
+  -- Buyers sometimes republish the same competition as a new notice; keep only the latest one per procedure
+  QUALIFY row_number() OVER (PARTITION BY coalesce(n.procedure_id, concat_ws('|', n.buyer_id, n.title, n.tender_deadline))
                              ORDER BY n.publication_date DESC, n.publication_number DESC) = 1
 ),
 -- Past awards comparable to each open tender, tagged by how they match. Regional history matters for
@@ -260,6 +279,8 @@ SELECT
   o.key_requirements,
   o.risks,
   o.has_price_index_clause,
+  o.price_share,
+  o.award_criteria,
   o.description,
   coalesce(hb.past_awards, 0)                            AS buyer_past_awards,
   hb.past_avg_bids                                       AS buyer_past_avg_bids,
