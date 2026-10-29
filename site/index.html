@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=11">
+  <link rel="stylesheet" href="styles.css?v=12">
 </head>
 <body>
   <a class="skip-link" href="#main">Siirry sisältöön</a>
@@ -40,6 +40,7 @@
   <nav class="section-nav" aria-label="Osiot">
     <div class="wrap">
       <a href="#tenders">Avoimet</a>
+      <a href="#portfolio">Portfolio</a>
       <a href="#market">Markkina</a>
       <a href="#competition">Kilpailu</a>
       <a href="#buyers">Tilaajat</a>
@@ -74,6 +75,24 @@
         <h2 id="tenders-title">Avoimet kilpailutukset</h2>
         <p class="section-note">Tekoäly arvioi soveltuvuuden ja riskit esimerkkiprofiilille. Kilpailutekijä lasketaan historian tarjousmääristä, ja pisteet tulevat kiinteästä kaavasta. <a href="#scoring">Miten pisteet lasketaan</a></p>
       </div>
+      <figure class="chart-card deadline-card" id="deadline-card" hidden>
+        <figcaption>Takarajat viikoittain</figcaption>
+        <div id="deadline-chart" class="weeks" role="img"></div>
+        <p class="chart-note"><span class="key" data-rec="Tarjoa"></span>Tarjoa <span class="key" data-rec="Harkitse"></span>Harkitse <span class="key" data-rec="Ei tarjota"></span>Ei tarjota</p>
+      </figure>
+      <div class="filters" role="group" aria-label="Suodata kilpailutuksia">
+        <label>Luokka <select id="tender-category"></select></label>
+        <label>Suositus <select id="tender-rec"></select></label>
+      </div>
+      <ol id="tender-list" class="tender-list"></ol>
+    </section>
+
+    <section id="portfolio" aria-labelledby="portfolio-title">
+      <div class="section-head">
+        <p class="eyebrow">02 · Tarjousportfolio</p>
+        <h2 id="portfolio-title">Mihin tarjota, kun kalusto ei riitä kaikkeen</h2>
+        <p class="section-note">Suositus arvioi jokaisen kilpailutuksen erikseen. Saman kauden urakat kilpailevat kuitenkin samasta kalustosta ja henkilöstöstä, joten tarjoukset valitaan kokonaisuutena.</p>
+      </div>
       <p id="capacity" class="callout capacity" hidden></p>
       <figure class="chart-card planner" id="planner" hidden>
         <figcaption id="plan-caption">Tarjousportfolio</figcaption>
@@ -95,21 +114,11 @@
         <p class="chart-note" id="plan-scope-note"></p>
         <p class="chart-note">Kapasiteettia kannattaa tarjota yli, koska suurin osa tarjouksista häviää. Voittomahdollisuus on historiallinen voittajien osuus tarjoajista saman tilaajan ja luokan hankinnoissa eli tasaväkinen kilpailu; todellinen osuus riippuu hintakilpailukyvystä. Kilpailutukset oletetaan toisistaan riippumattomiksi, vaikka kilpailijat ovat usein samat. Tarjous on sitova voimassaoloajan, joten suunnitelma päivitetään aina, kun aiemman kilpailun tulos selviää.</p>
       </figure>
-      <figure class="chart-card deadline-card" id="deadline-card" hidden>
-        <figcaption>Takarajat viikoittain</figcaption>
-        <div id="deadline-chart" class="weeks" role="img"></div>
-        <p class="chart-note"><span class="key" data-rec="Tarjoa"></span>Tarjoa <span class="key" data-rec="Harkitse"></span>Harkitse <span class="key" data-rec="Ei tarjota"></span>Ei tarjota</p>
-      </figure>
-      <div class="filters" role="group" aria-label="Suodata kilpailutuksia">
-        <label>Luokka <select id="tender-category"></select></label>
-        <label>Suositus <select id="tender-rec"></select></label>
-      </div>
-      <ol id="tender-list" class="tender-list"></ol>
     </section>
 
     <section id="market" aria-labelledby="market-title">
       <div class="section-head">
-        <p class="eyebrow">02 · Markkina</p>
+        <p class="eyebrow">03 · Markkina</p>
         <h2 id="market-title">Kuka voittaa</h2>
         <p class="section-note">Osuus ratkaistuista hankinnoista. Puitejärjestelyssä voi olla useita voittajia, joten osuudet voivat summautua yli 100 %. Sopimusarvo vain yhden voittajan sopimuksista.</p>
       </div>
@@ -130,7 +139,7 @@
 
     <section id="competition" aria-labelledby="competition-title">
       <div class="section-head">
-        <p class="eyebrow">03 · Kilpailu</p>
+        <p class="eyebrow">04 · Kilpailu</p>
         <h2 id="competition-title">Missä kilpailu on ohutta</h2>
         <p class="section-note">Osuus hankinnoista, joissa yksikään osa ei saanut yli kahta tarjousta. Suluissa hankintojen määrä; harmaa pylväs = alle 15 hankintaa, tulkitse varoen.</p>
       </div>
@@ -161,7 +170,7 @@
 
     <section id="buyers" aria-labelledby="buyers-title">
       <div class="section-head">
-        <p class="eyebrow">04 · Tilaajat</p>
+        <p class="eyebrow">05 · Tilaajat</p>
         <h2 id="buyers-title">Suurimmat tilaajat</h2>
         <p class="section-note">Useimmin voittanut yritys ja sen osuus tilaajan hankinnoista kertovat, onko tilaajalla vakiotoimittaja.</p>
       </div>
@@ -170,7 +179,7 @@
 
     <section id="method" aria-labelledby="method-title">
       <div class="section-head">
-        <p class="eyebrow">05 · Menetelmä</p>
+        <p class="eyebrow">06 · Menetelmä</p>
         <h2 id="method-title">Näin tämä on rakennettu</h2>
         <p class="section-note">ELT-putki Databricksissä medallion-arkkitehtuurilla. Raakadata säilyy, joten laatukorjaukset vaativat vain muunnoskerrosten uudelleenajon.</p>
       </div>
@@ -229,6 +238,6 @@
   </footer>
 
   <div id="tooltip" class="tooltip" aria-hidden="true" hidden></div>
-  <script src="app.js?v=17" defer></script>
+  <script src="app.js?v=18" defer></script>
 </body>
 </html>

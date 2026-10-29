@@ -9,7 +9,8 @@ const fmtMonth = new Intl.DateTimeFormat("fi-FI", { month: "short" });
 
 const OTHERS = "Muut toimijat";
 const SMALL_SAMPLE = 15;
-const TENDERS_COLLAPSED = 6;
+// Cards are tall on phones, so fewer are shown before "Näytä kaikki"
+const TENDERS_COLLAPSED = window.matchMedia("(max-width: 640px)").matches ? 3 : 6;
 const REC_ORDER = ["Tarjoa", "Harkitse", "Ei tarjota"];
 
 function fmtEur(v) {
@@ -122,7 +123,8 @@ function tenderCard(t) {
         el("span", { text: t.category }),
         t.region ? el("span", {}, t.region, t.region_from_llm ? el("span", { class: "llm", text: " · AI-päätelty" }) : null) : null,
         el("span", { class: days <= 14 ? "urgent" : null, text: `Takaraja ${fmtDate.format(new Date(t.deadline))} (${days} pv)` }),
-        t.period ? el("span", { text: `Kausi ${t.period}${t.option_years ? ` + ${fmtDec.format(t.option_years)} v optio` : ""}` }) : null)),
+        // The period is usually already in the title ("... 2027-2032"); show it only when it is not
+        t.period && !t.title.includes(t.period.replace("–", "-")) ? el("span", { text: `Kausi ${t.period}${t.option_years ? ` + ${fmtDec.format(t.option_years)} v optio` : ""}` }) : null)),
     el("div", { class: "verdict" },
       el("span", { class: "badge", "data-rec": t.recommendation, text: t.recommendation }),
       el("div", { class: "score" }, String(t.score), el("small", { text: " / 100" }))),
