@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=10">
+  <link rel="stylesheet" href="styles.css?v=11">
 </head>
 <body>
   <a class="skip-link" href="#main">Siirry sisältöön</a>
@@ -133,6 +133,10 @@
         <h2 id="competition-title">Missä kilpailu on ohutta</h2>
         <p class="section-note">Osuus hankinnoista, joissa yksikään osa ei saanut yli kahta tarjousta. Suluissa hankintojen määrä; harmaa pylväs = alle 15 hankintaa, tulkitse varoen.</p>
       </div>
+      <div id="eu-compare" class="eu-compare" hidden>
+        <dl id="eu-tiles" class="tiles"></dl>
+        <p class="chart-note">Vertailu EU:n <a href="https://single-market-scoreboard.ec.europa.eu/">Single Market Scoreboardin</a> hankintamittareihin (2024, kaikki alat). Yhden tarjouksen osuus lasketaan tässä hankinnoista, joissa yksikään osa ei saanut useampaa tarjousta, joten luku on varovainen arvio.</p>
+      </div>
       <div class="grid-2">
         <figure class="chart-card">
           <figcaption id="comp-caption">Hankintaluokittain</figcaption>
@@ -187,11 +191,18 @@
         <ul class="limits">
           <li><strong>Soveltuvuus 40 %</strong> – tekoäly arvioi 1–5, kuinka hyvin työ vastaa esimerkkiurakoitsijan profiilia.</li>
           <li><strong>Kilpailu 30 %</strong> – odotettu tarjousmäärä tilaajan aiemmista hankinnoista, tasoitettuna luokan keskiarvolla. Mitä vähemmän tarjouksia, sitä parempi.</li>
-          <li><strong>Riski 30 %</strong> – tekoäly arvioi 1–5 sopimuskauden, sanktioiden, päivystyksen ja indeksiehdon perusteella.</li>
+          <li><strong>Riski 30 %</strong> – tekoäly arvioi erikseen 1–5 laajuuden selkeyden, sopimusehdot (kesto, indeksiehto, hinnoittelumalli) ja operatiiviset vaatimukset (päivystys, sanktiot, vaativuus). Riski on niiden keskiarvo.</li>
           <li>Painotettu keskiarvo skaalataan 0–100:aan: <strong>Tarjoa</strong> ≥ 65, <strong>Harkitse</strong> ≥ 45. Jos soveltuvuus on 1, suositus on aina ”Ei tarjota”.</li>
         </ul>
         <p id="backtest-note" class="callout" hidden></p>
       </div>
+      <h3>Menetelmän tausta</h3>
+      <ul class="limits sources">
+        <li><strong>Tekijät</strong> noudattavat urakoitsijoiden tarjouspäätöksistä tehtyjä tutkimuksia, joissa tärkeimmiksi nousevat työn tyyppi ja kokemus, laajuuden selkeys, sopimusehdot ja nykyinen työkuorma (<a href="https://www.mdpi.com/2075-5309/14/10/3114">Aldossari 2024</a>; <a href="https://www.emerald.com/ci/article/16/2/127/35800/Critical-factors-influencing-the-bid-no-bid">Construction Innovation</a>).</li>
+        <li><strong>Voittomahdollisuus</strong> perustuu tasaväkisen kilpailun malliin, jossa k tarjoajan kilpailussa mahdollisuus on 1/k. Tarjoajien määrä on satunnainen, joten keskiarvo lasketaan luvusta 1/k eikä tarjoajien keskimäärästä (<a href="https://ascelibrary.com/doi/10.1061/%28ASCE%29CO.1943-7862.0001695">Friedmanin malli</a>; <a href="https://centaur.reading.ac.uk/51067">Ballesteros-Pérez ym. 2015</a>).</li>
+        <li><strong>Tarjousportfolio</strong> on samanaikaisen tarjoamisen valintaongelma, jota on mallinnettu kokonaislukuoptimoinnilla voittotodennäköisyyksien avulla (<a href="https://pubsonline.informs.org/doi/10.1287/opre.19.2.469">Operations Research 1971</a>).</li>
+        <li><strong>Kilpailun mittarit</strong> vastaavat EU:n Single Market Scoreboardia ja hankintojen riskitutkimusta, jossa yhden tarjouksen osuus on vakiintunut mittari (<a href="https://link.springer.com/article/10.1007/s11115-023-00742-0">Public Organization Review 2023</a>).</li>
+      </ul>
       <h3>Rajoitteet</h3>
       <ul class="limits">
         <li>Mukana vain EU-kynnysarvon ylittävät hankinnat (rakennusurakat noin 5,5 M€), eivät kansalliset pienhankinnat.</li>
@@ -217,6 +228,6 @@
   </footer>
 
   <div id="tooltip" class="tooltip" aria-hidden="true" hidden></div>
-  <script src="app.js?v=14" defer></script>
+  <script src="app.js?v=15" defer></script>
 </body>
 </html>

@@ -242,3 +242,11 @@ select, .segmented button {
 .plan-dist .week-bar span { background: var(--series-1); }
 .plan-dist .week-bar.over span { background: var(--status-critical); }
 @media (max-width: 760px) { .plan-body { grid-template-columns: 1fr; } }
+
+/* EU comparison tiles */
+.eu-compare { margin-bottom: 16px; }
+.eu-compare .chart-note a, .sources a { color: var(--text-secondary); }
+.status-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; vertical-align: middle; }
+.status-dot[data-state="good"] { background: var(--status-good); }
+.status-dot[data-state="warning"] { background: var(--status-warning); }
+.status-dot[data-state="critical"] { background: var(--status-critical); }

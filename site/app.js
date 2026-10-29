@@ -132,7 +132,9 @@ function tenderCard(t) {
       factor("Soveltuvuus", t.fit, "tekoälyn arvio"),
       factor("Kilpailu (5 = vähäinen)", t.competition,
         t.expected_bids != null ? `odotettu ${fmtDec.format(t.expected_bids)} tarjousta` : "ei historiaa"),
-      factor("Riski (5 = matala)", t.risk, "tekoälyn arvio")),
+      factor("Riski (5 = matala)", t.risk, t.scope_clarity != null
+        ? `laajuus ${t.scope_clarity} · ehdot ${t.contract_terms} · vaatimukset ${t.operational_demands}`
+        : "tekoälyn arvio")),
     el("details", {},
       el("summary", { text: "Perustelut ja historia" }),
       el("p", { text: t.summary }),
@@ -397,6 +399,25 @@ function renderEval(data) {
       el("dd", {}, fmtPct.format(m.value), el("small", { text: `n = ${fmtInt.format(m.n)}` })))));
 }
 
+// EU Single Market Scoreboard 2024 (all sectors); thresholds from the Scoreboard's own traffic lights
+const EU_SCOREBOARD = { year: 2024, singleBidEu: 0.28, singleBidFi: 0.15, priceOnlyEu: 0.54 };
+
+function renderEuIndicators(data) {
+  const k = data.eu_indicators;
+  const box = document.getElementById("eu-compare");
+  box.hidden = !k || k.single_bid_share == null;
+  if (box.hidden) return;
+  const status = (v, good, bad) => (v <= good ? "good" : v > bad ? "critical" : "warning");
+  const tile = (label, value, state, note) => el("div", { class: "tile" },
+    el("dt", { text: label }),
+    el("dd", {}, el("span", { class: "status-dot", "data-state": state }), fmtPct.format(value), el("small", { text: note })));
+  document.getElementById("eu-tiles").replaceChildren(
+    tile("Yhden tarjouksen hankinnat", k.single_bid_share, status(k.single_bid_share, 0.1, 0.2),
+      `Suomi kaikki alat ${fmtPct.format(EU_SCOREBOARD.singleBidFi)} · EU ${fmtPct.format(EU_SCOREBOARD.singleBidEu)} · hyvä ≤ 10 % · n = ${fmtInt.format(k.n_bids)}`),
+    tile("Ratkaistu pelkällä hinnalla", k.price_only_share, status(k.price_only_share, 0.8, 0.8),
+      `EU ${fmtPct.format(EU_SCOREBOARD.priceOnlyEu)} · raja 80 % · n = ${fmtInt.format(k.n_price)}`));
+}
+
 function renderBacktest(data) {
   const b = data.bid_backtest || {};
   const mae = b.bids_mae_shrunk, cat = b.bids_mae_category, rewin = b.incumbent_rewin_rate, rand = b.random_bidder_win_rate;
@@ -429,6 +450,7 @@ async function main() {
   renderBuyers(data);
   renderEval(data);
   renderBacktest(data);
+  renderEuIndicators(data);
 }
 
 main().catch((e) => {
