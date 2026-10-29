@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
   <a class="skip-link" href="#main">Siirry sisältöön</a>
@@ -75,6 +75,25 @@
         <p class="section-note">Tekoäly arvioi soveltuvuuden ja riskit esimerkkiprofiilille. Kilpailutekijä lasketaan historian tarjousmääristä, ja pisteet tulevat kiinteästä kaavasta. <a href="#scoring">Miten pisteet lasketaan</a></p>
       </div>
       <p id="capacity" class="callout capacity" hidden></p>
+      <figure class="chart-card planner" id="planner" hidden>
+        <figcaption id="plan-caption">Tarjousportfolio</figcaption>
+        <div class="filters" role="group" aria-label="Kapasiteetti">
+          <label>Kalusto ja henkilöstö riittävät <select id="plan-capacity"></select> urakkaan</label>
+          <label>Ylivarauksen riski enintään <select id="plan-risk"></select></label>
+        </div>
+        <dl id="plan-stats" class="tiles plan-stats"></dl>
+        <div class="plan-body">
+          <div>
+            <h3 class="plan-heading">Tarjoa näihin (takarajan mukaan)</h3>
+            <ol id="plan-list" class="plan-list"></ol>
+          </div>
+          <div>
+            <h3 class="plan-heading">Voittojen määrä</h3>
+            <div id="plan-dist" class="weeks plan-dist" role="img"></div>
+          </div>
+        </div>
+        <p class="chart-note">Kapasiteettia kannattaa tarjota yli, koska suurin osa tarjouksista häviää. Voittomahdollisuus = 1 / odotettu tarjousmäärä eli tasaväkinen kilpailu; todellinen osuus riippuu hintakilpailukyvystä. Tarjous on sitova voimassaoloajan, joten suunnitelma päivitetään aina, kun aiemman kilpailun tulos selviää.</p>
+      </figure>
       <figure class="chart-card deadline-card" id="deadline-card" hidden>
         <figcaption>Takarajat viikoittain</figcaption>
         <div id="deadline-chart" class="weeks" role="img"></div>
@@ -198,6 +217,6 @@
   </footer>
 
   <div id="tooltip" class="tooltip" aria-hidden="true" hidden></div>
-  <script src="app.js?v=12" defer></script>
+  <script src="app.js?v=13" defer></script>
 </body>
 </html>

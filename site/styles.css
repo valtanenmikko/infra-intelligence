@@ -227,3 +227,18 @@ select, .segmented button {
 .key { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin: 0 5px 0 10px; }
 .key:first-child { margin-left: 0; }
 @media (max-width: 640px) { .week-label { font-size: 0.6rem; } }
+
+/* Bid portfolio planner */
+.planner { margin-bottom: 16px; }
+.plan-stats { margin-bottom: 18px; }
+.plan-stats .tile { background: var(--surface-2); }
+.plan-body { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; }
+.plan-heading { font-size: 0.82rem; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px; font-family: var(--mono); }
+.plan-list { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.plan-list li { display: flex; flex-direction: column; }
+.plan-title { font-weight: 500; }
+.plan-meta { color: var(--text-muted); font-size: 0.82rem; }
+.plan-dist { height: 140px; }
+.plan-dist .week-bar span { background: var(--series-1); }
+.plan-dist .week-bar.over span { background: var(--status-critical); }
+@media (max-width: 760px) { .plan-body { grid-template-columns: 1fr; } }

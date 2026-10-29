@@ -157,7 +157,7 @@ function renderCapacity(openTenders) {
   });
   const [year, group] = [...byStart.entries()].sort((a, b) => b[1].length - a[1].length)[0] || [];
   box.hidden = !group || group.length < 3;
-  if (box.hidden) return;
+  if (box.hidden) return null;
   const roads = group.reduce((sum, t) => sum + (t.road_km || 0), 0);
   const deadlines = group.map((t) => t.deadline).sort();
   box.replaceChildren(
@@ -165,7 +165,79 @@ function renderCapacity(openTenders) {
     ` – ${roads ? `yhteensä noin ${fmtInt.format(Math.round(roads / 100) * 100)} km tiestöä, ` : ""}tarjousten takarajat ` +
     `${fmtDate.format(new Date(deadlines[0]))}–${fmtDate.format(new Date(deadlines[deadlines.length - 1]))}. ` +
     "Suositus arvioi jokaisen urakan erikseen, joten kalusto ja henkilöstö riittävät harvoin kaikkiin. " +
-    "Lista on järjestetty pisteiden ja takarajan mukaan priorisointia varten.");
+    "Alla oleva suunnittelija valitsee, mihin niistä kannattaa tarjota.");
+  return { year, group };
+}
+
+/** Probability of winning exactly k contracts, k = 0..n (Poisson binomial, independent tenders). */
+function winDistribution(probs) {
+  let dist = [1];
+  probs.forEach((p) => {
+    dist = [...dist, 0].map((v, k) => v * (1 - p) + (k > 0 ? dist[k - 1] * p : 0));
+  });
+  return dist;
+}
+
+/** Win chance in an even contest: one in the expected number of bidders. */
+const winChance = (t) => 1 / Math.max(t.expected_bids || 3, 1);
+
+/**
+ * Greedy bid portfolio: add tenders by expected value (score x win chance), skipping any that would push the
+ * chance of winning more contracts than the capacity above the risk limit. Bidding more tenders than the
+ * capacity is the point: most bids are lost.
+ */
+function planPortfolio(candidates, capacity, riskLimit) {
+  const ranked = [...candidates].sort((a, b) => b.score * winChance(b) - a.score * winChance(a) || a.days_left - b.days_left);
+  const chosen = [];
+  ranked.forEach((t) => {
+    const dist = winDistribution([...chosen, t].map(winChance));
+    const overRisk = dist.slice(capacity + 1).reduce((a, b) => a + b, 0);
+    if (overRisk <= riskLimit) chosen.push(t);
+  });
+  return chosen;
+}
+
+function renderPlanner(capacityGroup) {
+  const card = document.getElementById("planner");
+  card.hidden = !capacityGroup;
+  if (!capacityGroup) return;
+  const capSel = document.getElementById("plan-capacity");
+  const riskSel = document.getElementById("plan-risk");
+  capSel.replaceChildren(...[1, 2, 3, 4, 5].map((n) => el("option", { value: n, text: String(n), selected: n === 2 ? "" : null })));
+  riskSel.replaceChildren(...[0.05, 0.1, 0.2].map((r) => el("option", { value: r, text: fmtPct.format(r), selected: r === 0.1 ? "" : null })));
+  document.getElementById("plan-caption").textContent =
+    `Tarjousportfolio: vuonna ${capacityGroup.year} alkavat urakat (${capacityGroup.group.length} ehdokasta)`;
+  const draw = () => {
+    const capacity = Number(capSel.value);
+    const chosen = planPortfolio(capacityGroup.group, capacity, Number(riskSel.value));
+    const dist = winDistribution(chosen.map(winChance));
+    const expected = chosen.reduce((sum, t) => sum + winChance(t), 0);
+    const over = dist.slice(capacity + 1).reduce((a, b) => a + b, 0);
+    const atLeastOne = 1 - dist[0];
+    document.getElementById("plan-stats").replaceChildren(
+      el("div", { class: "tile" }, el("dt", { text: "Tarjottavia urakoita" }), el("dd", { text: fmtInt.format(chosen.length) })),
+      el("div", { class: "tile" }, el("dt", { text: "Voittoja keskimäärin" }), el("dd", { text: fmtDec.format(expected) })),
+      el("div", { class: "tile" }, el("dt", { text: "Vähintään yksi voitto" }), el("dd", { text: fmtPct.format(atLeastOne) })),
+      el("div", { class: "tile" }, el("dt", { text: "Kapasiteetti ylittyy" }), el("dd", { text: fmtPct.format(over) })));
+    // Long tails are merged into one "k+" column so the chart stays readable on narrow screens
+    const lastShown = Math.min(dist.length - 1, capacity + 3);
+    const shown = [...dist.slice(0, lastShown), dist.slice(lastShown).reduce((a, v) => a + v, 0)];
+    const max = Math.max(...shown);
+    const chart = document.getElementById("plan-dist");
+    chart.replaceChildren(...shown.map((v, k) => el("div", { class: "week" },
+      el("span", { class: "week-count", text: fmtPct.format(v) }),
+      el("div", { class: `week-bar${k > capacity ? " over" : ""}`, style: `height:${(v / max) * 100}%` }, el("span", { style: "flex:1" })),
+      el("span", { class: "week-label", text: k === lastShown && lastShown < dist.length - 1 ? `${k}+` : `${k}` }))));
+    chart.setAttribute("aria-label", `Voittojen määrän todennäköisyydet: ${dist.map((v, k) => `${k}: ${fmtPct.format(v)}`).join(", ")}`);
+    document.getElementById("plan-list").replaceChildren(...[...chosen]
+      .sort((a, b) => a.deadline.localeCompare(b.deadline))
+      .map((t) => el("li", {},
+        el("span", { class: "plan-title", text: t.title }),
+        el("span", { class: "plan-meta", text: `${t.score} p · voittomahdollisuus ${fmtPct.format(winChance(t))} · takaraja ${fmtDate.format(new Date(t.deadline))}` }))));
+  };
+  capSel.addEventListener("change", draw);
+  riskSel.addEventListener("change", draw);
+  draw();
 }
 
 // Open tenders per deadline week (Monday-based), stacked by recommendation, so bid-team peaks are visible
@@ -349,7 +421,7 @@ async function main() {
     .map((t) => ({ ...t, days_left: daysLeft(t.deadline) }))
     .filter((t) => t.days_left >= 0);
   renderMeta(data, openTenders);
-  renderCapacity(openTenders);
+  renderPlanner(renderCapacity(openTenders));
   renderDeadlines(openTenders);
   renderTenders(openTenders);
   renderMarket(data);
