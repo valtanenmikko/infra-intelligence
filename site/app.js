@@ -145,10 +145,10 @@ function tenderCard(t) {
 }
 
 // Bid recommendations are made one tender at a time; a contractor still has to choose between contracts
-// that start together. Summarise the largest group of recommended contracts with the same start year.
+// that start together. Summarise the largest group of bid-worthy contracts with the same start year.
 function renderCapacity(openTenders) {
   const box = document.getElementById("capacity");
-  const recommended = openTenders.filter((t) => t.recommendation === "Tarjoa");
+  const recommended = openTenders.filter((t) => t.recommendation !== "Ei tarjota");
   const byStart = new Map();
   recommended.forEach((t) => {
     const start = parseInt(t.period, 10);
@@ -160,7 +160,7 @@ function renderCapacity(openTenders) {
   const roads = group.reduce((sum, t) => sum + (t.road_km || 0), 0);
   const deadlines = group.map((t) => t.deadline).sort();
   box.replaceChildren(
-    el("strong", { text: `${group.length} suositeltua urakkaa alkaa vuonna ${year}` }),
+    el("strong", { text: `${group.length} tarjoamisen arvoista urakkaa (Tarjoa tai Harkitse) alkaa vuonna ${year}` }),
     ` – ${roads ? `yhteensä noin ${fmtInt.format(Math.round(roads / 100) * 100)} km tiestöä, ` : ""}tarjousten takarajat ` +
     `${fmtDate.format(new Date(deadlines[0]))}–${fmtDate.format(new Date(deadlines[deadlines.length - 1]))}. ` +
     "Suositus arvioi jokaisen urakan erikseen, joten kalusto ja henkilöstö riittävät harvoin kaikkiin. " +
@@ -264,7 +264,7 @@ function renderCompetition(data) {
   ];
   table(document.getElementById("competition-table"), "Kilpailu hankintaluokittain", cols("category", "Luokka"), data.competition);
   table(document.getElementById("region-table"), "Kilpailu maakunnittain", cols("region", "Maakunta"), data.regions);
-  const criteria = data.criteria || [];
+  const criteria = (data.criteria || []).filter((r) => r.awards >= 5);  // a band of one or two awards says nothing
   document.getElementById("criteria-card").hidden = criteria.length === 0;
   hbar(document.getElementById("criteria-chart"), criteria, opts("band"));
   table(document.getElementById("criteria-table"), "Kilpailu hinnan painon mukaan", cols("band", "Vertailuperuste"), criteria);
