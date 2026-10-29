@@ -110,7 +110,9 @@ function tenderCard(t) {
   const scope = [
     ["Tiestö", t.road_km, km], ["Sorateitä", t.gravel_road_km, km], ["Talvihoito Ise/Is", t.high_class_winter_km, km],
     ["Kävely ja pyöräily", t.cycleway_km, km], ["Vaativuus", t.difficulty, (v) => v],
+    ["Hinnan paino", t.price_share, (v) => fmtPct.format(v)],
   ].filter(([, v]) => v != null);
+  const criteria = (t.award_criteria || []).map((c) => `${c.name} ${fmtPct.format(c.share)}`).join(" · ");
   return el("li", { class: "tender" },
     el("div", {},
       el("h3", { text: t.title }),
@@ -135,10 +137,34 @@ function tenderCard(t) {
       el("p", { text: t.summary }),
       el("p", {}, el("strong", { text: "Soveltuvuus: " }), t.fit_reason),
       el("p", {}, el("strong", { text: "Riskit: " }), t.risk_reason),
+      criteria ? el("p", {}, el("strong", { text: "Vertailuperusteet: " }), criteria) : null,
       t.resource_notes?.length ? el("p", {}, el("strong", { text: "Resurssitarve: " }), t.resource_notes.join(" · ")) : null,
       el("p", {}, el("strong", { text: "Aiemmat voittajat: " }), winners),
       t.questions?.length ? el("ul", {}, t.questions.map((q) => el("li", { text: q }))) : null,
       t.url ? el("p", {}, el("a", { href: t.url, target: "_blank", rel: "noopener", text: "Ilmoitus TEDissä ↗" })) : null));
+}
+
+// Bid recommendations are made one tender at a time; a contractor still has to choose between contracts
+// that start together. Summarise the largest group of recommended contracts with the same start year.
+function renderCapacity(openTenders) {
+  const box = document.getElementById("capacity");
+  const recommended = openTenders.filter((t) => t.recommendation === "Tarjoa");
+  const byStart = new Map();
+  recommended.forEach((t) => {
+    const start = parseInt(t.period, 10);
+    if (start) byStart.set(start, [...(byStart.get(start) || []), t]);
+  });
+  const [year, group] = [...byStart.entries()].sort((a, b) => b[1].length - a[1].length)[0] || [];
+  box.hidden = !group || group.length < 3;
+  if (box.hidden) return;
+  const roads = group.reduce((sum, t) => sum + (t.road_km || 0), 0);
+  const deadlines = group.map((t) => t.deadline).sort();
+  box.replaceChildren(
+    el("strong", { text: `${group.length} suositeltua urakkaa alkaa vuonna ${year}` }),
+    ` – ${roads ? `yhteensä noin ${fmtInt.format(Math.round(roads / 100) * 100)} km tiestöä, ` : ""}tarjousten takarajat ` +
+    `${fmtDate.format(new Date(deadlines[0]))}–${fmtDate.format(new Date(deadlines[deadlines.length - 1]))}. ` +
+    "Suositus arvioi jokaisen urakan erikseen, joten kalusto ja henkilöstö riittävät harvoin kaikkiin. " +
+    "Lista on järjestetty pisteiden ja takarajan mukaan priorisointia varten.");
 }
 
 function renderTenders(openTenders) {
@@ -238,6 +264,10 @@ function renderCompetition(data) {
   ];
   table(document.getElementById("competition-table"), "Kilpailu hankintaluokittain", cols("category", "Luokka"), data.competition);
   table(document.getElementById("region-table"), "Kilpailu maakunnittain", cols("region", "Maakunta"), data.regions);
+  const criteria = data.criteria || [];
+  document.getElementById("criteria-card").hidden = criteria.length === 0;
+  hbar(document.getElementById("criteria-chart"), criteria, opts("band"));
+  table(document.getElementById("criteria-table"), "Kilpailu hinnan painon mukaan", cols("band", "Vertailuperuste"), criteria);
   const s = data.price_spread;
   document.getElementById("spread-callout").textContent =
     `Hintahaarukka: kun sekä alin että ylin tarjous on ilmoitettu (${s.n} hankintaa), ylin tarjous on mediaanina ${fmtPct.format(s.median_spread)} alinta kalliimpi.`;
@@ -288,6 +318,7 @@ async function main() {
     .map((t) => ({ ...t, days_left: daysLeft(t.deadline) }))
     .filter((t) => t.days_left >= 0);
   renderMeta(data, openTenders);
+  renderCapacity(openTenders);
   renderTenders(openTenders);
   renderMarket(data);
   renderCompetition(data);

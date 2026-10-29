@@ -206,3 +206,6 @@ select, .segmented button {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+.criteria-card { margin-top: 16px; }
+.capacity { margin: 0 0 16px; }

@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
   <a class="skip-link" href="#main">Siirry sisältöön</a>
@@ -74,6 +74,7 @@
         <h2 id="tenders-title">Avoimet kilpailutukset</h2>
         <p class="section-note">Tekoäly arvioi soveltuvuuden ja riskit esimerkkiprofiilille. Kilpailutekijä lasketaan historian tarjousmääristä, ja pisteet tulevat kiinteästä kaavasta. <a href="#scoring">Miten pisteet lasketaan</a></p>
       </div>
+      <p id="capacity" class="callout capacity" hidden></p>
       <div class="filters" role="group" aria-label="Suodata kilpailutuksia">
         <label>Luokka <select id="tender-category"></select></label>
         <label>Suositus <select id="tender-rec"></select></label>
@@ -120,6 +121,12 @@
           <details class="table-view"><summary>Näytä taulukkona</summary><div id="region-table"></div></details>
         </figure>
       </div>
+      <figure class="chart-card criteria-card" id="criteria-card" hidden>
+        <figcaption id="criteria-caption">Hinnan painon mukaan vertailuperusteissa</figcaption>
+        <div id="criteria-chart" class="hbar" role="list" aria-labelledby="criteria-caption"></div>
+        <p class="chart-note">Laatua painottavat hankinnat ovat pääosin ELY-keskusten hoitourakoita, joten ero kertoo myös hankintaluokasta eikä pelkästään vertailuperusteista.</p>
+        <details class="table-view"><summary>Näytä taulukkona</summary><div id="criteria-table"></div></details>
+      </figure>
       <p class="callout" id="spread-callout"></p>
     </section>
 
@@ -186,6 +193,6 @@
   </footer>
 
   <div id="tooltip" class="tooltip" aria-hidden="true" hidden></div>
-  <script src="app.js?v=7" defer></script>
+  <script src="app.js?v=8" defer></script>
 </body>
 </html>
