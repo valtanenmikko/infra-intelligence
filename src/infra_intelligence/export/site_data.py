@@ -75,7 +75,7 @@ QUERIES: dict[str, str] = {
     # Comparable to the EU Single Market Scoreboard indicators (single bidder, awarded on price only)
     "eu_indicators": """
         SELECT count(bids_received) AS n_bids, avg(CAST(is_single_bid AS INT)) AS single_bid_share,
-               count(price_share) AS n_price, avg(CASE WHEN price_share >= 1 THEN 1.0 ELSE 0 END) AS price_only_share
+               count(price_share) AS n_price, avg(CASE WHEN price_share >= 1 THEN 1.0 WHEN price_share IS NOT NULL THEN 0 END) AS price_only_share
         FROM workspace.gold.award_facts
     """,
     "criteria": """
