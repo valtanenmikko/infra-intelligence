@@ -171,11 +171,16 @@ function renderCapacity(openTenders) {
   return { year, group };
 }
 
-/** Probability of winning exactly k contracts, k = 0..n (Poisson binomial, independent tenders). */
-function winDistribution(probs) {
+/**
+ * Distribution of the total size won, in whole units: dist[u] = P(won size = u). Each bid is an independent win
+ * with its own probability (Poisson binomial when every size is 1).
+ */
+function sizeDistribution(bids) {
   let dist = [1];
-  probs.forEach((p) => {
-    dist = [...dist, 0].map((v, k) => v * (1 - p) + (k > 0 ? dist[k - 1] * p : 0));
+  bids.forEach(({ p, size }) => {
+    const next = new Array(dist.length + size).fill(0);
+    dist.forEach((v, u) => { next[u] += v * (1 - p); next[u + size] += v * p; });
+    dist = next;
   });
   return dist;
 }
@@ -183,62 +188,115 @@ function winDistribution(probs) {
 /** Win chance in an even contest, from history (winners per bidder); 1 / expected bids only as a fallback. */
 const winChance = (t) => t.win_chance ?? 1 / Math.max(t.expected_bids || 3, 1);
 
+// Capacity as a number of contracts, or as road length (the main driver of equipment and staff in maintenance).
+// Road length is counted in 10 km units; bins of the chart are one contract or 500 km.
+const KM_UNIT = 10;
+const PLAN_MODES = {
+  count: {
+    options: [1, 2, 3, 4, 5], initial: 2, bin: 1,
+    size: () => 1, fits: () => true, label: (u) => String(u),
+  },
+  km: {
+    options: [1000, 1500, 2000, 2500, 3000, 4000], initial: 2000, bin: 500 / KM_UNIT,
+    size: (t) => Math.round(t.road_km / KM_UNIT), fits: (t) => t.road_km > 0, label: (u) => fmtInt.format(u * KM_UNIT),
+  },
+};
+const overRisk = (dist, capUnits) => dist.slice(capUnits + 1).reduce((a, b) => a + b, 0);
+
 /**
- * Greedy bid portfolio: add tenders by expected value (score x win chance), skipping any that would push the
- * chance of winning more contracts than the capacity above the risk limit. Bidding more tenders than the
- * capacity is the point: most bids are lost.
+ * Bid portfolio: choose the tenders with the highest total expected value (score x win chance) while the chance of
+ * winning more than the capacity stays within the risk limit. Bidding beyond the capacity is the point: most bids
+ * are lost. With sizes (km) this is a knapsack-type problem, so neither greedy order is always best: start from the
+ * better of value order and value-per-size order, then try dropping each chosen tender and refilling. On the
+ * published data this matched brute-force optima for 1 000-2 000 km and was within 1 % at 3 000 km.
  */
-function planPortfolio(candidates, capacity, riskLimit) {
-  const ranked = [...candidates].sort((a, b) => b.score * winChance(b) - a.score * winChance(a) || a.days_left - b.days_left);
-  const chosen = [];
-  ranked.forEach((t) => {
-    const dist = winDistribution([...chosen, t].map(winChance));
-    const overRisk = dist.slice(capacity + 1).reduce((a, b) => a + b, 0);
-    if (overRisk <= riskLimit) chosen.push(t);
-  });
-  return chosen;
+function planPortfolio(candidates, mode, capUnits, riskLimit) {
+  const value = (t) => t.score * winChance(t);
+  const total = (set) => set.reduce((sum, t) => sum + value(t), 0);
+  const fits = (set) => overRisk(sizeDistribution(set.map((c) => ({ p: winChance(c), size: mode.size(c) }))), capUnits) <= riskLimit;
+  const orders = [
+    [...candidates].sort((a, b) => value(b) - value(a) || a.days_left - b.days_left),
+    [...candidates].sort((a, b) => value(b) / mode.size(b) - value(a) / mode.size(a) || a.days_left - b.days_left),
+  ];
+  const fill = (start, order, skip) => order.reduce((set, t) =>
+    (t === skip || set.includes(t) || !fits([...set, t]) ? set : [...set, t]), start);
+  let best = orders.map((order) => fill([], order)).sort((a, b) => total(b) - total(a))[0];
+  for (let improved = true; improved;) {
+    improved = false;
+    for (const out of best) {
+      for (const order of orders) {
+        const candidate = fill(best.filter((t) => t !== out), order, out);
+        if (total(candidate) > total(best) + 1e-9) { best = candidate; improved = true; break; }
+      }
+      if (improved) break;
+    }
+  }
+  return best;
 }
 
 function renderPlanner(capacityGroup) {
   const card = document.getElementById("planner");
   card.hidden = !capacityGroup;
   if (!capacityGroup) return;
+  const unitSel = document.getElementById("plan-unit");
   const capSel = document.getElementById("plan-capacity");
   const riskSel = document.getElementById("plan-risk");
-  capSel.replaceChildren(...[1, 2, 3, 4, 5].map((n) => el("option", { value: n, text: String(n), selected: n === 2 ? "" : null })));
+  unitSel.replaceChildren(el("option", { value: "count", text: "urakkaan" }), el("option", { value: "km", text: "km tiestöä" }));
   riskSel.replaceChildren(...[0.05, 0.1, 0.2].map((r) => el("option", { value: r, text: fmtPct.format(r), selected: r === 0.1 ? "" : null })));
+  const setCapacityOptions = () => {
+    const mode = PLAN_MODES[unitSel.value];
+    capSel.replaceChildren(...mode.options.map((n) => el("option", { value: n, text: fmtInt.format(n), selected: n === mode.initial ? "" : null })));
+  };
   document.getElementById("plan-caption").textContent =
     `Tarjousportfolio: vuonna ${capacityGroup.year} alkavat urakat (${capacityGroup.group.length} ehdokasta)`;
+
   const draw = () => {
-    const capacity = Number(capSel.value);
-    const chosen = planPortfolio(capacityGroup.group, capacity, Number(riskSel.value));
-    const dist = winDistribution(chosen.map(winChance));
-    const expected = chosen.reduce((sum, t) => sum + winChance(t), 0);
-    const over = dist.slice(capacity + 1).reduce((a, b) => a + b, 0);
-    const atLeastOne = 1 - dist[0];
+    const isKm = unitSel.value === "km";
+    const mode = PLAN_MODES[unitSel.value];
+    const capUnits = isKm ? Number(capSel.value) / KM_UNIT : Number(capSel.value);
+    const candidates = capacityGroup.group.filter(mode.fits);
+    const chosen = planPortfolio(candidates, mode, capUnits, Number(riskSel.value));
+    const dist = sizeDistribution(chosen.map((t) => ({ p: winChance(t), size: mode.size(t) })));
+    const expected = chosen.reduce((sum, t) => sum + winChance(t) * mode.size(t), 0);
+    const noWins = chosen.reduce((prod, t) => prod * (1 - winChance(t)), 1);
     document.getElementById("plan-stats").replaceChildren(
       el("div", { class: "tile" }, el("dt", { text: "Tarjottavia urakoita" }), el("dd", { text: fmtInt.format(chosen.length) })),
-      el("div", { class: "tile" }, el("dt", { text: "Voittoja keskimäärin" }), el("dd", { text: fmtDec.format(expected) })),
-      el("div", { class: "tile" }, el("dt", { text: "Vähintään yksi voitto" }), el("dd", { text: fmtPct.format(atLeastOne) })),
-      el("div", { class: "tile" }, el("dt", { text: "Kapasiteetti ylittyy" }), el("dd", { text: fmtPct.format(over) })));
-    // Long tails are merged into one "k+" column so the chart stays readable on narrow screens
-    const lastShown = Math.min(dist.length - 1, capacity + 3);
-    const shown = [...dist.slice(0, lastShown), dist.slice(lastShown).reduce((a, v) => a + v, 0)];
+      el("div", { class: "tile" }, el("dt", { text: isKm ? "Voitettua tiestöä keskimäärin" : "Voittoja keskimäärin" }),
+        el("dd", { text: isKm ? `${fmtInt.format(Math.round(expected) * KM_UNIT)} km` : fmtDec.format(expected) })),
+      el("div", { class: "tile" }, el("dt", { text: "Vähintään yksi voitto" }), el("dd", { text: fmtPct.format(1 - noWins) })),
+      el("div", { class: "tile" }, el("dt", { text: "Kapasiteetti ylittyy" }), el("dd", { text: fmtPct.format(overRisk(dist, capUnits)) })));
+
+    // Chart bins of one contract or 500 km; bins from three past the capacity on are merged into one "+" column.
+    // Capacities are whole bins, so a bin is over capacity exactly when it starts past it.
+    const capBin = Math.floor(capUnits / mode.bin);
+    const bins = Array.from({ length: Math.ceil(dist.length / mode.bin) },
+      (_, i) => dist.slice(i * mode.bin, (i + 1) * mode.bin).reduce((a, v) => a + v, 0));
+    const lastShown = Math.min(bins.length - 1, capBin + 3);
+    const shown = [...bins.slice(0, lastShown), bins.slice(lastShown).reduce((a, v) => a + v, 0)];
     const max = Math.max(...shown);
+    const isOver = (i) => (mode.bin === 1 ? i > capUnits : i * mode.bin >= capUnits);
+    document.getElementById("plan-dist-heading").textContent = isKm ? "Voitettu tiestö (km)" : "Voittojen määrä";
     const chart = document.getElementById("plan-dist");
-    chart.replaceChildren(...shown.map((v, k) => el("div", { class: "week" },
+    chart.replaceChildren(...shown.map((v, i) => el("div", { class: "week" },
       el("span", { class: "week-count", text: fmtPct.format(v) }),
-      el("div", { class: `week-bar${k > capacity ? " over" : ""}`, style: `height:${(v / max) * 100}%` }, el("span", { style: "flex:1" })),
-      el("span", { class: "week-label", text: k === lastShown && lastShown < dist.length - 1 ? `${k}+` : `${k}` }))));
-    chart.setAttribute("aria-label", `Voittojen määrän todennäköisyydet: ${dist.map((v, k) => `${k}: ${fmtPct.format(v)}`).join(", ")}`);
+      el("div", { class: `week-bar${isOver(i) ? " over" : ""}`, style: `height:${(v / max) * 100}%` }, el("span", { style: "flex:1" })),
+      el("span", { class: "week-label", text: `${mode.label(i * mode.bin)}${i === lastShown && lastShown < bins.length - 1 ? "+" : ""}` }))));
+    chart.setAttribute("aria-label", `Todennäköisyydet: ${shown.map((v, i) => `${mode.label(i * mode.bin)}: ${fmtPct.format(v)}`).join(", ")}`);
+    const excluded = capacityGroup.group.length - candidates.length;
+    document.getElementById("plan-scope-note").textContent = isKm && excluded
+      ? `Kilometreinä mukana vain urakat, joiden tiestön pituus on ilmoitettu (${candidates.length}/${capacityGroup.group.length}).`
+      : "";
     document.getElementById("plan-list").replaceChildren(...[...chosen]
       .sort((a, b) => a.deadline.localeCompare(b.deadline))
       .map((t) => el("li", {},
         el("span", { class: "plan-title", text: t.title }),
-        el("span", { class: "plan-meta", text: `${t.score} p · voittomahdollisuus ${fmtPct.format(winChance(t))} · takaraja ${fmtDate.format(new Date(t.deadline))}` }))));
+        el("span", { class: "plan-meta", text: `${t.score} p · voittomahdollisuus ${fmtPct.format(winChance(t))}` +
+          `${t.road_km ? ` · ${fmtInt.format(t.road_km)} km` : ""} · takaraja ${fmtDate.format(new Date(t.deadline))}` }))));
   };
+  unitSel.addEventListener("change", () => { setCapacityOptions(); draw(); });
   capSel.addEventListener("change", draw);
   riskSel.addEventListener("change", draw);
+  setCapacityOptions();
   draw();
 }
 
