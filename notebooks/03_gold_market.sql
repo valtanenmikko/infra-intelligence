@@ -71,6 +71,9 @@ AS SELECT
   size(n.winner_ids)              AS winner_count,
   n.total_value_eur               AS contract_value_eur,
   n.tenders_received_max          AS bids_received,
+  -- Contracts a bidder wins per bid in an even contest: winners / bids (1 / bids for a single winner).
+  -- Averaging this per award is not the same as 1 / average bids, which underestimates it.
+  least(greatest(size(n.winner_ids), 1), n.tenders_received_max) / nullif(n.tenders_received_max, 0) AS win_chance,
   n.price_share,
   n.tenders_received_max <= 1     AS is_single_bid,
   n.tenders_received_max <= 2     AS is_low_competition,
@@ -236,15 +239,15 @@ AS WITH open AS (
 -- Past awards comparable to each open tender, tagged by how they match. Regional history matters for
 -- state road maintenance: all ELY centres share one buyer ID, so buyer history alone is nationwide.
 comparable AS (
-  SELECT o.publication_number AS open_id, 'buyer' AS scope, a.publication_number, a.bids_received
+  SELECT o.publication_number AS open_id, 'buyer' AS scope, a.publication_number, a.bids_received, a.win_chance
   FROM open o JOIN workspace.gold.award_facts a ON a.buyer_id = o.buyer_id AND a.infra_category = o.infra_category
   UNION ALL
-  SELECT o.publication_number, 'region', a.publication_number, a.bids_received
+  SELECT o.publication_number, 'region', a.publication_number, a.bids_received, a.win_chance
   FROM open o JOIN workspace.gold.award_facts a ON a.infra_category = o.infra_category AND arrays_overlap(a.regions, o.regions)
 ),
 history AS (
   SELECT open_id, scope, count(*) AS past_awards, count(bids_received) AS past_bid_awards,
-         round(avg(bids_received), 1) AS past_avg_bids
+         round(avg(bids_received), 1) AS past_avg_bids, avg(win_chance) AS past_win_chance
   FROM comparable GROUP BY ALL
 ),
 past_winners AS (
@@ -261,6 +264,9 @@ past_winners AS (
 category_bids AS (
   SELECT category_label AS infra_category, avg_bids AS category_avg_bids
   FROM workspace.gold.competition WHERE year_label = 'Kaikki'
+),
+category_chance AS (
+  SELECT infra_category, avg(win_chance) AS category_win_chance FROM workspace.gold.award_facts GROUP BY 1
 )
 SELECT
   o.publication_number,
@@ -294,13 +300,17 @@ SELECT
   hr.past_avg_bids                                       AS region_past_avg_bids,
   wr.top_winners                                         AS region_past_top_winners,
   c.category_avg_bids,
+  -- Buyer history shrunk toward the category with the same weight as the bid estimate (k = 3)
+  round((coalesce(hb.past_win_chance * hb.past_bid_awards, 0) + 3 * cc.category_win_chance)
+        / (coalesce(hb.past_bid_awards, 0) + 3), 3)    AS win_chance,
   concat('https://ted.europa.eu/fi/notice/-/detail/', o.publication_number) AS ted_url
 FROM open o
 LEFT JOIN history hb      ON hb.open_id = o.publication_number AND hb.scope = 'buyer'
 LEFT JOIN past_winners wb ON wb.open_id = o.publication_number AND wb.scope = 'buyer'
 LEFT JOIN history hr      ON hr.open_id = o.publication_number AND hr.scope = 'region'
 LEFT JOIN past_winners wr ON wr.open_id = o.publication_number AND wr.scope = 'region'
-LEFT JOIN category_bids c ON c.infra_category = o.infra_category;
+LEFT JOIN category_bids c ON c.infra_category = o.infra_category
+LEFT JOIN category_chance cc ON cc.infra_category = o.infra_category;
 
 -- COMMAND ----------
 
@@ -313,7 +323,11 @@ CREATE OR REPLACE TABLE workspace.gold.bid_factor_backtest
 COMMENT 'Out-of-time accuracy of the bid-count forecast and the incumbent re-win rate'
 AS WITH a AS (SELECT * FROM workspace.gold.award_facts WHERE bids_received IS NOT NULL),
 pred AS (
-  SELECT t.bids_received AS actual,
+  SELECT t.bids_received AS actual, t.win_chance AS actual_chance,
+    (SELECT avg(h.win_chance) FROM a h WHERE h.publication_date < t.publication_date
+       AND h.infra_category = t.infra_category) AS cat_chance,
+    (SELECT avg(h.win_chance) FROM a h WHERE h.publication_date < t.publication_date
+       AND h.infra_category = t.infra_category AND h.buyer_id = t.buyer_id) AS buy_chance,
     (SELECT avg(h.bids_received) FROM a h WHERE h.publication_date < t.publication_date
        AND h.infra_category = t.infra_category) AS cat,
     (SELECT avg(h.bids_received) FROM a h WHERE h.publication_date < t.publication_date
@@ -350,7 +364,16 @@ SELECT 'incumbent_rewin_rate', round(avg(CASE WHEN arrays_overlap(winners, previ
        count(*) FROM incumbent WHERE previous_winners IS NOT NULL
 UNION ALL
 SELECT 'random_bidder_win_rate', round(avg(1.0 / greatest(bids_received, 1)), 2), count(*)
-FROM incumbent WHERE previous_winners IS NOT NULL AND bids_received IS NOT NULL;
+FROM incumbent WHERE previous_winners IS NOT NULL AND bids_received IS NOT NULL
+UNION ALL
+-- Win chance used by the bid portfolio planner: direct estimate vs 1 / expected bids
+SELECT 'win_chance_actual_mean', round(avg(actual_chance), 3), count(*) FROM pred WHERE cat IS NOT NULL AND actual_chance IS NOT NULL
+UNION ALL
+SELECT 'win_chance_mae_direct', round(avg(abs((coalesce(buy_chance * buy_n, 0) + 3 * cat_chance) / (buy_n + 3) - actual_chance)), 3), count(*)
+FROM pred WHERE cat IS NOT NULL AND actual_chance IS NOT NULL
+UNION ALL
+SELECT 'win_chance_mae_inverse_bids', round(avg(abs(1 / ((coalesce(buy * buy_n, 0) + 3 * cat) / (buy_n + 3)) - actual_chance)), 3), count(*)
+FROM pred WHERE cat IS NOT NULL AND actual_chance IS NOT NULL;
 
 -- COMMAND ----------
 

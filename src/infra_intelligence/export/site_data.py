@@ -60,7 +60,7 @@ QUERIES: dict[str, str] = {
                o.estimated_value_eur, a.recommendation, a.score, a.fit, a.competition, a.risk, a.expected_bids,
                a.summary, a.fit_reason, a.risk_reason, to_json(a.questions_for_bid_team) AS questions,
                a.road_km, a.gravel_road_km, a.high_class_winter_km, a.cycleway_km, a.difficulty,
-               to_json(a.resource_notes) AS resource_notes, o.price_share, to_json(o.award_criteria) AS award_criteria,
+               to_json(a.resource_notes) AS resource_notes, o.price_share, to_json(o.award_criteria) AS award_criteria, o.win_chance,
                to_json(coalesce(o.region_past_top_winners, o.buyer_past_top_winners)) AS past_winners, o.ted_url AS url
         FROM workspace.gold.open_tenders o JOIN a USING (publication_number)
         ORDER BY a.score DESC
@@ -82,7 +82,7 @@ INT_FIELDS = {"notices", "awards", "competitions", "open_tenders", "wins", "n", 
 FLOAT_FIELDS = {"single_winner_value_eur", "avg_bids", "share_low_competition", "share_single_bid", "won_value_eur",
                 "share_of_awards", "awarded_value_eur", "top_winner_share", "option_years", "estimated_value_eur",
                 "expected_bids", "median_spread", "value", "road_km", "gravel_road_km", "high_class_winter_km",
-                "cycleway_km", "price_share"}
+                "cycleway_km", "price_share", "win_chance"}
 BOOL_FIELDS = {"region_from_llm"}
 JSON_FIELDS = {"questions", "past_winners", "resource_notes", "award_criteria"}
 EVAL_LABELS = {
