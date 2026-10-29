@@ -54,7 +54,7 @@ package from `src/`, so business logic is unit tested locally and the notebooks 
 |---|---|---|
 | Bronze (raw) | `ted_notices`, `prh_companies` | Raw JSON, incremental and idempotent `MERGE`; PRH lookups cached and refreshed every 90 days |
 | Silver (cleaned, conformed) | `notices`, `notice_winners`, `companies`, `buyers`, `llm_extractions` | Typed records, infra scope by main CPV, entity resolution by business ID |
-| Gold (business-ready) | `market_share`, `competition`, `competition_by_region`, `buyer_profiles`, `open_tenders`, `price_spread`, `bid_assessments`, `llm_eval_metrics` | SQL with `GROUPING SETS` rollups and in-notebook quality assertions |
+| Gold (business-ready) | `market_share`, `competition`, `competition_by_region`, `buyer_profiles`, `open_tenders`, `price_spread`, `bid_assessments`, `bid_factor_backtest`, `llm_eval_metrics` | SQL with `GROUPING SETS` rollups and in-notebook quality assertions |
 
 ## Design decisions
 
@@ -81,8 +81,22 @@ Euro values are the weak spot: few notices state one in the text, so the field i
 
 **The go/no-go score is computed, not generated.**
 The model rates two qualitative factors with reasons, *fit* to a bidder profile and *risk*. *Competition* comes from
-historical bid counts (same region → same buyer → category average). A fixed weighted formula produces the 0–100
-score and the recommendation, so results are reproducible and the model does no arithmetic.
+historical bid counts. A fixed weighted formula (fit 40 %, competition 30 %, risk 30 %) produces the 0–100 score and
+the recommendation, so results are reproducible and the model does no arithmetic.
+
+**The history factors are backtested, and the data overruled two intuitions.**
+Each past award is predicted using only awards published before it (`gold.bid_factor_backtest`, rebuilt daily):
+
+| Bid-count estimate | Mean absolute error (bids) | n |
+|---|---|---|
+| Most specific history first (region → buyer → category) | 2.2 | 212 |
+| Category average | 2.08 | 212 |
+| Buyer average shrunk toward the category average, *(n·buyer + 3·category) / (n + 3)* | **2.0** | 212 |
+
+Regional history looked most relevant but was the noisiest: a region rarely has more than a handful of comparable
+awards. The score now uses the shrunk estimate. An incumbent bonus was also considered, but the winner of the previous
+comparable award (same buyer, category and region) won the next one in only 23 % of cases (n = 75), below the 33 %
+expected for a random bidder. Past winners are shown to the bid team as context, not scored.
 
 **Privacy by default.** Sole traders often trade under a personal name. A winner's name is published only if PRH
 open data knows the ID as a company that is not a sole trader; others are grouped as *Muut toimijat*. A Gold
@@ -131,7 +145,7 @@ tests/         unit tests (stdlib unittest, mocks for all external APIs)
 ## Running
 
 ```bash
-python -m unittest discover -s tests -t .      # 98 tests, no network
+python -m unittest discover -s tests -t .      # 101 tests, no network
 ```
 
 On Databricks the pipeline runs as the scheduled job `infra-intelligence-daily` (10:30 Europe/Helsinki, after
