@@ -10,7 +10,7 @@ Split of responsibilities, so the result is reproducible and auditable:
 from dataclasses import dataclass
 from typing import Any
 
-PROMPT_VERSION = "bid-v4"
+PROMPT_VERSION = "bid-v5"
 BATCH_SIZE = 5  # tenders per request
 
 # Example bidder used in the demo. A real deployment would load the company's own profile.
@@ -34,7 +34,9 @@ otherwise null; never estimate.
   high_class_winter_km: roads in winter maintenance classes Ise and Is (the most demanding: most equipment and
   on-call staff). cycleway_km: walking and cycling routes. difficulty: the stated difficulty level.
   notes: at most 4 short notes on equipment, staffing, on-call duty, qualifications or special tasks in the text.
-Use the scope in fit and risk: compare its size and demands to the bidder profile."""
+Use the scope in fit and risk: compare its size and demands to the bidder profile.
+Award criteria: a large quality share rewards demonstrated capability, key staff and equipment; price-only
+competitions are won on cost alone. Mention what the criteria mean for the bid in fit_reason."""
 
 # Difficulty levels used in Finnish state road maintenance contracts (Väylävirasto)
 DIFFICULTY_LEVELS = ["perusurakka", "vaativa urakka", "erittäin vaativa urakka"]
@@ -145,6 +147,16 @@ def recommendation(score: int, fit: int) -> str:
     return "Ei tarjota"
 
 
+def _criteria(tender: dict[str, Any]) -> str:
+    named = tender.get("award_criteria") or []
+    if named:
+        return ", ".join(f"{c['name']} {round(c['share'] * 100)} %" for c in named)
+    share = tender.get("price_share")
+    if share is None:
+        return "ei tietoa"
+    return "pelkkä hinta" if share >= 1 else f"hinta {round(share * 100)} %, laatu {round((1 - share) * 100)} %"
+
+
 def _winners(winners: Any) -> str:
     if not winners:
         return "ei tietoa"
@@ -172,6 +184,7 @@ def _tender_block(tender: dict[str, Any]) -> str:
         f"Sopimuskausi: {period}, optiot {tender.get('option_years') or 'ei tietoa'} v",
         f"Arvioitu arvo: {tender.get('estimated_value_eur') or 'ei ilmoitettu'} €",
         f"Indeksiehto: {tender.get('has_price_index_clause')}",
+        f"Vertailuperusteet: {_criteria(tender)}",
         f"Laajuus: {tender.get('scope_summary') or ''}",
         f"Vaatimukset: {'; '.join(tender.get('key_requirements') or [])}",
         f"Tunnistetut riskit: {'; '.join(tender.get('risks') or [])}",

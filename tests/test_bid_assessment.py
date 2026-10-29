@@ -85,6 +85,13 @@ class PromptTest(unittest.TestCase):
         self.assertIn("Odotettu tarjousmäärä historian perusteella: 3.7", p)
         self.assertIn("Kuvaus: Sopimukseen kuuluvaa tiestöä on yhteensä noin 900", p)
 
+    def test_prompt_shows_award_criteria(self):
+        named = [{"name": "Vertailuhinta", "kind": "price", "share": 0.65}, {"name": "Laatu", "kind": "quality", "share": 0.35}]
+        self.assertIn("Vertailuperusteet: Vertailuhinta 65 %, Laatu 35 %", build_prompt([{**TENDER, "award_criteria": named}]))
+        self.assertIn("Vertailuperusteet: hinta 80 %, laatu 20 %", build_prompt([{**TENDER, "price_share": 0.8}]))
+        self.assertIn("Vertailuperusteet: pelkkä hinta", build_prompt([{**TENDER, "price_share": 1.0}]))
+        self.assertIn("Vertailuperusteet: ei tietoa", build_prompt([TENDER]))
+
     def test_long_description_is_truncated(self):
         p = build_prompt([{**TENDER, "description": "x" * 10_000}])
         self.assertIn("x" * 3000, p)
