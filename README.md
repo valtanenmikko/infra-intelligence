@@ -94,7 +94,9 @@ Each past award is predicted using only awards published before it (`gold.bid_fa
 | Buyer average shrunk toward the category average, *(n·buyer + 3·category) / (n + 3)* | **2.0** | 212 |
 
 Regional history looked most relevant but was the noisiest: a region rarely has more than a handful of comparable
-awards. The score now uses the shrunk estimate. An incumbent bonus was also considered, but the winner of the previous
+awards. The score now uses the shrunk estimate. Nesting regional history inside the buyer did not help either
+(2.003 → 1.999), so similar state maintenance contracts honestly end up with equal scores; the site breaks ties by
+deadline instead of inventing precision. An incumbent bonus was also considered, but the winner of the previous
 comparable award (same buyer, category and region) won the next one in only 23 % of cases (n = 75), below the 33 %
 expected for a random bidder. Past winners are shown to the bid team as context, not scored.
 
