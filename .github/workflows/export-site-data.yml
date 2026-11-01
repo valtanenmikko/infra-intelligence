@@ -24,17 +24,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Backup runs stop here once today's data is out, so they don't spend the Free Edition compute quota.
+      - name: Skip if already exported today
+        id: fresh
+        if: github.event_name == 'schedule'
+        run: |
+          if grep -q "\"generated_at\": \"$(date -u +%F)\"" site/data/site.json; then
+            echo "Already exported today"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/setup-python@v5
+        if: steps.fresh.outputs.skip != 'true'
         with:
           python-version: "3.12"
 
       - name: Install dependencies
+        if: steps.fresh.outputs.skip != 'true'
         run: pip install requests
 
       - name: Unit tests
+        if: steps.fresh.outputs.skip != 'true'
         run: python -m unittest discover -s tests -t .
 
       - name: Export Gold tables
+        if: steps.fresh.outputs.skip != 'true'
         env:
           DATABRICKS_HOST: ${{ vars.DATABRICKS_HOST }}
           DATABRICKS_WAREHOUSE_ID: ${{ vars.DATABRICKS_WAREHOUSE_ID }}
@@ -42,6 +56,7 @@ jobs:
         run: python scripts/export_site_data.py
 
       - name: Commit if data changed
+        if: steps.fresh.outputs.skip != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
