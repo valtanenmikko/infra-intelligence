@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Backup runs stop here once today's data is out, so they don't spend the Free Edition compute quota.
       - name: Skip if already exported today
@@ -33,7 +33,7 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         if: steps.fresh.outputs.skip != 'true'
         with:
           python-version: "3.12"
