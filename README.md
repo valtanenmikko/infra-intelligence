@@ -187,8 +187,15 @@ tests/         unit tests (stdlib unittest, mocks for all external APIs)
 ## Running
 
 ```bash
-python -m unittest discover -s tests -t .      # 118 tests, no network
+python -m unittest discover -s tests -t .      # 118 unit tests, no network
+python -m unittest tests.test_site             # 10 browser tests (Playwright + Chromium; skipped without them)
 ```
+
+The browser tests serve `site/` locally and check that the page loads without errors, filters and the portfolio
+planner behave, chart tables open, phones get no horizontal scroll and axe-core finds no WCAG 2.1 AA violations.
+They also check the planner maths against brute force: the win distribution against full enumeration, and the
+chosen portfolio against the best subset (exact for contract counts, within 2 % for road km). The `site-tests`
+workflow runs them on every site change.
 
 On Databricks the pipeline runs as the scheduled job `infra-intelligence-daily` (10:30 Europe/Helsinki, after
 the Gemini daily quota resets). It checks the notebooks out from this repo on every run:
