@@ -194,15 +194,18 @@ On Databricks the pipeline runs as the scheduled job `infra-intelligence-daily` 
 the Gemini daily quota resets). It checks the notebooks out from this repo on every run:
 
 ```
-bronze_ted → bronze_prh → silver → llm_extract → gold → llm_eval
-                                                      └→ bid_assessment
+bronze_ted → bronze_prh → silver → llm_extract → gold → llm_eval ───────┐
+                                                      └→ bid_assessment ─┴→ site_export
 ```
 
 Gold runs even if the LLM step fails (e.g. quota), so market tables stay fresh. The Gemini key is read from a
 secret scope: `databricks secrets put-secret infra-intelligence gemini-api-key`.
 
-The GitHub Actions workflow `export-site-data` exports Gold to `site/data/site.json` every day after the job and
-commits it if the data changed. It reads the repository variables `DATABRICKS_HOST` and `DATABRICKS_WAREHOUSE_ID`
+The last task, `site_export`, starts the GitHub Actions workflow `export-site-data`, which exports Gold to
+`site/data/site.json` and commits it if the data changed. Starting it from the job matters: GitHub's cron for
+free repos often runs hours late or not at all, so the workflow's own schedule is only a backup (it skips once
+the day's data is out). The task reads a fine-grained GitHub token (this repo, Actions read/write) from the
+secret `infra-intelligence/github-token`. The workflow reads the repository variables `DATABRICKS_HOST` and `DATABRICKS_WAREHOUSE_ID`
 and the secret `DATABRICKS_TOKEN`. When the token expires the workflow fails; create a new token in Databricks
 (Settings → Developer → Access tokens) and replace the secret.
 
