@@ -80,3 +80,7 @@ ASSESSMENT_MODELS = ["gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.5-flash-l
 ASSESSMENT_RPM = 4
 SECRET_SCOPE = "infra-intelligence"
 GEMINI_SECRET_KEY = "gemini-api-key"
+# Fine-grained GitHub token (this repo only, Actions: read and write) that starts the site export.
+GITHUB_SECRET_KEY = "github-token"
+GITHUB_REPO = "valtanenmikko/infra-intelligence"
+SITE_EXPORT_WORKFLOW = "export-site-data.yml"

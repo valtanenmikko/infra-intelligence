@@ -2,12 +2,11 @@
 name: export-site-data
 
 on:
-  # UTC. GitHub often starts scheduled runs hours late, so later runs are backups: a run with no data changes
-  # commits nothing. The Databricks job usually finishes within minutes of starting.
+  # The Databricks job dispatches this workflow when it finishes (notebook 07). The cron is a backup only: GitHub
+  # often runs it hours late or skips it, especially on the hour. UTC.
   schedule:
-    - cron: "0 9 * * *"
-    - cron: "0 11 * * *"
-    - cron: "0 14 * * *"
+    - cron: "17 9 * * *"
+    - cron: "47 12 * * *"
   workflow_dispatch:
 
 permissions:
