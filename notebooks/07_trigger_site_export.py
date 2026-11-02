@@ -17,7 +17,7 @@ import requests
 
 from infra_intelligence.config import GITHUB_REPO, GITHUB_SECRET_KEY, SECRET_SCOPE, SITE_EXPORT_WORKFLOW
 
-token = dbutils.secrets.get(SECRET_SCOPE, GITHUB_SECRET_KEY)
+token = dbutils.secrets.get(SECRET_SCOPE, GITHUB_SECRET_KEY).strip()  # piped input may end in a newline
 resp = requests.post(
     f"https://api.github.com/repos/{GITHUB_REPO}/actions/workflows/{SITE_EXPORT_WORKFLOW}/dispatches",
     json={"ref": "main"},
