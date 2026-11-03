@@ -47,6 +47,22 @@ class DatabricksSqlTest(unittest.TestCase):
         self.session.post.return_value = _resp(_result("FAILED"))
         with self.assertRaisesRegex(SqlError, "boom"):
             self.sql.query("SELECT 1")
+        self.assertEqual(self.session.post.call_count, 1)
+
+    def test_retries_transient_failure(self):
+        unavailable = _result("FAILED")
+        unavailable["status"]["error"]["message"] = "BAD_REQUEST: UNAVAILABLE: RCS returned no response"
+        self.session.post.side_effect = [_resp(unavailable), _resp(_result("SUCCEEDED", ["a"], [("1",)]))]
+        self.assertEqual(self.sql.query("SELECT 1"), [{"a": "1"}])
+        self.assertEqual(self.session.post.call_count, 2)
+
+    def test_gives_up_after_retries(self):
+        unavailable = _result("FAILED")
+        unavailable["status"]["error"]["message"] = "UNAVAILABLE"
+        self.session.post.return_value = _resp(unavailable)
+        with self.assertRaises(SqlError):
+            self.sql.query("SELECT 1")
+        self.assertEqual(self.session.post.call_count, 4)
 
     def test_http_error_raises(self):
         self.session.post.return_value = _resp({}, status=403)

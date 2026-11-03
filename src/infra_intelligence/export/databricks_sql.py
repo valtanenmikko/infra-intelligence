@@ -4,6 +4,9 @@ import time
 from typing import Any
 
 TERMINAL_STATES = {"SUCCEEDED", "FAILED", "CANCELED", "CLOSED"}
+# Databricks-internal outages (e.g. "UNAVAILABLE: RCS returned no response for service=key-manager") pass in a
+# minute or two; export statements are read-only, so they are safe to run again.
+TRANSIENT_MARKERS = ("UNAVAILABLE", "TEMPORARILY_UNAVAILABLE")
 
 
 class SqlError(RuntimeError):
@@ -12,7 +15,8 @@ class SqlError(RuntimeError):
 
 class DatabricksSql:
     def __init__(self, session: Any, host: str, token: str, warehouse_id: str,
-                 poll_s: float = 3.0, max_polls: int = 100, sleep=time.sleep) -> None:
+                 poll_s: float = 3.0, max_polls: int = 100, retries: int = 3, retry_s: float = 30.0,
+                 sleep=time.sleep) -> None:
         if not (host and token and warehouse_id):
             raise ValueError("host, token and warehouse_id are required")
         self._session = session
@@ -21,10 +25,22 @@ class DatabricksSql:
         self._warehouse_id = warehouse_id
         self._poll_s = poll_s
         self._max_polls = max_polls
+        self._retries = retries
+        self._retry_s = retry_s
         self._sleep = sleep
 
     def query(self, statement: str) -> list[dict[str, Any]]:
         """Run a statement and return rows as dicts keyed by column name (values as JSON strings/None)."""
+        for attempt in range(self._retries + 1):
+            try:
+                return self._run(statement)
+            except SqlError as e:
+                if attempt == self._retries or not any(m in str(e) for m in TRANSIENT_MARKERS):
+                    raise
+                self._sleep(self._retry_s)
+        raise AssertionError("unreachable")
+
+    def _run(self, statement: str) -> list[dict[str, Any]]:
         body = {"warehouse_id": self._warehouse_id, "statement": statement, "wait_timeout": "30s",
                 "format": "JSON_ARRAY", "disposition": "INLINE"}
         r = self._check(self._session.post(self._base, json=body, headers=self._headers, timeout=60))
