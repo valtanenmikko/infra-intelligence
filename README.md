@@ -7,7 +7,7 @@ A bid team has three recurring questions: *which open tenders are worth our effo
 where is competition thin?* This project answers them from EU procurement data (TED) and the Finnish company
 register (PRH), and adds a go/no-go assessment for every open tender.
 
-> Status: the full pipeline runs daily on Databricks (Bronze → Silver → LLM → Gold → evaluation and go/no-go).
+> Status: the full pipeline runs on Databricks (Bronze → Silver → LLM → Gold → evaluation and go/no-go).
 > The demo site reads exported Gold data.
 
 ## What it shows
@@ -88,7 +88,7 @@ historical bid counts. A fixed weighted formula (fit 40 %, competition 30 %, ris
 the recommendation, so results are reproducible and the model does no arithmetic.
 
 **The history factors are backtested, and the data overruled two intuitions.**
-Each past award is predicted using only awards published before it (`gold.bid_factor_backtest`, rebuilt daily):
+Each past award is predicted using only awards published before it (`gold.bid_factor_backtest`, rebuilt on every run):
 
 | Bid-count estimate | Mean absolute error (bids) | n |
 |---|---|---|
@@ -197,8 +197,8 @@ They also check the planner maths against brute force: the win distribution agai
 chosen portfolio against the best subset (exact for contract counts, within 2 % for road km). The `site-tests`
 workflow runs them on every site change.
 
-On Databricks the pipeline runs as the scheduled job `infra-intelligence-daily` (10:30 Europe/Helsinki, after
-the Gemini daily quota resets). It checks the notebooks out from this repo on every run:
+On Databricks the pipeline runs as the job `infra-intelligence-daily`, started by hand (its daily schedule is
+paused). It checks the notebooks out from this repo on every run:
 
 ```
 bronze_ted → bronze_prh → silver → llm_extract → gold → llm_eval ───────┐
@@ -209,9 +209,7 @@ Gold runs even if the LLM step fails (e.g. quota), so market tables stay fresh. 
 secret scope: `databricks secrets put-secret infra-intelligence gemini-api-key`.
 
 The last task, `site_export`, starts the GitHub Actions workflow `export-site-data`, which exports Gold to
-`site/data/site.json` and commits it if the data changed. Starting it from the job matters: GitHub's cron for
-free repos often runs hours late or not at all, so the workflow's own schedule is only a backup (it skips once
-the day's data is out). The task reads a fine-grained GitHub token (this repo, Actions read/write) from the
+`site/data/site.json` and commits it if the data changed. The workflow can also be started by hand. The task reads a fine-grained GitHub token (this repo, Actions read/write) from the
 secret `infra-intelligence/github-token`. The workflow reads the repository variables `DATABRICKS_HOST` and `DATABRICKS_WAREHOUSE_ID`
 and the secret `DATABRICKS_TOKEN`. When the token expires the workflow fails; create a new token in Databricks
 (Settings → Developer → Access tokens) and replace the secret.
