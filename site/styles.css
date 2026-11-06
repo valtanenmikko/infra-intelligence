@@ -210,8 +210,7 @@ select, .segmented button {
 .criteria-card { margin-top: 16px; }
 .capacity { margin: 0 0 16px; }
 
-.hero-period .live { color: var(--text-secondary); display: block; margin-top: 4px; }
-.hero-period .live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--status-good); margin: 0 7px 1px 0; }
+.hero-period .updated { color: var(--text-secondary); display: block; margin-top: 4px; }
 
 /* Deadline weeks: stacked columns per week */
 .deadline-card { margin-bottom: 16px; }

@@ -79,7 +79,7 @@ class SiteTest(unittest.TestCase):
         page, errors = self.open()
         self.assertEqual(errors, [])
         self.assertEqual(page.locator("[role=alert]").count(), 0)
-        self.assertIn("viimeksi", page.locator(".hero-period").inner_text())
+        self.assertIn("Päivitetty", page.locator(".hero-period").inner_text())
 
     def test_recommendation_filter_shows_only_matching_cards(self):
         page, _ = self.open()
